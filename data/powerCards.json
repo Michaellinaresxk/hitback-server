@@ -1,0 +1,184 @@
+{
+  "powerCards": [
+    {
+      "id": "power_robo_001",
+      "type": "robo",
+      "name": "Ladrón Musical",
+      "description": "Roba 1 token de otro jugador",
+      "emoji": "🥷",
+      "usageLimit": 2,
+      "currentUses": 0
+    },
+    {
+      "id": "power_escudo_001",
+      "type": "escudo",
+      "name": "Escudo Sónico",
+      "description": "Inmune a robos por 2 rondas",
+      "emoji": "🛡️",
+      "usageLimit": 1,
+      "currentUses": 0
+    },
+    {
+      "id": "power_boost_001",
+      "type": "boost",
+      "name": "Amplificador",
+      "description": "Tu próxima respuesta vale doble puntos",
+      "emoji": "⚡",
+      "usageLimit": 3,
+      "currentUses": 0
+    },
+    {
+      "id": "power_refresh_001",
+      "type": "refresh",
+      "name": "Segunda Oportunidad",
+      "description": "Recupera 1 token perdido",
+      "emoji": "🔄",
+      "usageLimit": 2,
+      "currentUses": 0
+    },
+    {
+      "id": "power_peek_001",
+      "type": "peek",
+      "name": "Spoiler",
+      "description": "Ve la respuesta 3 segundos antes",
+      "emoji": "👁️",
+      "usageLimit": 1,
+      "currentUses": 0
+    },
+    {
+      "id": "power_precision_001",
+      "type": "precision",
+      "name": "Precisión Total",
+      "description": "Si aciertas año exacto, +2 puntos extra",
+      "emoji": "🎯",
+      "usageLimit": 2,
+      "currentUses": 0
+    }
+  ],
+  "combos": [
+    {
+      "id": "combo_hot_streak",
+      "name": "Hot Streak",
+      "description": "3 respuestas correctas consecutivas",
+      "conditions": [
+        {
+          "type": "consecutive_wins",
+          "value": 3
+        }
+      ],
+      "reward": {
+        "type": "tokens",
+        "amount": 2
+      },
+      "emoji": "🔥"
+    },
+    {
+      "id": "combo_artist_master",
+      "name": "Maestro de Artistas",
+      "description": "3 cartas de artista correctas seguidas",
+      "conditions": [
+        {
+          "type": "card_type_streak",
+          "value": 3,
+          "cardType": "artist"
+        }
+      ],
+      "reward": {
+        "type": "power_card",
+        "amount": 1,
+        "powerCardType": "boost"
+      },
+      "emoji": "🎤"
+    },
+    {
+      "id": "combo_decade_wizard",
+      "name": "Mago de Décadas",
+      "description": "Acierta 2 cartas de década seguidas",
+      "conditions": [
+        {
+          "type": "card_type_streak",
+          "value": 2,
+          "cardType": "decade"
+        }
+      ],
+      "reward": {
+        "type": "points",
+        "amount": 5
+      },
+      "emoji": "📅"
+    },
+    {
+      "id": "combo_speed_demon",
+      "name": "Speed Demon",
+      "description": "Responde en menos de 2 segundos",
+      "conditions": [
+        {
+          "type": "time_bonus",
+          "value": 2000
+        }
+      ],
+      "reward": {
+        "type": "tokens",
+        "amount": 1
+      },
+      "emoji": "⚡"
+    },
+    {
+      "id": "combo_challenge_king",
+      "name": "Rey del Challenge",
+      "description": "Completa 2 challenge cards",
+      "conditions": [
+        {
+          "type": "card_type_streak",
+          "value": 2,
+          "cardType": "challenge"
+        }
+      ],
+      "reward": {
+        "type": "power_card",
+        "amount": 1,
+        "powerCardType": "peek"
+      },
+      "emoji": "👑"
+    },
+    {
+      "id": "combo_difficulty_beast",
+      "name": "Bestia de Dificultad",
+      "description": "3 cartas difíciles (hard/expert) seguidas",
+      "conditions": [
+        {
+          "type": "difficulty_streak",
+          "value": 3,
+          "difficulty": "hard"
+        }
+      ],
+      "reward": {
+        "type": "tokens",
+        "amount": 3
+      },
+      "emoji": "🦁"
+    }
+  ],
+  "rewardThresholds": {
+    "easy": {
+      "minTokens": 0,
+      "powerCardChance": 0.1,
+      "bonusTokenChance": 0.2
+    },
+    "medium": {
+      "minTokens": 1,
+      "powerCardChance": 0.2,
+      "bonusTokenChance": 0.3
+    },
+    "hard": {
+      "minTokens": 2,
+      "powerCardChance": 0.4,
+      "bonusTokenChance": 0.5
+    },
+    "expert": {
+      "minTokens": 3,
+      "powerCardChance": 0.6,
+      "bonusTokenChance": 0.7
+    }
+  }
+}
