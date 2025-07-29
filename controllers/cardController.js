@@ -1,304 +1,362 @@
-const path = require('path');
-const fs = require('fs');
+const TrackService = require('../services/TrackService');
 
-// ✅ Función helper para cargar datos de manera segura
-const loadTracksData = () => {
-  try {
-    const tracksPath = path.join(__dirname, '..', 'data', 'tracks.json');
+class CardController {
+  constructor() {
+    this.trackService = new TrackService();
+  }
 
-    if (!fs.existsSync(tracksPath)) {
-      console.error('❌ tracks.json not found at:', tracksPath);
-      return { tracks: [] };
+  // ========================================
+  // MAIN QR SCAN CONTROLLER - LOCAL ONLY
+  // ========================================
+
+  scanQRCode = async (req, res) => {
+    try {
+      const { qrCode } = req.params;
+      console.log(`🔍 Scanning QR (Local Mode): ${qrCode}`);
+
+      // Validar formato QR
+      const parsedQR = this.parseQRCode(qrCode);
+      const { trackId, cardType, difficulty } = parsedQR;
+
+      // Obtener track local
+      const track = await this.trackService.getTrackById(trackId);
+
+      // Validar que el track tenga el tipo de carta solicitado
+      if (!track.questions || !track.questions[cardType]) {
+        return res.status(404).json({
+          success: false,
+          error: `No ${cardType} data found for this track`,
+          qrCode: qrCode,
+          availableTypes: track.availableCardTypes || []
+        });
+      }
+
+      // Obtener pregunta específica
+      const questionData = track.questions[cardType];
+
+      // Calcular puntos según dificultad
+      const finalPoints = this.calculatePoints(questionData.points, difficulty);
+
+      // Construir respuesta
+      const response = {
+        success: true,
+        qrCode: qrCode,
+        card: {
+          cardType: cardType,
+          difficulty: difficulty,
+          points: finalPoints,
+          question: questionData.question,
+          answer: questionData.answer,
+
+          // Audio local
+          audioUrl: track.audioUrl,
+          audioSource: track.audioSource,
+          audioFile: track.audioFile,
+          duration: Math.min(track.duration / 1000, 30), // Max 30 segundos
+          hasAudio: track.hasAudio,
+
+          // Información del track
+          track: {
+            id: track.id,
+            title: track.title,
+            artist: track.artist,
+            album: track.album,
+            year: track.year,
+            genre: track.genre,
+            decade: track.decade,
+            popularity: track.popularity
+          },
+
+          // Metadatos adicionales
+          challengeType: questionData.challengeType || null,
+          hints: questionData.hints || [],
+          lastUpdated: track.lastUpdated
+        }
+      };
+
+      console.log(`✅ QR Scan Success: ${track.title} - ${cardType} (${finalPoints}pts) [Audio: ${track.audioSource}]`);
+      res.json(response);
+
+    } catch (error) {
+      console.error('❌ QR SCAN ERROR:', error);
+
+      if (error.message.includes('not found')) {
+        res.status(404).json({
+          success: false,
+          error: error.message,
+          qrCode: req.params.qrCode
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: 'Internal server error during QR scan',
+          qrCode: req.params.qrCode,
+          details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+      }
     }
-
-    const data = fs.readFileSync(tracksPath, 'utf8');
-    const parsed = JSON.parse(data);
-
-    console.log(`✅ Loaded ${parsed.tracks?.length || 0} tracks`);
-    return parsed;
-  } catch (error) {
-    console.error('❌ Error loading tracks data:', error);
-    return { tracks: [] };
-  }
-};
-
-// ✅ Helper function to parse QR code
-const parseQRCode = (qrCode) => {
-  console.log(`🔍 Parsing QR: ${qrCode}`);
-
-  // Expected format: HITBACK_001_SONG_EASY
-  const parts = qrCode.split('_');
-
-  if (parts.length < 2 || parts[0] !== 'HITBACK') {
-    throw new Error(`Invalid QR code format. Expected: HITBACK_001_SONG_EASY, got: ${qrCode}`);
-  }
-
-  const trackId = parts[1];
-  const cardType = parts[2] ? parts[2].toLowerCase() : 'song';
-  const difficulty = parts[3] ? parts[3].toLowerCase() : 'medium';
-
-  console.log(`📋 Parsed - Track: ${trackId}, Type: ${cardType}, Difficulty: ${difficulty}`);
-  return { trackId, cardType, difficulty };
-};
-
-// ✅ Helper function to build audio URL
-const buildAudioUrl = (req, audioFile) => {
-  const baseUrl = `${req.protocol}://${req.get('host')}`;
-  return `${baseUrl}/audio/${audioFile}`;
-};
-
-// ✅ Helper function to calculate points based on difficulty
-const calculatePoints = (basePoints, difficulty) => {
-  const multipliers = {
-    easy: 1,
-    medium: 1.5,
-    hard: 2,
-    expert: 3
   };
 
-  return Math.round(basePoints * (multipliers[difficulty] || 1));
-};
+  // ========================================
+  // GET ALL TRACKS - LOCAL ONLY
+  // ========================================
 
-// ✅ Helper function to validate track structure
-const validateTrack = (track) => {
-  const required = ['id', 'title', 'artist', 'audioFile', 'questions'];
-  const missing = required.filter(field => !track[field]);
-
-  if (missing.length > 0) {
-    throw new Error(`Track ${track.id} missing required fields: ${missing.join(', ')}`);
-  }
-
-  return true;
-};
-
-// ========================================
-// MAIN QR SCAN CONTROLLER - ✅ CORREGIDO
-// ========================================
-
-exports.scanQRCode = async (req, res) => {
-  try {
-    const { qrCode } = req.params;
-    console.log(`🔍 Scanning QR: ${qrCode}`);
-
-    // Parse QR code
-    const { trackId, cardType, difficulty } = parseQRCode(qrCode);
-
-    // Load tracks data
-    const tracksData = loadTracksData();
-    const track = tracksData.tracks.find(t => t.id === trackId);
-
-    if (!track) {
-      return res.status(404).json({
-        success: false,
-        error: 'Track not found',
-        qrCode: qrCode,
-        availableIds: tracksData.tracks.map(t => t.id)
-      });
-    }
-
-    // ✅ SOPORTE PARA AMBAS ESTRUCTURAS: questions Y cardTypes
-    let question;
-    if (track.questions && track.questions[cardType]) {
-      question = track.questions[cardType];
-    } else if (track.cardTypes && track.cardTypes[cardType]) {
-      question = track.cardTypes[cardType];
-    } else {
-      return res.status(404).json({
-        success: false,
-        error: `No ${cardType} data found for this track`,
-        qrCode: qrCode,
-        availableTypes: Object.keys(track.questions || track.cardTypes || {})
-      });
-    }
-
-    // Build audio URL
-    const audioUrl = buildAudioUrl(req, track.audioFile || `${track.id}.mp3`);
-
-    // ✅ NO FALLAR SI NO HAY AUDIO - Solo advertir
-    const audioPath = path.join(__dirname, '..', 'public', 'audio', track.audioFile || `${track.id}.mp3`);
-    const audioExists = fs.existsSync(audioPath);
-
-    if (!audioExists) {
-      console.warn(`⚠️ Audio file not found: ${track.audioFile}, but continuing...`);
-    }
-
-    // Calculate points
-    const finalPoints = calculatePoints(question.points, difficulty);
-
-    // ✅ RESPUESTA EXITOSA INCLUSO SIN AUDIO
-    const response = {
-      success: true,
-      qrCode: qrCode,
-      card: {
-        cardType: cardType,
-        difficulty: difficulty,
-        points: finalPoints,
-        question: question.question,
-        answer: question.answer,
-        audioUrl: audioUrl,
-        duration: track.duration || 30,
-        audioExists: audioExists,
-        track: {
-          id: track.id,
-          title: track.title,
-          artist: track.artist,
-          year: track.year,
-          genre: track.genre
-        }
-      }
-    };
-
-    console.log(`✅ QR Scan Success: ${track.title} - ${cardType} (${finalPoints}pts) [Audio: ${audioExists ? 'OK' : 'Missing'}]`);
-    res.json(response);
-
-  } catch (error) {
-    console.error('❌ QR SCAN ERROR:', error);
-    res.status(400).json({
-      success: false,
-      error: error.message,
-      qrCode: req.params.qrCode
-    });
-  }
-};
-
-// ========================================
-// GET ALL TRACKS - ✅ CORREGIDO
-// ========================================
-
-exports.getAllTracks = (req, res) => {
-  try {
-    console.log('📊 Getting all tracks...');
-
-    const tracksData = loadTracksData();
-
-    if (!tracksData.tracks || tracksData.tracks.length === 0) {
-      return res.json({
-        success: true,
-        count: 0,
-        tracks: [],
-        message: 'No tracks available'
-      });
-    }
-
-    const tracks = tracksData.tracks.map(track => {
-      try {
-        validateTrack(track);
-
-        return {
-          id: track.id,
-          qrCode: track.qrCode || `HITBACK_${track.id}`,
-          title: track.title,
-          artist: track.artist,
-          year: track.year,
-          genre: track.genre,
-          difficulty: track.difficulty,
-          audioUrl: buildAudioUrl(req, track.audioFile),
-          availableCardTypes: Object.keys(track.questions || {}),
-          audioExists: fs.existsSync(path.join(__dirname, '..', 'public', 'audio', track.audioFile))
-        };
-      } catch (error) {
-        console.warn(`⚠️ Invalid track ${track.id}:`, error.message);
-        return null;
-      }
-    }).filter(Boolean); // Remove null tracks
-
-    console.log(`✅ Returning ${tracks.length} valid tracks`);
-
-    res.json({
-      success: true,
-      count: tracks.length,
-      tracks: tracks,
-      timestamp: new Date().toISOString()
-    });
-
-  } catch (error) {
-    console.error('❌ Error getting tracks:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get tracks',
-      message: error.message
-    });
-  }
-};
-
-// ========================================
-// GET SPECIFIC TRACK - ✅ CORREGIDO
-// ========================================
-
-exports.getTrackById = (req, res) => {
-  try {
-    const { id } = req.params;
-    console.log(`🎵 Getting track by ID: ${id}`);
-
-    const tracksData = loadTracksData();
-    const track = tracksData.tracks?.find(t => t.id === id);
-
-    if (!track) {
-      console.log(`❌ Track ${id} not found`);
-      return res.status(404).json({
-        success: false,
-        error: 'Track not found',
-        availableIds: tracksData.tracks?.map(t => t.id) || []
-      });
-    }
-
+  getAllTracks = async (req, res) => {
     try {
-      validateTrack(track);
-    } catch (validationError) {
-      return res.status(500).json({
+      console.log('📊 Getting all local tracks...');
+
+      const result = await this.trackService.getAllTracks();
+
+      // Agregar URLs base para testing
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const enrichedTracks = result.tracks.map(track => ({
+        ...track,
+        qrCodes: this.generateQRCodesForTrack(track.id),
+        testUrls: {
+          scan: `${baseUrl}/api/cards/scan`,
+          audio: track.audioUrl,
+          checkAudio: `${baseUrl}/api/audio/check/${track.audioFile}`,
+          streamAudio: `${baseUrl}/api/audio/stream/${track.audioFile}`
+        }
+      }));
+
+      console.log(`✅ Returning ${enrichedTracks.length} local tracks`);
+
+      res.json({
+        ...result,
+        tracks: enrichedTracks,
+        endpoints: {
+          scan: `${baseUrl}/api/cards/scan/:qrCode`,
+          track: `${baseUrl}/api/tracks/:id`,
+          random: `${baseUrl}/api/tracks/random`,
+          audioList: `${baseUrl}/api/audio/list`
+        }
+      });
+
+    } catch (error) {
+      console.error('❌ Error getting tracks:', error);
+      res.status(500).json({
         success: false,
-        error: 'Track data invalid',
-        message: validationError.message
+        error: 'Failed to get tracks',
+        message: error.message
       });
     }
+  };
 
-    const audioPath = path.join(__dirname, '..', 'public', 'audio', track.audioFile);
-    const audioExists = fs.existsSync(audioPath);
+  // ========================================
+  // GET SPECIFIC TRACK - LOCAL ONLY
+  // ========================================
 
-    const response = {
-      success: true,
-      track: {
-        ...track,
-        audioUrl: buildAudioUrl(req, track.audioFile),
-        audioExists: audioExists,
-        availableCardTypes: Object.keys(track.questions || {})
+  getTrackById = async (req, res) => {
+    try {
+      const { id } = req.params;
+      console.log(`🎵 Getting local track: ${id}`);
+
+      const track = await this.trackService.getTrackById(id);
+
+      // Enriquecer con URLs de testing
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+      const response = {
+        success: true,
+        track: {
+          ...track,
+          qrCodes: this.generateQRCodesForTrack(track.id),
+          testUrls: {
+            songEasy: `${baseUrl}/api/cards/scan/HITBACK_${id}_SONG_EASY`,
+            artistMedium: `${baseUrl}/api/cards/scan/HITBACK_${id}_ARTIST_MEDIUM`,
+            decadeHard: `${baseUrl}/api/cards/scan/HITBACK_${id}_DECADE_HARD`,
+            challengeExpert: `${baseUrl}/api/cards/scan/HITBACK_${id}_CHALLENGE_EXPERT`
+          }
+        }
+      };
+
+      console.log(`✅ Track found: ${track.title} (${track.audioSource} audio)`);
+      res.json(response);
+
+    } catch (error) {
+      console.error('❌ Error getting track:', error);
+
+      if (error.message.includes('not found')) {
+        res.status(404).json({
+          success: false,
+          error: error.message
+        });
+      } else {
+        res.status(500).json({
+          success: false,
+          error: 'Failed to get track',
+          message: error.message
+        });
       }
-    };
+    }
+  };
 
-    console.log(`✅ Track found: ${track.title}`);
-    res.json(response);
+  // ========================================
+  // RANDOM TRACK ENDPOINT
+  // ========================================
 
-  } catch (error) {
-    console.error('❌ Error getting track:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to get track',
-      message: error.message
-    });
-  }
-};
+  getRandomTrack = async (req, res) => {
+    try {
+      const filters = {
+        hasAudio: req.query.hasAudio === 'true',
+        difficulty: req.query.difficulty,
+        genre: req.query.genre,
+        cardType: req.query.cardType
+      };
 
-// ========================================
-// GENERATE QR CODES (UTILITY) - ✅ MEJORADO
-// ========================================
+      // Limpiar filtros undefined
+      Object.keys(filters).forEach(key => {
+        if (filters[key] === undefined || filters[key] === '') {
+          delete filters[key];
+        }
+      });
 
-exports.generateQRCodes = (req, res) => {
-  try {
-    console.log('🏷️ Generating QR codes...');
+      console.log('🎲 Getting random local track with filters:', filters);
 
-    const tracksData = loadTracksData();
-    const cardTypes = ['song', 'artist', 'decade', 'lyrics', 'challenge'];
-    const difficulties = ['easy', 'medium', 'hard', 'expert'];
+      const track = await this.trackService.getRandomTrack(filters);
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
 
-    const qrCodes = [];
+      res.json({
+        success: true,
+        track: {
+          ...track,
+          testUrls: {
+            scan: `${baseUrl}/api/cards/scan/HITBACK_${track.id}_SONG_EASY`,
+            play: track.audioUrl
+          }
+        },
+        appliedFilters: filters
+      });
 
-    tracksData.tracks?.forEach(track => {
-      try {
-        validateTrack(track);
+    } catch (error) {
+      console.error('❌ Error getting random track:', error);
+      res.status(404).json({
+        success: false,
+        error: error.message,
+        availableFilters: {
+          hasAudio: 'boolean',
+          difficulty: 'easy|medium|hard|expert',
+          genre: 'string',
+          cardType: 'song|artist|decade|lyrics|challenge'
+        }
+      });
+    }
+  };
 
+  // ========================================
+  // HEALTH CHECK - LOCAL ONLY
+  // ========================================
+
+  healthCheck = async (req, res) => {
+    try {
+      console.log('🏥 Health check (Local Mode)...');
+
+      const trackServiceHealth = await this.trackService.healthCheck();
+      const baseUrl = `${req.protocol}://${req.get('host')}`;
+
+      const health = {
+        success: true,
+        message: 'Local Audio Card Service is healthy',
+        mode: 'LOCAL_AUDIO_ONLY',
+        timestamp: new Date().toISOString(),
+        services: {
+          trackService: trackServiceHealth
+        },
+        endpoints: {
+          scan: `${baseUrl}/api/cards/scan/:qrCode`,
+          tracks: `${baseUrl}/api/tracks`,
+          random: `${baseUrl}/api/tracks/random`,
+          audioList: `${baseUrl}/api/audio/list`,
+          health: `${baseUrl}/api/cards/health`
+        },
+        testCodes: [
+          'HITBACK_001_SONG_EASY',
+          'HITBACK_002_ARTIST_MEDIUM',
+          'HITBACK_003_DECADE_HARD',
+          'HITBACK_004_CHALLENGE_EXPERT'
+        ]
+      };
+
+      // Determinar estado general
+      if (trackServiceHealth.status === 'error') {
+        health.success = false;
+        health.status = 'error';
+      } else if (trackServiceHealth.status === 'degraded') {
+        health.status = 'degraded';
+        health.warnings = ['Some local files may be missing'];
+      } else {
+        health.status = 'healthy';
+      }
+
+      console.log(`✅ Health check completed - Status: ${health.status}`);
+      res.json(health);
+
+    } catch (error) {
+      console.error('❌ Health check failed:', error);
+      res.status(500).json({
+        success: false,
+        status: 'error',
+        error: 'Health check failed',
+        message: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+  };
+
+  // ========================================
+  // AUDIO DIAGNOSTICS - NEW LOCAL FEATURE
+  // ========================================
+
+  audioDiagnostics = async (req, res) => {
+    try {
+      console.log('🔍 Running audio diagnostics...');
+
+      const audioFiles = this.trackService.checkAudioFiles();
+      const availableFiles = this.trackService.listAvailableAudioFiles();
+
+      const diagnostics = {
+        success: true,
+        timestamp: new Date().toISOString(),
+        trackAudioMapping: audioFiles,
+        availableAudioFiles: availableFiles,
+        stats: {
+          totalTracks: audioFiles.length,
+          tracksWithAudio: audioFiles.filter(t => t.exists).length,
+          tracksWithoutAudio: audioFiles.filter(t => !t.exists).length,
+          orphanedAudioFiles: availableFiles.filter(af =>
+            !audioFiles.find(t => t.audioFile === af.filename)
+          )
+        }
+      };
+
+      res.json(diagnostics);
+
+    } catch (error) {
+      console.error('❌ Audio diagnostics failed:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Audio diagnostics failed',
+        message: error.message
+      });
+    }
+  };
+
+  // ========================================
+  // GENERATE QR CODES - LOCAL ONLY
+  // ========================================
+
+  generateQRCodes = async (req, res) => {
+    try {
+      console.log('🏷️ Generating QR codes for local tracks...');
+
+      const allTracks = await this.trackService.getAllTracks();
+      const cardTypes = ['song', 'artist', 'decade', 'lyrics', 'challenge'];
+      const difficulties = ['easy', 'medium', 'hard', 'expert'];
+      const qrCodes = [];
+
+      allTracks.tracks.forEach(track => {
         cardTypes.forEach(cardType => {
-          // Only generate QR if the track has that question type
-          if (track.questions[cardType]) {
+          if (track.questions && track.questions[cardType]) {
             difficulties.forEach(difficulty => {
               const qrCode = `HITBACK_${track.id}_${cardType.toUpperCase()}_${difficulty.toUpperCase()}`;
 
@@ -306,115 +364,101 @@ exports.generateQRCodes = (req, res) => {
                 qrCode,
                 trackId: track.id,
                 trackTitle: track.title,
+                trackArtist: track.artist,
                 cardType,
                 difficulty,
-                points: calculatePoints(track.questions[cardType].points, difficulty),
+                points: this.calculatePoints(track.questions[cardType].points, difficulty),
                 question: track.questions[cardType].question,
-                audioUrl: buildAudioUrl(req, track.audioFile)
+                audioUrl: track.audioUrl,
+                audioSource: track.audioSource,
+                hasAudio: track.hasAudio
               });
             });
           }
         });
-      } catch (error) {
-        console.warn(`⚠️ Skipping invalid track ${track.id}:`, error.message);
-      }
-    });
+      });
 
-    console.log(`✅ Generated ${qrCodes.length} QR codes`);
+      console.log(`✅ Generated ${qrCodes.length} QR codes`);
 
-    res.json({
-      success: true,
-      message: 'QR codes generated for physical cards',
-      totalCodes: qrCodes.length,
-      qrCodes: qrCodes,
-      timestamp: new Date().toISOString()
-    });
+      res.json({
+        success: true,
+        message: 'QR codes generated for local tracks',
+        totalCodes: qrCodes.length,
+        qrCodes: qrCodes,
+        stats: {
+          tracksWithAudio: qrCodes.filter(qr => qr.hasAudio).length,
+          localAudioCodes: qrCodes.filter(qr => qr.audioSource === 'local').length,
+          noAudioCodes: qrCodes.filter(qr => qr.audioSource === 'none').length
+        },
+        timestamp: new Date().toISOString()
+      });
 
-  } catch (error) {
-    console.error('❌ Error generating QR codes:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Failed to generate QR codes',
-      message: error.message
-    });
-  }
-};
-
-// ========================================
-// HEALTH CHECK - ✅ MEJORADO
-// ========================================
-
-exports.healthCheck = (req, res) => {
-  try {
-    console.log('🏥 Health check...');
-
-    const tracksData = loadTracksData();
-    const audioPath = path.join(__dirname, '..', 'public', 'audio');
-
-    // Check if audio directory exists
-    const audioExists = fs.existsSync(audioPath);
-
-    // Count audio files
-    let audioCount = 0;
-    let missingAudio = [];
-
-    if (audioExists) {
-      const files = fs.readdirSync(audioPath);
-      audioCount = files.filter(file => file.endsWith('.mp3')).length;
-
-      // Check for missing audio files
-      tracksData.tracks?.forEach(track => {
-        const trackAudioPath = path.join(audioPath, track.audioFile);
-        if (!fs.existsSync(trackAudioPath)) {
-          missingAudio.push(track.audioFile);
-        }
+    } catch (error) {
+      console.error('❌ Error generating QR codes:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to generate QR codes',
+        message: error.message
       });
     }
+  };
 
-    const health = {
-      success: true,
-      message: 'Card service is healthy',
-      timestamp: new Date().toISOString(),
-      stats: {
-        totalTracks: tracksData.tracks?.length || 0,
-        audioDirectory: audioExists ? 'exists' : 'missing',
-        audioFiles: audioCount,
-        expectedAudioFiles: tracksData.tracks?.length || 0,
-        missingAudioFiles: missingAudio.length,
-        missingAudioList: missingAudio
-      },
-      endpoints: {
-        scan: '/api/cards/scan/:qrCode',
-        tracks: '/api/tracks',
-        generate: '/api/cards/generate-qr',
-        health: '/api/cards/health'
-      },
-      directories: {
-        tracks: path.join(__dirname, '..', 'data', 'tracks.json'),
-        audio: audioPath
-      }
+  // ========================================
+  // HELPER METHODS
+  // ========================================
+
+  parseQRCode(qrCode) {
+    console.log(`🔍 Parsing QR: ${qrCode}`);
+
+    const parts = qrCode.split('_');
+
+    if (parts.length < 2 || parts[0] !== 'HITBACK') {
+      throw new Error(`Invalid QR code format. Expected: HITBACK_001_SONG_EASY, got: ${qrCode}`);
+    }
+
+    const trackId = parts[1];
+    const cardType = parts[2] ? parts[2].toLowerCase() : 'song';
+    const difficulty = parts[3] ? parts[3].toLowerCase() : 'medium';
+
+    console.log(`📋 Parsed - Track: ${trackId}, Type: ${cardType}, Difficulty: ${difficulty}`);
+    return { trackId, cardType, difficulty };
+  }
+
+  calculatePoints(basePoints, difficulty) {
+    const multipliers = {
+      easy: 1,
+      medium: 1.5,
+      hard: 2,
+      expert: 3
     };
 
-    // Add warnings if there are issues
-    if (missingAudio.length > 0) {
-      health.warnings = [`${missingAudio.length} audio files are missing`];
-    }
-
-    if (!audioExists) {
-      health.warnings = [...(health.warnings || []), 'Audio directory does not exist'];
-    }
-
-    console.log(`✅ Health check completed - ${tracksData.tracks?.length || 0} tracks, ${audioCount} audio files`);
-
-    res.json(health);
-
-  } catch (error) {
-    console.error('❌ Health check failed:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Health check failed',
-      message: error.message,
-      timestamp: new Date().toISOString()
-    });
+    return Math.round(basePoints * (multipliers[difficulty] || 1));
   }
+
+  generateQRCodesForTrack(trackId) {
+    const cardTypes = ['SONG', 'ARTIST', 'DECADE', 'LYRICS', 'CHALLENGE'];
+    const difficulties = ['EASY', 'MEDIUM', 'HARD', 'EXPERT'];
+    const qrCodes = [];
+
+    cardTypes.forEach(type => {
+      difficulties.forEach(diff => {
+        qrCodes.push(`HITBACK_${trackId}_${type}_${diff}`);
+      });
+    });
+
+    return qrCodes;
+  }
+}
+
+// Export instance methods
+const cardController = new CardController();
+
+module.exports = {
+  scanQRCode: cardController.scanQRCode,
+  getAllTracks: cardController.getAllTracks,
+  getTrackById: cardController.getTrackById,
+  getRandomTrack: cardController.getRandomTrack,
+  generateQRCodes: cardController.generateQRCodes,
+  audioDiagnostics: cardController.audioDiagnostics,
+  healthCheck: cardController.healthCheck
 };

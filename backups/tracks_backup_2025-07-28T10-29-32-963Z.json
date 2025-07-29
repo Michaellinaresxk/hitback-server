@@ -1,0 +1,172 @@
+{
+  "tracks": [
+    {
+      "id": "001",
+      "qrCode": "HITBACK_001",
+      "title": "Despacito",
+      "artist": "Luis Fonsi ft. Daddy Yankee",
+      "year": 2017,
+      "decade": "2010s",
+      "genre": "Reggaeton",
+      "difficulty": "easy",
+      "popularity": 95,
+      "audioFile": "001.mp3",
+      "duration": 30,
+      "lyrics": "Sí, sabes que ya llevo un rato mirándote...",
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Despacito",
+          "points": 1
+        },
+        "artist": {
+          "question": "¿Quién la canta?",
+          "answer": "Luis Fonsi ft. Daddy Yankee",
+          "points": 2
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3
+        },
+        "lyrics": {
+          "question": "Completa: 'Sí, sabes que ya llevo un rato...'",
+          "answer": "mirándote",
+          "points": 3
+        },
+        "challenge": {
+          "question": "Baila los primeros 10 segundos de Despacito",
+          "answer": "Completar baile reggaeton",
+          "points": 5,
+          "challengeType": "dance"
+        }
+      }
+    },
+    {
+      "id": "002",
+      "qrCode": "HITBACK_002",
+      "title": "Bohemian Rhapsody",
+      "artist": "Queen",
+      "year": 1975,
+      "decade": "1970s",
+      "genre": "Rock",
+      "difficulty": "hard",
+      "popularity": 90,
+      "audioFile": "002.mp3",
+      "duration": 30,
+      "lyrics": "Is this the real life, is this just fantasy...",
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Bohemian Rhapsody",
+          "points": 1
+        },
+        "artist": {
+          "question": "¿Quién la canta?",
+          "answer": "Queen",
+          "points": 2
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3
+        },
+        "lyrics": {
+          "question": "Completa: 'Is this the real life...'",
+          "answer": "is this just fantasy",
+          "points": 3
+        },
+        "challenge": {
+          "question": "Imita a Freddie Mercury cantando la canción",
+          "answer": "Completar imitación de Freddie",
+          "points": 5,
+          "challengeType": "imitate"
+        }
+      }
+    },
+    {
+      "id": "003",
+      "qrCode": "HITBACK_003",
+      "title": "Shape of You",
+      "artist": "Ed Sheeran",
+      "year": 2017,
+      "decade": "2010s",
+      "genre": "Pop",
+      "difficulty": "medium",
+      "popularity": 88,
+      "audioFile": "003.mp3",
+      "duration": 30,
+      "lyrics": "The club isn't the best place to find a lover...",
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Shape of You",
+          "points": 1
+        },
+        "artist": {
+          "question": "¿Quién la canta?",
+          "answer": "Ed Sheeran",
+          "points": 2
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3
+        },
+        "lyrics": {
+          "question": "Completa: 'The club isn't the best place...'",
+          "answer": "to find a lover",
+          "points": 3
+        },
+        "challenge": {
+          "question": "Canta el coro completo",
+          "answer": "Cantar coro de Shape of You",
+          "points": 5,
+          "challengeType": "sing"
+        }
+      }
+    },
+    {
+      "id": "004",
+      "qrCode": "HITBACK_004",
+      "title": "Test QR Easy",
+      "artist": "Test Artist",
+      "year": 2020,
+      "decade": "2020s",
+      "genre": "Pop",
+      "difficulty": "easy",
+      "popularity": 50,
+      "audioFile": "004.mp3",
+      "duration": 30,
+      "lyrics": "This is a test song for easy scanning...",
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Test QR Easy",
+          "points": 1
+        },
+        "artist": {
+          "question": "¿Quién la canta?",
+          "answer": "Test Artist",
+          "points": 2
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3
+        },
+        "lyrics": {
+          "question": "Completa: 'This is a test song...'",
+          "answer": "for easy scanning",
+          "points": 3
+        },
+        "challenge": {
+          "question": "Canta cualquier parte de la canción",
+          "answer": "Cantar test song",
+          "points": 5,
+          "challengeType": "sing"
+        }
+      }
+    }
+  ]
+}

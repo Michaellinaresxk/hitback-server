@@ -2,171 +2,164 @@
   "tracks": [
     {
       "id": "001",
-      "qrCode": "HITBACK_001",
       "title": "Despacito",
       "artist": "Luis Fonsi ft. Daddy Yankee",
+      "album": "Vida",
       "year": 2017,
-      "decade": "2010s",
       "genre": "Reggaeton",
-      "difficulty": "easy",
+      "decade": "2010s",
       "popularity": 95,
-      "audioFile": "001.mp3",
-      "duration": 30,
-      "lyrics": "Sí, sabes que ya llevo un rato mirándote...",
+      "duration": 229000,
+      "audioFile": "001_despacito.mp3",
+      "audioSource": "local",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
           "question": "¿Cuál es la canción?",
           "answer": "Despacito",
-          "points": 1
+          "points": 1,
+          "hints": ["Es un hit de reggaeton", "Luis Fonsi la canta"]
         },
         "artist": {
-          "question": "¿Quién la canta?",
+          "question": "¿Quién canta esta canción?",
           "answer": "Luis Fonsi ft. Daddy Yankee",
-          "points": 2
+          "points": 2,
+          "hints": ["Colaboración entre dos artistas", "Uno es puertorriqueño"]
         },
         "decade": {
-          "question": "¿De qué década es?",
+          "question": "¿De qué década es esta canción?",
           "answer": "2010s",
-          "points": 3
+          "points": 3,
+          "hints": ["Es relativamente reciente", "Se hizo viral en YouTube"]
         },
         "lyrics": {
           "question": "Completa: 'Sí, sabes que ya llevo un rato...'",
           "answer": "mirándote",
-          "points": 3
+          "points": 3,
+          "hints": ["Primera línea de la canción", "Habla de observar"]
         },
         "challenge": {
           "question": "Baila los primeros 10 segundos de Despacito",
           "answer": "Completar baile reggaeton",
           "points": 5,
-          "challengeType": "dance"
+          "challengeType": "dance",
+          "hints": ["Movimientos de reggaeton", "Ritmo lento y sensual"]
         }
       }
     },
     {
       "id": "002",
-      "qrCode": "HITBACK_002",
       "title": "Bohemian Rhapsody",
       "artist": "Queen",
+      "album": "A Night at the Opera",
       "year": 1975,
-      "decade": "1970s",
       "genre": "Rock",
-      "difficulty": "hard",
+      "decade": "1970s",
       "popularity": 90,
-      "audioFile": "002.mp3",
-      "duration": 30,
-      "lyrics": "Is this the real life, is this just fantasy...",
+      "duration": 355000,
+      "audioFile": "002_bohemian_rhapsody.mp3",
+      "audioSource": "local",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
           "question": "¿Cuál es la canción?",
           "answer": "Bohemian Rhapsody",
-          "points": 1
+          "points": 1,
+          "hints": ["Clásico del rock", "Tiene una parte operística"]
         },
         "artist": {
-          "question": "¿Quién la canta?",
+          "question": "¿Quién canta esta canción?",
           "answer": "Queen",
-          "points": 2
+          "points": 2,
+          "hints": ["Banda británica", "Freddie Mercury era el vocalista"]
         },
         "decade": {
-          "question": "¿De qué década es?",
+          "question": "¿De qué década es esta canción?",
           "answer": "1970s",
-          "points": 3
+          "points": 3,
+          "hints": ["Era del rock clásico", "Antes de los 80s"]
         },
         "lyrics": {
           "question": "Completa: 'Is this the real life...'",
           "answer": "is this just fantasy",
-          "points": 3
+          "points": 3,
+          "hints": ["Primera línea icónica", "Pregunta existencial"]
         },
         "challenge": {
           "question": "Imita a Freddie Mercury cantando la canción",
           "answer": "Completar imitación de Freddie",
           "points": 5,
-          "challengeType": "imitate"
-        }
-      }
-    },
-    {
-      "id": "003",
-      "qrCode": "HITBACK_003",
-      "title": "Shape of You",
-      "artist": "Ed Sheeran",
-      "year": 2017,
-      "decade": "2010s",
-      "genre": "Pop",
-      "difficulty": "medium",
-      "popularity": 88,
-      "audioFile": "003.mp3",
-      "duration": 30,
-      "lyrics": "The club isn't the best place to find a lover...",
-      "questions": {
-        "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Shape of You",
-          "points": 1
-        },
-        "artist": {
-          "question": "¿Quién la canta?",
-          "answer": "Ed Sheeran",
-          "points": 2
-        },
-        "decade": {
-          "question": "¿De qué década es?",
-          "answer": "2010s",
-          "points": 3
-        },
-        "lyrics": {
-          "question": "Completa: 'The club isn't the best place...'",
-          "answer": "to find a lover",
-          "points": 3
-        },
-        "challenge": {
-          "question": "Canta el coro completo",
-          "answer": "Cantar coro de Shape of You",
-          "points": 5,
-          "challengeType": "sing"
+          "challengeType": "imitate",
+          "hints": ["Movimientos teatrales", "Voz potente y dramática"]
         }
       }
     },
     {
       "id": "004",
-      "qrCode": "HITBACK_004",
-      "title": "Test QR Easy",
-      "artist": "Test Artist",
-      "year": 2020,
-      "decade": "2020s",
-      "genre": "Pop",
-      "difficulty": "easy",
-      "popularity": 50,
-      "audioFile": "004.mp3",
-      "duration": 30,
-      "lyrics": "This is a test song for easy scanning...",
+      "title": "Uptown Funk",
+      "artist": "Mark Ronson ft. Bruno Mars",
+      "album": "Uptown Special",
+      "year": 2014,
+      "genre": "Funk/Pop",
+      "decade": "2010s",
+      "popularity": 92,
+      "duration": 270000,
+      "audioFile": "004_uptown_funk.mp3",
+      "audioSource": "local",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
           "question": "¿Cuál es la canción?",
-          "answer": "Test QR Easy",
-          "points": 1
+          "answer": "Uptown Funk",
+          "points": 1,
+          "hints": ["Bruno Mars la canta", "Es muy funky y bailable"]
         },
         "artist": {
-          "question": "¿Quién la canta?",
-          "answer": "Test Artist",
-          "points": 2
+          "question": "¿Quién canta esta canción?",
+          "answer": "Mark Ronson ft. Bruno Mars",
+          "points": 2,
+          "hints": ["Colaboración", "Bruno Mars es el vocalista principal"]
         },
         "decade": {
-          "question": "¿De qué década es?",
-          "answer": "2020s",
-          "points": 3
+          "question": "¿De qué década es esta canción?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Es de los 2010s", "Era del streaming musical"]
         },
         "lyrics": {
-          "question": "Completa: 'This is a test song...'",
-          "answer": "for easy scanning",
-          "points": 3
+          "question": "Completa: 'This hit, that ice cold...'",
+          "answer": "Michelle Pfeiffer, that white gold",
+          "points": 3,
+          "hints": ["Menciona a una actriz", "Habla de oro blanco"]
         },
         "challenge": {
-          "question": "Canta cualquier parte de la canción",
-          "answer": "Cantar test song",
+          "question": "Baila el coro de Uptown Funk",
+          "answer": "Completar baile funky",
           "points": 5,
-          "challengeType": "sing"
+          "challengeType": "dance",
+          "hints": ["Movimientos funky", "Estilo retro pero moderno"]
         }
       }
     }
-  ]
+  ],
+  "metadata": {
+    "version": "2.0.0",
+    "totalTracks": 3,
+    "lastUpdated": "2024-01-15T10:00:00.000Z",
+    "supportedFormats": [".mp3", ".wav", ".m4a"],
+    "supportedCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+    "supportedDifficulties": ["easy", "medium", "hard", "expert"]
+  }
 }

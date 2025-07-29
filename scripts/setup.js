@@ -2,60 +2,51 @@ const fs = require('fs');
 const path = require('path');
 const https = require('https');
 
-console.log('🎵 HITBACK Backend Setup Starting...\n');
+console.log('🎵 HITBACK Audio Setup - COMPLETE VERSION\n');
 
-// Create required directories
+// Crear directorios necesarios
 const directories = [
-  'public/audio',
+  'public/audio/tracks',
   'data',
-  'logs',
-  'uploads'
+  'logs'
 ];
 
+console.log('📁 Creating directories...');
 directories.forEach(dir => {
   const dirPath = path.join(__dirname, '..', dir);
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
-    console.log(`✅ Created directory: ${dir}`);
+    console.log(`✅ Created: ${dir}`);
+  } else {
+    console.log(`✅ Exists: ${dir}`);
   }
 });
 
-// Download sample audio files (using free/public domain audio)
-const sampleAudioFiles = [
+// Archivos de audio de ejemplo (puedes reemplazar con tus archivos reales)
+const audioFiles = [
   {
     id: '001',
-    name: 'Sample 1 - Electronic Beat',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
+    name: '001_despacito.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+    description: 'Audio sample for Despacito'
   },
   {
     id: '002',
-    name: 'Sample 2 - Rock Style',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3'
+    name: '002_bohemian_rhapsody.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+    description: 'Audio sample for Bohemian Rhapsody'
   },
   {
     id: '003',
-    name: 'Sample 3 - Pop Style',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3'
+    name: '003_shape_of_you.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+    description: 'Audio sample for Shape of You'
   },
   {
     id: '004',
-    name: 'Sample 4 - Ambient',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3'
-  },
-  {
-    id: '005',
-    name: 'Sample 5 - Jazz Style',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3'
-  },
-  {
-    id: '006',
-    name: 'Sample 6 - Classical',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3'
-  },
-  {
-    id: 'test1',
-    name: 'Test Track 1',
-    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3'
+    name: '004_test.mp3',
+    url: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
+    description: 'Test audio file'
   }
 ];
 
@@ -77,7 +68,7 @@ async function downloadFile(url, destination) {
       });
 
       file.on('error', (err) => {
-        fs.unlink(destination, () => { }); // Delete file on error
+        fs.unlink(destination, () => { });
         reject(err);
       });
     }).on('error', (err) => {
@@ -86,174 +77,150 @@ async function downloadFile(url, destination) {
   });
 }
 
-async function downloadSampleAudio() {
-  console.log('\n🎵 Downloading sample audio files...');
+async function setupAudioFiles() {
+  console.log('\n🎵 Setting up audio files...');
 
-  for (const audio of sampleAudioFiles) {
+  const audioDir = path.join(__dirname, '..', 'public', 'audio', 'tracks');
+
+  for (const audio of audioFiles) {
     try {
-      const filePath = path.join(__dirname, '..', 'public', 'audio', `${audio.id}.mp3`);
+      const filePath = path.join(audioDir, audio.name);
 
       if (fs.existsSync(filePath)) {
-        console.log(`⏭️  ${audio.name} already exists`);
+        console.log(`⏭️  ${audio.description} already exists`);
         continue;
       }
 
-      console.log(`📥 Downloading ${audio.name}...`);
+      console.log(`📥 Downloading ${audio.description}...`);
       await downloadFile(audio.url, filePath);
-      console.log(`✅ Downloaded ${audio.name}`);
+      console.log(`✅ ${audio.name} downloaded successfully`);
+
     } catch (error) {
       console.log(`❌ Failed to download ${audio.name}: ${error.message}`);
+
+      // Crear archivo placeholder si la descarga falla
+      const placeholderPath = path.join(audioDir, audio.name);
+      const placeholderContent = 'placeholder audio file - replace with real audio';
+      fs.writeFileSync(placeholderPath, placeholderContent);
+      console.log(`📝 Created placeholder: ${audio.name}`);
     }
   }
 }
 
-// Create environment file
-function createEnvFile() {
-  const envContent = `# HITBACK Backend Configuration
-PORT=3000
-NODE_ENV=development
+// Validar configuración
+function validateSetup() {
+  console.log('\n🔍 Validating setup...');
 
-# Audio Configuration  
-AUDIO_DIRECTORY=./public/audio
-MAX_AUDIO_SIZE=10MB
+  const checks = [
+    {
+      name: 'data/tracks.json',
+      path: path.join(__dirname, '..', 'data', 'tracks.json'),
+      required: true
+    },
+    {
+      name: 'public/audio/tracks directory',
+      path: path.join(__dirname, '..', 'public', 'audio', 'tracks'),
+      required: true
+    },
+    {
+      name: 'routes/qr.js',
+      path: path.join(__dirname, '..', 'routes', 'qr.js'),
+      required: true
+    },
+    {
+      name: 'controllers/gameController.js',
+      path: path.join(__dirname, '..', 'controllers', 'gameController.js'),
+      required: true
+    }
+  ];
 
-# Rate Limiting
-RATE_LIMIT_WINDOW=15
-RATE_LIMIT_MAX_REQUESTS=100
+  let allValid = true;
 
-# CORS Settings
-ALLOWED_ORIGINS=*
+  checks.forEach(check => {
+    const exists = fs.existsSync(check.path);
+    const status = exists ? '✅' : '❌';
+    console.log(`${status} ${check.name}`);
 
-# Game Settings
-MAX_PLAYERS=8
-GAME_DURATION=1200
-AUDIO_PREVIEW_DURATION=5
+    if (!exists && check.required) {
+      allValid = false;
+    }
+  });
 
-# Logging
-LOG_LEVEL=info
-LOG_FILE=./logs/hitback.log
-`;
+  console.log(`\n${allValid ? '🎉' : '⚠️'} Setup ${allValid ? 'completed successfully' : 'has issues'}`);
 
-  const envPath = path.join(__dirname, '..', '.env');
-  if (!fs.existsSync(envPath)) {
-    fs.writeFileSync(envPath, envContent);
-    console.log('✅ Created .env file');
-  }
+  return allValid;
 }
 
-// Create gitignore
-function createGitignore() {
-  const gitignoreContent = `# Dependencies
-node_modules/
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+// Generar script de prueba
+function generateTestScript() {
+  const testScript = `#!/bin/bash
+# HITBACK Backend Test Script
 
-# Environment variables
-.env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+echo "🧪 Testing HITBACK Backend..."
 
-# Logs
-logs/
-*.log
+# Test 1: Health check
+echo "1. Testing health endpoint..."
+curl -s http://localhost:3000/api/health | jq .
 
-# Audio files (optional - uncomment if you don't want to commit audio)
-# public/audio/*.mp3
+# Test 2: QR scan endpoint  
+echo "2. Testing QR scan..."
+curl -s -X POST http://localhost:3000/api/qr/scan/HITBACK_001_SONG_EASY | jq .
 
-# Uploads
-uploads/
+# Test 3: Tracks endpoint
+echo "3. Testing tracks endpoint..."
+curl -s http://localhost:3000/api/tracks | jq .
 
-# OS generated files
-.DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
-Thumbs.db
+# Test 4: Audio list
+echo "4. Testing audio list..."
+curl -s http://localhost:3000/api/audio/list | jq .
 
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Testing
-coverage/
-.nyc_output/
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
+echo "✅ Tests completed!"
 `;
 
-  const gitignorePath = path.join(__dirname, '..', '.gitignore');
-  if (!fs.existsSync(gitignorePath)) {
-    fs.writeFileSync(gitignorePath, gitignoreContent);
-    console.log('✅ Created .gitignore file');
-  }
+  const testPath = path.join(__dirname, '..', 'test-backend.sh');
+  fs.writeFileSync(testPath, testScript);
+  fs.chmodSync(testPath, '755');
+  console.log('📝 Created test-backend.sh script');
 }
 
-// Get local IP address
-function getLocalIPAddress() {
+// Obtener IP local para mostrar URLs
+function getLocalIP() {
   const { networkInterfaces } = require('os');
   const nets = networkInterfaces();
-  const results = {};
 
   for (const name of Object.keys(nets)) {
     for (const net of nets[name]) {
-      const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4;
-      if (net.family === familyV4Value && !net.internal) {
-        if (!results[name]) {
-          results[name] = [];
-        }
-        results[name].push(net.address);
+      if (net.family === 'IPv4' && !net.internal) {
+        return net.address;
       }
     }
   }
-
-  return Object.values(results).flat()[0] || 'localhost';
+  return 'localhost';
 }
 
-// Main setup function
-async function setup() {
+// Función principal
+async function main() {
   try {
-    console.log('📁 Creating directories...');
-    // Directories already created above
+    await setupAudioFiles();
+    const isValid = validateSetup();
+    generateTestScript();
 
-    console.log('\n⚙️  Creating configuration files...');
-    createEnvFile();
-    createGitignore();
+    const localIP = getLocalIP();
 
-    console.log('\n🎵 Setting up audio files...');
-    await downloadSampleAudio();
-
-    const localIP = getLocalIPAddress();
-
-    console.log('\n🎉 Setup completed successfully!\n');
+    console.log('\n🎉 Setup completed!\n');
     console.log('📋 Next Steps:');
     console.log('1. Start the server: npm start');
-    console.log('2. Update your React Native app audioService.ts:');
+    console.log(`2. Update your Expo audioService.ts:`);
     console.log(`   const SERVER_URL = 'http://${localIP}:3000';`);
-    console.log('3. Make sure both devices are on the same WiFi network');
-    console.log('4. Test the connection in your app\n');
+    console.log('3. Test endpoints:');
+    console.log(`   Health: http://${localIP}:3000/api/health`);
+    console.log(`   QR Scan: http://${localIP}:3000/api/qr/scan/HITBACK_001_SONG_EASY`);
+    console.log(`   Audio: http://${localIP}:3000/audio/tracks/001_despacito.mp3`);
+    console.log('\n🧪 Run tests: ./test-backend.sh');
 
-    console.log('🔗 Server URLs:');
-    console.log(`   Local: http://localhost:3000`);
-    console.log(`   Network: http://${localIP}:3000`);
-    console.log(`   QR Scan: POST http://${localIP}:3000/api/cards/scan/:qrCode`);
-    console.log(`   Audio: http://${localIP}:3000/audio/001.mp3\n`);
-
-    console.log('🧪 Test QR Codes:');
-    console.log('   HITBACK_001_SONG_EASY');
-    console.log('   HITBACK_002_ARTIST_MEDIUM');
-    console.log('   HITBACK_003_CHALLENGE_HARD');
-    console.log('   HITBACK_004_DECADE_EXPERT\n');
+    if (!isValid) {
+      console.log('\n⚠️  Some files are missing. Check the validation above.');
+    }
 
   } catch (error) {
     console.error('❌ Setup failed:', error.message);
@@ -261,5 +228,4 @@ async function setup() {
   }
 }
 
-// Run setup
-setup();
+main();
