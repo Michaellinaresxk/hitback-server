@@ -19,14 +19,14 @@
       "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
+          "question": "¿Quién canta el rap de la cancion canción?",
           "answer": "Despacito",
           "points": 1,
           "hints": ["Es un hit de reggaeton", "Luis Fonsi la canta"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Luis Fonsi ft. Daddy Yankee",
+          "question": "¿Quién canta el rap de la cancion canción?",
+          "answer": "Daddy Yankee",
           "points": 2,
           "hints": ["Colaboración entre dos artistas", "Uno es puertorriqueño"]
         },
@@ -70,7 +70,7 @@
       "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
+          "question": "¿De qué década es esta canción?",
           "answer": "Bohemian Rhapsody",
           "points": 1,
           "hints": ["Clásico del rock", "Tiene una parte operística"]
