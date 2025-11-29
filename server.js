@@ -1,4 +1,3 @@
-// server.js - CONFIGURACIÓN CORREGIDA PARA RED LOCAL
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -51,11 +50,21 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: ['http://localhost:*', 'https://localhost:*', 'exp://*', /.*\.exp\.direct.*/, /.*\.expo\.dev.*/],
+  origin: [
+    'http://localhost:*',
+    'https://localhost:*',
+    'exp://*',
+    /.*\.exp\.direct.*/,
+    /.*\.expo\.dev.*/,
+    'http://192.168.1.10:*',
+    'file://',
+    null
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-expo-token']
 }));
+
 
 app.use(morgan('combined', {
   stream: { write: message => logger.info(message.trim()) }
@@ -121,7 +130,7 @@ app.get('/api/expo/health', (req, res) => {
 // ========================================
 // ✅ USAR RUTAS COMPLETAS (NO LAS BÁSICAS)
 // ========================================
-app.use('/api/qr', qrRoutes);           // ✅ Esta es la ruta que usa tu app
+app.use('/api/qr', qrRoutes);
 app.use('/api/tracks', tracksRoutes);
 app.use('/api/audio', audioRoutes);
 app.use('/api/game', gameRoutes);
@@ -154,6 +163,29 @@ app.get('/', (req, res) => {
       audioTest: networkIPs.map(ip => `http://${ip}:${PORT}/audio/tracks/`)
     }
   }, 'HITBACK API is running with COMPLETE ROUTES');
+});
+
+app.get('/api/test/tracks', (req, res) => {
+  console.log('🧪 Test endpoint called');
+
+  res.json({
+    success: true,
+    message: "Test tracks retrieved",
+    data: [
+      {
+        id: "DEMO1",
+        title: "Canción Demo 1",
+        artist: "Artista Demo 1",
+        audioFile: "demo1.mp3"
+      },
+      {
+        id: "DEMO2",
+        title: "Canción Demo 2",
+        artist: "Artista Demo 2",
+        audioFile: "demo2.mp3"
+      }
+    ]
+  });
 });
 
 // ========================================
