@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -17,8 +18,6 @@ const tracksRoutes = require('./routes/tracks');
 const audioRoutes = require('./routes/audio');
 const gameRoutes = require('./routes/game');
 const healthRoutes = require('./routes/health');
-
-require('dotenv').config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -187,6 +186,82 @@ app.get('/api/test/tracks', (req, res) => {
     ]
   });
 });
+
+// TEST ENDPOINT - Deezer
+app.get('/api/test/deezer', async (req, res) => {
+  try {
+    const deezerService = require('./services/DeezerService');
+    const healthCheck = await deezerService.healthCheck();
+
+    res.json({
+      success: true,
+      service: 'Deezer API',
+      status: healthCheck.status,
+      testTrack: healthCheck.testTrack,
+      message: healthCheck.hasPreview
+        ? '✅ Deezer is working with previews!'
+        : '⚠️ Deezer connected but no preview available'
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// TEST ENDPOINT - Deezer Fallback
+app.post('/api/test/deezer-fallback', async (req, res) => {
+  try {
+    const DeezerService = require('./services/DeezerService');
+
+    // Simular un track sin audio local
+    const testTrack = {
+      id: '999',
+      title: 'Blinding Lights',
+      artist: 'The Weeknd',
+      hasAudio: false,  // Sin audio local
+      audioFile: null
+    };
+
+    console.log('🧪 Testing Deezer fallback...');
+    const deezerTrack = await DeezerService.searchTrack(testTrack.title, testTrack.artist);
+
+    if (deezerTrack && deezerTrack.previewUrl) {
+      res.json({
+        success: true,
+        message: '✅ Deezer fallback working!',
+        scenario: 'No local audio → Deezer preview used',
+        result: {
+          hasAudio: true,
+          url: deezerTrack.previewUrl,
+          source: 'deezer',
+          duration: 30,
+          metadata: {
+            title: deezerTrack.title,
+            artist: deezerTrack.artist,
+            album: deezerTrack.album,
+            albumArt: deezerTrack.cover.large,
+            deezerLink: deezerTrack.link,
+            explicit: deezerTrack.explicit
+          }
+        }
+      });
+    } else {
+      res.json({
+        success: false,
+        message: '❌ No preview found in Deezer'
+      });
+    }
+
+  } catch (error) {
+    res.json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 
 // ========================================
 // MANEJO DE ERRORES

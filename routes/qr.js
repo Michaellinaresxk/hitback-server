@@ -1,20 +1,19 @@
-// routes/qr.js - VERSIÓN CORREGIDA CON MEJOR MANEJO DE ERRORES
+// routes/qr.js - VERSION CON DEEZER INTEGRADO
 
 const express = require('express');
 const fs = require('fs');
 const path = require('path');
 const router = express.Router();
 
-// 🛠️ FUNCIÓN PARA CARGAR TRACKS CON MANEJO DE ERRORES
+// 🛠️ FUNCION PARA CARGAR TRACKS CON MANEJO DE ERRORES
 function loadTracks() {
   try {
-    // Intentar múltiples ubicaciones para tracks.json
     const possiblePaths = [
-      path.join(process.cwd(), 'data/tracks.json'),     // ✅ PRIMERO: En directorio data/ (tu ubicación)
-      path.join(__dirname, '../data/tracks.json'),      // Desde routes/ a data/
-      path.join(__dirname, '../../data/tracks.json'),   // Si routes está en subdirectorio
-      path.join(process.cwd(), 'tracks.json'),          // Fallback: root del proyecto
-      path.join(__dirname, '../tracks.json'),           // Fallback: desde routes/
+      path.join(process.cwd(), 'data/tracks.json'),
+      path.join(__dirname, '../data/tracks.json'),
+      path.join(__dirname, '../../data/tracks.json'),
+      path.join(process.cwd(), 'tracks.json'),
+      path.join(__dirname, '../tracks.json'),
     ];
 
     let tracksData = null;
@@ -39,7 +38,6 @@ function loadTracks() {
       throw new Error('tracks.json not found in any expected location');
     }
 
-    // Validar estructura
     if (!tracksData.tracks || !Array.isArray(tracksData.tracks)) {
       throw new Error('Invalid tracks.json structure - missing tracks array');
     }
@@ -55,12 +53,10 @@ function loadTracks() {
   }
 }
 
-// 🎯 PARSEAR QR CODE CON VALIDACIÓN
+// 🎯 PARSEAR QR CODE CON VALIDACION
 function parseQRCode(qrCode) {
   try {
     console.log(`🔍 Parsing QR code: ${qrCode}`);
-
-    // Formato esperado: HITBACK_001_SONG_EASY
     const qrPattern = /^HITBACK_(\d{3})_([A-Z]+)_([A-Z]+)$/;
     const match = qrCode.match(qrPattern);
 
@@ -69,7 +65,6 @@ function parseQRCode(qrCode) {
     }
 
     const [, trackId, questionType, difficulty] = match;
-
     console.log(`✅ QR parsed - Track: ${trackId}, Type: ${questionType}, Difficulty: ${difficulty}`);
 
     return {
@@ -110,13 +105,11 @@ function generateQuestion(track, questionType) {
   try {
     console.log(`🎯 Generating question - Type: ${questionType}`);
 
-    // Verificar si el track tiene preguntas
     if (!track.questions || typeof track.questions !== 'object') {
       console.warn(`⚠️ Track ${track.id} has no questions object, using defaults`);
       return generateDefaultQuestion(track, questionType);
     }
 
-    // Obtener pregunta específica
     const question = track.questions[questionType];
 
     if (!question) {
@@ -171,30 +164,83 @@ function generateDefaultQuestion(track, questionType) {
   return defaultQuestions[questionType] || defaultQuestions.song;
 }
 
-// 🎵 GENERAR INFO DE AUDIO
-function generateAudioInfo(track, serverUrl = 'http://192.168.1.10:3000') {
+// 🎵 GENERAR INFO DE AUDIO - SISTEMA HÍBRIDO CON DEEZER
+async function generateAudioInfo(track, serverUrl = 'http://192.168.1.10:3000') {
+  const audioInfo = {
+    hasAudio: false,
+    url: null,
+    source: null,
+    duration: 0,
+    metadata: null
+  };
+
   try {
-    if (!track.hasAudio || !track.audioFile) {
-      console.log(`⚠️ Track ${track.id} has no audio`);
-      return {
-        hasAudio: false,
-        url: null,
-        duration: 0
-      };
+    // 1️⃣ PRIORIDAD: Audio local (control total, sin restricciones)
+    if (track.hasAudio && track.audioFile) {
+      const localUrl = `${serverUrl}/audio/tracks/${track.audioFile}`;
+      console.log(`✅ Audio local disponible: ${track.audioFile}`);
+
+      audioInfo.hasAudio = true;
+      audioInfo.url = localUrl;
+      audioInfo.source = 'local';
+      audioInfo.duration = Math.floor((track.duration || 180000) / 1000);
     }
 
-    const audioUrl = `${serverUrl}/audio/tracks/${track.audioFile}`;
-    console.log(`🎵 Audio URL generated: ${audioUrl}`);
+    // 2️⃣ FALLBACK: Deezer preview (si no hay audio local)
+    if (!audioInfo.hasAudio) {
+      try {
+        console.log(`🔍 No hay audio local, buscando en Deezer...`);
+        const DeezerService = require('./services/DeezerService');
+        const deezerTrack = await DeezerService.searchTrack(track.title, track.artist);
 
-    return {
-      hasAudio: true,
-      url: audioUrl,
-      duration: Math.floor((track.duration || 180000) / 1000) // Convert to seconds
-    };
+        if (deezerTrack && deezerTrack.previewUrl) {
+          console.log(`✅ Deezer preview encontrado: ${deezerTrack.title}`);
+
+          audioInfo.hasAudio = true;
+          audioInfo.url = deezerTrack.previewUrl;
+          audioInfo.source = 'deezer';
+          audioInfo.duration = 30; // Previews son 30 segundos
+
+          // Metadata de Deezer
+          audioInfo.metadata = {
+            deezerLink: deezerTrack.link,
+            albumArt: deezerTrack.cover.large,
+            explicit: deezerTrack.explicit
+          };
+        } else {
+          console.log(`⚠️ No se encontró preview en Deezer`);
+        }
+      } catch (deezerError) {
+        console.log(`⚠️ Deezer no disponible: ${deezerError.message}`);
+      }
+    }
+
+    // 3️⃣ Si tenemos audio local, enriquecer con metadata de Deezer
+    if (audioInfo.source === 'local') {
+      try {
+        console.log(`🔍 Obteniendo metadata de Deezer para enriquecer...`);
+        const DeezerService = require('./services/DeezerService');
+        const deezerTrack = await DeezerService.searchTrack(track.title, track.artist);
+
+        if (deezerTrack) {
+          console.log(`✅ Metadata de Deezer obtenida`);
+          audioInfo.metadata = {
+            deezerLink: deezerTrack.link,
+            albumArt: deezerTrack.cover.large,
+            explicit: deezerTrack.explicit
+          };
+        }
+      } catch (e) {
+        // No crítico, seguimos sin metadata
+        console.log(`⚠️ No se pudo obtener metadata de Deezer`);
+      }
+    }
+
+    return audioInfo;
 
   } catch (error) {
-    console.error('❌ Audio info generation error:', error.message);
-    return { hasAudio: false, url: null, duration: 0 };
+    console.error('❌ Error generando audio info:', error.message);
+    return audioInfo;
   }
 }
 
@@ -231,10 +277,10 @@ router.post('/scan/:qrCode', async (req, res) => {
     console.log('🎯 Generating question...');
     const question = generateQuestion(track, questionType);
 
-    // 6. Generar información de audio
+    // 6. Generar información de audio (AHORA ES ASYNC!)
     console.log('🎵 Generating audio info...');
     const serverUrl = `${req.protocol}://${req.get('host')}`;
-    const audio = generateAudioInfo(track, serverUrl);
+    const audio = await generateAudioInfo(track, serverUrl);
 
     // 7. Preparar respuesta
     const responseData = {
@@ -267,7 +313,7 @@ router.post('/scan/:qrCode', async (req, res) => {
     console.log(`\n✅ ===== QR SCAN SUCCESS =====`);
     console.log(`🎵 Track: ${track.title} - ${track.artist}`);
     console.log(`🎯 Question: ${question.question}`);
-    console.log(`🎵 Audio: ${audio.hasAudio ? 'Available' : 'Not available'}`);
+    console.log(`🎵 Audio: ${audio.hasAudio ? `✅ ${audio.source}` : '❌ Not available'}`);
     console.log(`⏱️ Processing time: ${Date.now() - startTime}ms`);
     console.log(`===============================\n`);
 
@@ -282,7 +328,6 @@ router.post('/scan/:qrCode', async (req, res) => {
     console.error(`⏱️ Processing time: ${Date.now() - startTime}ms`);
     console.error(`===============================\n`);
 
-    // Determinar tipo de error y código de estado
     let statusCode = 500;
     let errorCode = 'INTERNAL_ERROR';
 
@@ -307,7 +352,7 @@ router.post('/scan/:qrCode', async (req, res) => {
   }
 });
 
-// 🧪 RUTA DE VALIDACIÓN DE QR
+// 🧪 RUTA DE VALIDACION DE QR
 router.get('/validate/:qrCode', (req, res) => {
   try {
     const { qrCode } = req.params;
