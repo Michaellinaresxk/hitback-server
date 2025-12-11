@@ -2,7 +2,7 @@ const TrackService = require('../services/TrackService');
 
 class CardController {
   constructor() {
-    this.trackService = new TrackService();
+    this.trackService = TrackService; // ✅ Ya es una instancia singleton
   }
 
   // ========================================
@@ -12,7 +12,7 @@ class CardController {
   scanQRCode = async (req, res) => {
     try {
       const { qrCode } = req.params;
-      console.log(`🔍 Scanning QR (Local Mode): ${qrCode}`);
+      console.log(`ðŸ” Scanning QR (Local Mode): ${qrCode}`);
 
       // Validar formato QR
       const parsedQR = this.parseQRCode(qrCode);
@@ -31,10 +31,10 @@ class CardController {
         });
       }
 
-      // Obtener pregunta específica
+      // Obtener pregunta especÃ­fica
       const questionData = track.questions[cardType];
 
-      // Calcular puntos según dificultad
+      // Calcular puntos segÃºn dificultad
       const finalPoints = this.calculatePoints(questionData.points, difficulty);
 
       // Construir respuesta
@@ -55,7 +55,7 @@ class CardController {
           duration: Math.min(track.duration / 1000, 30), // Max 30 segundos
           hasAudio: track.hasAudio,
 
-          // Información del track
+          // InformaciÃ³n del track
           track: {
             id: track.id,
             title: track.title,
@@ -74,11 +74,11 @@ class CardController {
         }
       };
 
-      console.log(`✅ QR Scan Success: ${track.title} - ${cardType} (${finalPoints}pts) [Audio: ${track.audioSource}]`);
+      console.log(`âœ… QR Scan Success: ${track.title} - ${cardType} (${finalPoints}pts) [Audio: ${track.audioSource}]`);
       res.json(response);
 
     } catch (error) {
-      console.error('❌ QR SCAN ERROR:', error);
+      console.error('âŒ QR SCAN ERROR:', error);
 
       if (error.message.includes('not found')) {
         res.status(404).json({
@@ -103,7 +103,7 @@ class CardController {
 
   getAllTracks = async (req, res) => {
     try {
-      console.log('📊 Getting all local tracks...');
+      console.log('ðŸ“Š Getting all local tracks...');
 
       const result = await this.trackService.getAllTracks();
 
@@ -120,7 +120,7 @@ class CardController {
         }
       }));
 
-      console.log(`✅ Returning ${enrichedTracks.length} local tracks`);
+      console.log(`âœ… Returning ${enrichedTracks.length} local tracks`);
 
       res.json({
         ...result,
@@ -134,7 +134,7 @@ class CardController {
       });
 
     } catch (error) {
-      console.error('❌ Error getting tracks:', error);
+      console.error('âŒ Error getting tracks:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to get tracks',
@@ -150,7 +150,7 @@ class CardController {
   getTrackById = async (req, res) => {
     try {
       const { id } = req.params;
-      console.log(`🎵 Getting local track: ${id}`);
+      console.log(`ðŸŽµ Getting local track: ${id}`);
 
       const track = await this.trackService.getTrackById(id);
 
@@ -170,11 +170,11 @@ class CardController {
         }
       };
 
-      console.log(`✅ Track found: ${track.title} (${track.audioSource} audio)`);
+      console.log(`âœ… Track found: ${track.title} (${track.audioSource} audio)`);
       res.json(response);
 
     } catch (error) {
-      console.error('❌ Error getting track:', error);
+      console.error('âŒ Error getting track:', error);
 
       if (error.message.includes('not found')) {
         res.status(404).json({
@@ -211,7 +211,7 @@ class CardController {
         }
       });
 
-      console.log('🎲 Getting random local track with filters:', filters);
+      console.log('ðŸŽ² Getting random local track with filters:', filters);
 
       const track = await this.trackService.getRandomTrack(filters);
       const baseUrl = `${req.protocol}://${req.get('host')}`;
@@ -229,7 +229,7 @@ class CardController {
       });
 
     } catch (error) {
-      console.error('❌ Error getting random track:', error);
+      console.error('âŒ Error getting random track:', error);
       res.status(404).json({
         success: false,
         error: error.message,
@@ -249,7 +249,7 @@ class CardController {
 
   healthCheck = async (req, res) => {
     try {
-      console.log('🏥 Health check (Local Mode)...');
+      console.log('ðŸ¥ Health check (Local Mode)...');
 
       const trackServiceHealth = await this.trackService.healthCheck();
       const baseUrl = `${req.protocol}://${req.get('host')}`;
@@ -288,11 +288,11 @@ class CardController {
         health.status = 'healthy';
       }
 
-      console.log(`✅ Health check completed - Status: ${health.status}`);
+      console.log(`âœ… Health check completed - Status: ${health.status}`);
       res.json(health);
 
     } catch (error) {
-      console.error('❌ Health check failed:', error);
+      console.error('âŒ Health check failed:', error);
       res.status(500).json({
         success: false,
         status: 'error',
@@ -309,7 +309,7 @@ class CardController {
 
   audioDiagnostics = async (req, res) => {
     try {
-      console.log('🔍 Running audio diagnostics...');
+      console.log('ðŸ” Running audio diagnostics...');
 
       const audioFiles = this.trackService.checkAudioFiles();
       const availableFiles = this.trackService.listAvailableAudioFiles();
@@ -332,7 +332,7 @@ class CardController {
       res.json(diagnostics);
 
     } catch (error) {
-      console.error('❌ Audio diagnostics failed:', error);
+      console.error('âŒ Audio diagnostics failed:', error);
       res.status(500).json({
         success: false,
         error: 'Audio diagnostics failed',
@@ -347,7 +347,7 @@ class CardController {
 
   generateQRCodes = async (req, res) => {
     try {
-      console.log('🏷️ Generating QR codes for local tracks...');
+      console.log('ðŸ·ï¸ Generating QR codes for local tracks...');
 
       const allTracks = await this.trackService.getAllTracks();
       const cardTypes = ['song', 'artist', 'decade', 'lyrics', 'challenge'];
@@ -378,7 +378,7 @@ class CardController {
         });
       });
 
-      console.log(`✅ Generated ${qrCodes.length} QR codes`);
+      console.log(`âœ… Generated ${qrCodes.length} QR codes`);
 
       res.json({
         success: true,
@@ -394,7 +394,7 @@ class CardController {
       });
 
     } catch (error) {
-      console.error('❌ Error generating QR codes:', error);
+      console.error('âŒ Error generating QR codes:', error);
       res.status(500).json({
         success: false,
         error: 'Failed to generate QR codes',
@@ -408,7 +408,7 @@ class CardController {
   // ========================================
 
   parseQRCode(qrCode) {
-    console.log(`🔍 Parsing QR: ${qrCode}`);
+    console.log(`ðŸ” Parsing QR: ${qrCode}`);
 
     const parts = qrCode.split('_');
 
@@ -420,7 +420,7 @@ class CardController {
     const cardType = parts[2] ? parts[2].toLowerCase() : 'song';
     const difficulty = parts[3] ? parts[3].toLowerCase() : 'medium';
 
-    console.log(`📋 Parsed - Track: ${trackId}, Type: ${cardType}, Difficulty: ${difficulty}`);
+    console.log(`ðŸ“‹ Parsed - Track: ${trackId}, Type: ${cardType}, Difficulty: ${difficulty}`);
     return { trackId, cardType, difficulty };
   }
 
