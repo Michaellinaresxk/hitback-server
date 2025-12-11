@@ -1,3 +1,4 @@
+
 const QRService = require('../services/QRService');
 const AudioService = require('../services/AudioService');
 const TrackService = require('../services/TrackService');
@@ -8,11 +9,11 @@ class GameController {
   constructor() {
     this.qrService = new QRService();
     this.audioService = new AudioService();
-    this.trackService = TrackService; // ✅ Ya es una instancia singleton
+    this.trackService = new TrackService();
   }
 
   /**
-   * ðŸŽ¯ ENDPOINT PRINCIPAL: Escanear cÃ³digo QR
+   * 🎯 ENDPOINT PRINCIPAL: Escanear código QR
    * POST/GET /api/qr/scan/:qrCode
    */
   scanQRCode = asyncHandler(async (req, res) => {
@@ -109,7 +110,7 @@ class GameController {
   });
 
   /**
-   * ðŸ“‹ Obtener todos los tracks
+   * 📋 Obtener todos los tracks
    * GET /api/tracks
    */
   getAllTracks = asyncHandler(async (req, res) => {
@@ -149,7 +150,7 @@ class GameController {
   });
 
   /**
-   * ðŸŽµ Obtener track especÃ­fico
+   * 🎵 Obtener track específico
    * GET /api/tracks/:id
    */
   getTrackById = asyncHandler(async (req, res) => {
@@ -191,7 +192,7 @@ class GameController {
   });
 
   /**
-   * ðŸŽ² Obtener track aleatorio
+   * 🎲 Obtener track aleatorio
    * GET /api/tracks/random
    */
   getRandomTrack = asyncHandler(async (req, res) => {
@@ -233,7 +234,7 @@ class GameController {
   });
 
   /**
-   * ðŸ·ï¸ Generar cÃ³digos QR
+   * 🏷️ Generar códigos QR
    * GET /api/qr/generate
    */
   generateQRCodes = asyncHandler(async (req, res) => {
@@ -268,7 +269,7 @@ class GameController {
   });
 
   /**
-   * ðŸ”§ Health check del sistema
+   * 🔧 Health check del sistema
    * GET /api/health
    */
   healthCheck = asyncHandler(async (req, res) => {
@@ -306,7 +307,7 @@ class GameController {
   });
 
   /**
-   * ðŸ” DiagnÃ³stico de audio
+   * 🔍 Diagnóstico de audio
    * GET /api/audio/diagnostics
    */
   audioDiagnostics = asyncHandler(async (req, res) => {
@@ -347,7 +348,7 @@ class GameController {
   });
 
   // ========================================
-  // MÃ‰TODOS HELPER PRIVADOS
+  // MÉTODOS HELPER PRIVADOS
   // ========================================
 
   /**

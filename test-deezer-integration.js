@@ -1,5 +1,5 @@
 require('dotenv').config();
-const deezerService = require('../services/DeezerService');
+const deezerService = require('./services/DeezerService');
 
 async function testDeezerIntegration() {
   console.log('\n🎵 HITBACK - Deezer Integration Test\n');

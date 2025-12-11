@@ -6,45 +6,48 @@
       "artist": "Luis Fonsi ft. Daddy Yankee",
       "album": "Vida",
       "year": 2017,
-      "genre": "REGGAETON",
+      "genre": "Reggaeton",
       "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "popularity": 95,
+      "duration": 229000,
+      "audioFile": "001_despacito.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Despacito",
+          "question": "Who raps in this song?",
+          "answer": "Daddy Yankee",
           "points": 1,
-          "hints": ["Es un hit de reggaeton", "Luis Fonsi la canta"]
+          "hints": ["It's a reggaeton hit", "Luis Fonsi sings it"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
+          "question": "Who sings this song?",
           "answer": "Luis Fonsi",
           "points": 2,
-          "hints": ["Colaboración con Daddy Yankee", "Artista puertorriqueño"]
+          "hints": ["Collaboration between two artists", "One is Puerto Rican"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "2010s",
           "points": 3,
-          "hints": ["Es relativamente reciente", "Se hizo viral en YouTube"]
+          "hints": ["It's relatively recent", "Went viral on YouTube"]
         },
         "lyrics": {
-          "question": "Completa: 'Sí, sabes que ya llevo un rato...'",
+          "question": "Complete: 'Sí, sabes que ya llevo un rato...'",
           "answer": "mirándote",
           "points": 3,
-          "hints": ["Primera línea de la canción", "Es sobre mirar"]
+          "hints": ["First line of the song", "It's about watching"]
         },
         "challenge": {
-          "question": "Baila los primeros 10 segundos de Despacito",
-          "answer": "Completar baile reggaeton",
+          "question": "Dance the first 10 seconds of Despacito",
+          "answer": "Complete reggaeton dance",
           "points": 5,
           "challengeType": "dance",
-          "hints": ["Movimientos de reggaeton", "Ritmo lento y sensual"]
+          "hints": ["Reggaeton moves", "Slow and sensual rhythm"]
         }
       }
     },
@@ -54,93 +57,99 @@
       "artist": "Queen",
       "album": "A Night at the Opera",
       "year": 1975,
-      "genre": "ROCK",
+      "genre": "Rock",
       "decade": "1970s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
+      "popularity": 90,
+      "duration": 355000,
+      "audioFile": "002_bohemian_rhapsody.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Bohemian Rhapsody",
+          "question": "What decade is this song from?",
+          "answer": "1970s",
           "points": 1,
-          "hints": ["Rock clásico", "Tiene una sección operática"]
+          "hints": ["Classic rock", "Has an operatic section"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
+          "question": "Who sings this song?",
           "answer": "Queen",
           "points": 2,
-          "hints": ["Banda británica", "Freddie Mercury era el vocalista"]
+          "hints": ["British band", "Freddie Mercury was the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "1970s",
           "points": 3,
-          "hints": ["Era del rock clásico", "Antes de los 80s"]
+          "hints": ["Classic rock era", "Before the 80s"]
         },
         "lyrics": {
-          "question": "Completa: 'Is this the real life...'",
+          "question": "Complete: 'Is this the real life...'",
           "answer": "is this just fantasy",
           "points": 3,
-          "hints": ["Línea inicial icónica", "Pregunta existencial"]
+          "hints": ["Iconic opening line", "Existential question"]
         },
         "challenge": {
-          "question": "Imita a Freddie Mercury cantando la canción",
-          "answer": "Completar imitación de Freddie",
+          "question": "Imitate Freddie Mercury singing the song",
+          "answer": "Complete Freddie imitation",
           "points": 5,
           "challengeType": "imitate",
-          "hints": ["Movimientos teatrales", "Voz poderosa y dramática"]
+          "hints": ["Theatrical movements", "Powerful and dramatic voice"]
         }
       }
     },
     {
       "id": "003",
-      "title": "Don't Stop Believin'",
-      "artist": "Journey",
-      "album": "Escape",
-      "year": 1981,
-      "genre": "ROCK",
+      "title": "Rock the Night",
+      "artist": "Europe",
+      "album": "The Final Countdown",
+      "year": 1986,
+      "genre": "Hard Rock/Glam Metal",
       "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "popularity": 84,
+      "duration": 254000,
+      "audioFile": "003_rock_night.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es el título de este himno del rock?",
-          "answer": "Don't Stop Believin'",
+          "question": "What is the title of this Europe song?",
+          "answer": "Rock the Night",
           "points": 1,
-          "hints": ["Himno motivacional", "Una de las canciones más descargadas"]
+          "hints": ["It's about rocking all night", "From the same album as 'The Final Countdown'"]
         },
         "artist": {
-          "question": "¿Qué banda interpreta esta canción?",
-          "answer": "Journey",
+          "question": "Which Swedish band performs this song?",
+          "answer": "Europe",
           "points": 2,
-          "hints": ["Banda de San Francisco", "Steve Perry era el vocalista"]
+          "hints": ["Swedish hard rock band", "Joey Tempest is the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "1980s",
           "points": 3,
-          "hints": ["Principios de los 80", "Era del arena rock"]
+          "hints": ["Mid-80s", "Golden era of hair metal"]
         },
         "lyrics": {
-          "question": "Completa: 'Just a small town girl...'",
-          "answer": "living in a lonely world",
+          "question": "Which album does this song come from?",
+          "answer": "The Final Countdown",
           "points": 3,
-          "hints": ["Primera línea icónica", "Habla de una chica de pueblo pequeño"]
+          "hints": ["Iconic 80s album", "Also contains their biggest hit"]
         },
         "challenge": {
-          "question": "Canta el coro con pasión como en un estadio",
-          "answer": "Completar canto épico",
+          "question": "Make the classic rock gesture with both hands",
+          "answer": "Complete rock gesture",
           "points": 5,
-          "challengeType": "sing",
-          "hints": ["Himno de estadio", "Canta con los brazos levantados"]
+          "challengeType": "gesture",
+          "hints": ["Devil horns", "Typical hard rock gesture"]
         }
       }
     },
@@ -150,539 +159,581 @@
       "artist": "Mark Ronson ft. Bruno Mars",
       "album": "Uptown Special",
       "year": 2014,
-      "genre": "POP",
+      "genre": "Funk/Pop",
       "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "popularity": 92,
+      "duration": 270000,
+      "audioFile": "004_uptown_funk.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
+          "question": "What is the song?",
           "answer": "Uptown Funk",
           "points": 1,
-          "hints": ["Bruno Mars la canta", "Es muy funky y bailable"]
+          "hints": ["Bruno Mars sings it", "It's very funky and danceable"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Bruno Mars",
+          "question": "Who sings this song?",
+          "answer": "Mark Ronson ft. Bruno Mars",
           "points": 2,
-          "hints": ["Colaboración con Mark Ronson", "Vocalista principal"]
+          "hints": ["Collaboration", "Bruno Mars is the main vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "2010s",
           "points": 3,
-          "hints": ["Es de los 2010s", "Era del streaming musical"]
+          "hints": ["It's from the 2010s", "Streaming music era"]
         },
         "lyrics": {
-          "question": "Completa: 'This hit, that ice cold...'",
+          "question": "Complete: 'This hit, that ice cold...'",
           "answer": "Michelle Pfeiffer, that white gold",
           "points": 3,
-          "hints": ["Menciona una actriz", "Habla de oro blanco"]
+          "hints": ["Mentions an actress", "Talks about white gold"]
         },
         "challenge": {
-          "question": "Baila el coro de Uptown Funk",
-          "answer": "Completar baile funky",
+          "question": "Dance the Uptown Funk chorus",
+          "answer": "Complete funky dance",
           "points": 5,
           "challengeType": "dance",
-          "hints": ["Movimientos funky", "Estilo retro pero moderno"]
+          "hints": ["Funky movements", "Retro but modern style"]
         }
       }
     },
     {
       "id": "005",
-      "title": "Shape of You",
-      "artist": "Ed Sheeran",
-      "album": "Divide",
-      "year": 2017,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "title": "Enjoy the Silence",
+      "artist": "Depeche Mode",
+      "album": "Violator",
+      "year": 1990,
+      "genre": "Electronic/Synth-pop",
+      "decade": "1990s",
+      "popularity": 88,
+      "duration": 234000,
+      "audioFile": "005_enjoy_the_silence.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Shape of You",
+          "question": "What is the title of this Depeche Mode song?",
+          "answer": "Enjoy the Silence",
           "points": 1,
-          "hints": ["Ed Sheeran", "Uno de los mayores éxitos de 2017"]
+          "hints": ["It's about enjoying silence", "One of their biggest hits"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Ed Sheeran",
+          "question": "Which band performs this song?",
+          "answer": "Depeche Mode",
           "points": 2,
-          "hints": ["Artista británico", "Pelirrojo"]
+          "hints": ["British synth-pop band", "Dave Gahan is the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "2010s",
+          "question": "What decade is this song from?",
+          "answer": "1990s",
           "points": 3,
-          "hints": ["Muy reciente", "2017"]
+          "hints": ["Early 90s", "Golden era of synth-pop"]
         },
         "lyrics": {
-          "question": "Completa: 'I'm in love with the...'",
-          "answer": "shape of you",
+          "question": "Which album does this song come from?",
+          "answer": "Violator",
           "points": 3,
-          "hints": ["Título de la canción", "Es sobre una forma"]
+          "hints": ["One of their most successful albums", "Also includes 'Personal Jesus'"]
         },
         "challenge": {
-          "question": "Baila al ritmo de Shape of You",
-          "answer": "Completar baile",
+          "question": "Strike a dramatic pose like in the music video",
+          "answer": "Complete dramatic pose",
           "points": 5,
-          "challengeType": "dance",
-          "hints": ["Ritmo pegajoso", "Movimientos modernos"]
+          "challengeType": "pose",
+          "hints": ["Iconic black and white video", "Artistic and dramatic poses"]
         }
       }
     },
     {
       "id": "006",
-      "title": "Billie Jean",
-      "artist": "Michael Jackson",
-      "album": "Thriller",
+      "title": "Sharp Dressed Man",
+      "artist": "ZZ Top",
+      "album": "Eliminator",
       "year": 1983,
-      "genre": "POP",
+      "genre": "Rock/Blues Rock",
       "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "popularity": 85,
+      "duration": 258000,
+      "audioFile": "006_sharp_dressed_man.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Billie Jean",
+          "question": "What is the title of this ZZ Top song?",
+          "answer": "Sharp Dressed Man",
           "points": 1,
-          "hints": ["Michael Jackson", "Del álbum Thriller"]
+          "hints": ["It's about a well-dressed man", "Classic 80s rock"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Michael Jackson",
+          "question": "Which band performs this song?",
+          "answer": "ZZ Top",
           "points": 2,
-          "hints": ["El Rey del Pop", "Moonwalk"]
+          "hints": ["Texas trio", "Famous for their beards"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "1980s",
           "points": 3,
-          "hints": ["Principios de los 80", "Era dorada de MTV"]
+          "hints": ["MTV era", "Synthesizer decade"]
         },
         "lyrics": {
-          "question": "Completa: 'Billie Jean is not...'",
-          "answer": "my lover",
+          "question": "What is the name of this song's album?",
+          "answer": "Eliminator",
           "points": 3,
-          "hints": ["Línea del coro", "No es mi..."]
+          "hints": ["Iconic 80s album", "Cover features a red car"]
         },
         "challenge": {
-          "question": "Haz el moonwalk de Michael Jackson",
-          "answer": "Completar moonwalk",
+          "question": "Imitate playing guitar like Billy Gibbons",
+          "answer": "Complete guitar imitation",
           "points": 5,
-          "challengeType": "dance",
-          "hints": ["Movimiento icónico", "Caminar hacia atrás"]
+          "challengeType": "imitate",
+          "hints": ["Blues rock style", "Classic guitarist movements"]
         }
       }
     },
     {
       "id": "007",
-      "title": "Sweet Child O' Mine",
-      "artist": "Guns N' Roses",
-      "album": "Appetite for Destruction",
-      "year": 1987,
-      "genre": "ROCK",
+      "title": "Don't Stop Believin'",
+      "artist": "Journey",
+      "album": "Escape",
+      "year": 1981,
+      "genre": "Rock/Arena Rock",
       "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "popularity": 94,
+      "duration": 251000,
+      "audioFile": "007_dont_stop_believing.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Sweet Child O' Mine",
+          "question": "What is the title of this rock anthem?",
+          "answer": "Don't Stop Believin'",
           "points": 1,
-          "hints": ["Guns N' Roses", "Riff de guitarra icónico"]
+          "hints": ["Motivational anthem", "One of the most downloaded songs"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Guns N' Roses",
+          "question": "Which band performs this song?",
+          "answer": "Journey",
           "points": 2,
-          "hints": ["Banda de hard rock", "Axl Rose es el vocalista"]
+          "hints": ["San Francisco band", "Steve Perry was the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "1980s",
           "points": 3,
-          "hints": ["Finales de los 80", "Era del hair metal"]
+          "hints": ["Early 80s", "Arena rock era"]
         },
         "lyrics": {
-          "question": "Completa: 'She's got eyes of the...'",
-          "answer": "bluest skies",
+          "question": "Which album does this song come from?",
+          "answer": "Escape",
           "points": 3,
-          "hints": ["Ojos de...", "Color del cielo"]
+          "hints": ["Very successful album", "Also includes 'Open Arms'"]
         },
         "challenge": {
-          "question": "Toca el riff de guitarra con air guitar",
-          "answer": "Completar riff",
+          "question": "Sing the chorus with passion like in a stadium",
+          "answer": "Complete epic singing",
           "points": 5,
-          "challengeType": "airguitar",
-          "hints": ["Riff famoso", "Slash lo toca"]
+          "challengeType": "sing",
+          "hints": ["Stadium anthem", "Sing with arms raised"]
         }
       }
     },
     {
       "id": "008",
-      "title": "Smells Like Teen Spirit",
-      "artist": "Nirvana",
-      "album": "Nevermind",
-      "year": 1991,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "title": "Money",
+      "artist": "Pink Floyd",
+      "album": "The Dark Side of the Moon",
+      "year": 1973,
+      "genre": "Progressive Rock",
+      "decade": "1970s",
+      "popularity": 87,
+      "duration": 382000,
+      "audioFile": "008_money.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Smells Like Teen Spirit",
+          "question": "What is the title of this Pink Floyd song?",
+          "answer": "Money",
           "points": 1,
-          "hints": ["Nirvana", "Himno del grunge"]
+          "hints": ["It's about money", "Has an irregular time signature"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Nirvana",
+          "question": "Which band performs this song?",
+          "answer": "Pink Floyd",
           "points": 2,
-          "hints": ["Banda de grunge", "Kurt Cobain era el líder"]
+          "hints": ["British progressive rock band", "Famous for concept albums"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "1990s",
+          "question": "What decade is this song from?",
+          "answer": "1970s",
           "points": 3,
-          "hints": ["Principios de los 90", "Era del grunge"]
+          "hints": ["Golden decade of progressive rock", "Era of great concept albums"]
         },
         "lyrics": {
-          "question": "Completa: 'Here we are now...'",
-          "answer": "entertain us",
+          "question": "From which iconic album does it come?",
+          "answer": "The Dark Side of the Moon",
           "points": 3,
-          "hints": ["Línea del coro", "Entretenernos"]
+          "hints": ["One of the best-selling albums", "Has a prism on the cover"]
         },
         "challenge": {
-          "question": "Canta con actitud grunge como Kurt Cobain",
-          "answer": "Completar performance",
+          "question": "Imitate the cash register sounds from the beginning",
+          "answer": "Complete sound imitation",
           "points": 5,
-          "challengeType": "sing",
-          "hints": ["Actitud rebelde", "Voz rasposa"]
+          "challengeType": "sound",
+          "hints": ["Unique sound effects", "Money and register sounds"]
         }
       }
     },
     {
       "id": "009",
-      "title": "Hotel California",
-      "artist": "Eagles",
-      "album": "Hotel California",
-      "year": 1976,
-      "genre": "ROCK",
-      "decade": "1970s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
+      "title": "Born to Be Wild",
+      "artist": "Steppenwolf",
+      "album": "Steppenwolf",
+      "year": 1968,
+      "genre": "Hard Rock",
+      "decade": "1960s",
+      "popularity": 89,
+      "duration": 210000,
+      "audioFile": "009_born_to_be_wild.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Hotel California",
+          "question": "What is the title of this rock anthem?",
+          "answer": "Born to Be Wild",
           "points": 1,
-          "hints": ["Eagles", "Sobre un hotel misterioso"]
+          "hints": ["Biker anthem", "Easy Rider soundtrack"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Eagles",
+          "question": "Which band performs this song?",
+          "answer": "Steppenwolf",
           "points": 2,
-          "hints": ["Banda americana", "Rock de los 70"]
+          "hints": ["Canadian-American band", "John Kay was the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "1970s",
+          "question": "What decade is this song from?",
+          "answer": "1960s",
           "points": 3,
-          "hints": ["Mediados de los 70", "Era del classic rock"]
+          "hints": ["Late 60s", "Psychedelic rock era"]
         },
         "lyrics": {
-          "question": "Completa: 'On a dark desert highway...'",
-          "answer": "cool wind in my hair",
+          "question": "In which famous movie did this song appear?",
+          "answer": "Easy Rider",
           "points": 3,
-          "hints": ["Primera línea", "Viento frío"]
+          "hints": ["Biker movie", "With Dennis Hopper and Peter Fonda"]
         },
         "challenge": {
-          "question": "Haz el solo de guitarra con air guitar",
-          "answer": "Completar solo",
+          "question": "Act like you're riding a Harley Davidson",
+          "answer": "Complete biker imitation",
           "points": 5,
-          "challengeType": "airguitar",
-          "hints": ["Solo legendario", "Muy largo"]
+          "challengeType": "imitate",
+          "hints": ["Rebellious attitude", "Biker movements"]
         }
       }
     },
     {
       "id": "010",
-      "title": "Wonderwall",
-      "artist": "Oasis",
-      "album": "(What's the Story) Morning Glory?",
-      "year": 1995,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "title": "You Really Got Me",
+      "artist": "The Kinks",
+      "album": "The Kinks",
+      "year": 1964,
+      "genre": "Rock/Proto-punk",
+      "decade": "1960s",
+      "popularity": 82,
+      "duration": 145000,
+      "audioFile": "010_you_really_got_me.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Wonderwall",
+          "question": "What is the title of this song?",
+          "answer": "You Really Got Me",
           "points": 1,
-          "hints": ["Oasis", "Britpop clásico"]
+          "hints": ["Early rock classic", "Also covered by Van Halen"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Oasis",
+          "question": "Which band originally recorded this song?",
+          "answer": "The Kinks",
           "points": 2,
-          "hints": ["Banda británica", "Hermanos Gallagher"]
+          "hints": ["British band", "Ray Davies was the leader"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "1990s",
+          "question": "What decade is the original from?",
+          "answer": "1960s",
           "points": 3,
-          "hints": ["Mediados de los 90", "Era del Britpop"]
+          "hints": ["Beatles era", "1960s decade"]
         },
         "lyrics": {
-          "question": "Completa: 'Maybe you're gonna be the one that...'",
-          "answer": "saves me",
+          "question": "What year was it originally released?",
+          "answer": "1964",
           "points": 3,
-          "hints": ["Línea del coro", "Me salva"]
+          "hints": ["Mid-60s", "Same year as 'A Hard Day's Night'"]
         },
         "challenge": {
-          "question": "Canta el coro con acento británico",
-          "answer": "Completar canto",
+          "question": "Play the main riff with air guitar",
+          "answer": "Complete guitar riff",
           "points": 5,
-          "challengeType": "sing",
-          "hints": ["Acento de Manchester", "Británico"]
+          "challengeType": "airguitar",
+          "hints": ["Simple but powerful riff", "Just three basic chords"]
         }
       }
     },
     {
       "id": "011",
-      "title": "Lose Yourself",
-      "artist": "Eminem",
-      "album": "8 Mile Soundtrack",
-      "year": 2002,
-      "genre": "HIP_HOP",
-      "decade": "2000s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
+      "title": "Miss You",
+      "artist": "The Rolling Stones",
+      "album": "Some Girls",
+      "year": 1978,
+      "genre": "Rock/Disco",
+      "decade": "1970s",
+      "popularity": 88,
+      "duration": 285000,
+      "audioFile": "011_Miss_you.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Lose Yourself",
+          "question": "What is the title of this Rolling Stones song?",
+          "answer": "Miss You",
           "points": 1,
-          "hints": ["Eminem", "De la película 8 Mile"]
+          "hints": ["It's about missing someone", "Has disco elements"]
         },
         "artist": {
-          "question": "¿Quién rapea esta canción?",
-          "answer": "Eminem",
+          "question": "Which band performs this song?",
+          "answer": "The Rolling Stones",
           "points": 2,
-          "hints": ["Rapero de Detroit", "Ganó un Oscar"]
+          "hints": ["Legendary British band", "Mick Jagger is the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "2000s",
+          "question": "What decade is this song from?",
+          "answer": "1970s",
           "points": 3,
-          "hints": ["Principios de los 2000", "Era del hip hop mainstream"]
+          "hints": ["Late 70s", "Disco-rock era"]
         },
         "lyrics": {
-          "question": "Completa: 'His palms are sweaty, knees weak, arms are...'",
-          "answer": "heavy",
+          "question": "Which album does this song come from?",
+          "answer": "Some Girls",
           "points": 3,
-          "hints": ["Primera línea", "Pesado"]
+          "hints": ["Controversial Stones album", "One of their most successful"]
         },
         "challenge": {
-          "question": "Rapea el primer verso completo",
-          "answer": "Completar rap",
+          "question": "Dance like in the disco era of the 70s",
+          "answer": "Complete disco dance",
           "points": 5,
-          "challengeType": "rap",
-          "hints": ["Muy rápido", "Sin respirar"]
+          "challengeType": "dance",
+          "hints": ["Disco movements", "70s style"]
         }
       }
     },
     {
       "id": "012",
-      "title": "One",
-      "artist": "U2",
-      "album": "Achtung Baby",
-      "year": 1991,
-      "genre": "ROCK",
+      "title": "Iris",
+      "artist": "Goo Goo Dolls",
+      "album": "Dizzy Up the Girl",
+      "year": 1998,
+      "genre": "Alternative Rock/Pop Rock",
       "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
+      "popularity": 91,
+      "duration": 289000,
+      "audioFile": "012_iris.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "One",
+          "question": "What is the title of this song?",
+          "answer": "Iris",
           "points": 1,
-          "hints": ["U2", "Sobre la unidad"]
+          "hints": ["Name of a flower", "Very emotional ballad"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "U2",
+          "question": "Which band performs this song?",
+          "answer": "Goo Goo Dolls",
           "points": 2,
-          "hints": ["Banda irlandesa", "Bono es el vocalista"]
+          "hints": ["Buffalo band", "Johnny Rzeznik is the vocalist"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
+          "question": "What decade is this song from?",
           "answer": "1990s",
           "points": 3,
-          "hints": ["Principios de los 90", "Del álbum Achtung Baby"]
+          "hints": ["Late 90s", "Alternative rock era"]
         },
         "lyrics": {
-          "question": "Completa: 'One love, one blood, one life...'",
-          "answer": "you got to do what you should",
+          "question": "In which movie was this song a soundtrack?",
+          "answer": "City of Angels",
           "points": 3,
-          "hints": ["Línea del coro", "Debes hacer lo que deberías"]
+          "hints": ["Movie with Nicolas Cage", "Supernatural romance"]
         },
         "challenge": {
-          "question": "Canta con emoción como Bono",
-          "answer": "Completar canto emocional",
+          "question": "Sing with emotion like a powerful ballad",
+          "answer": "Complete emotional singing",
           "points": 5,
           "challengeType": "sing",
-          "hints": ["Muy emotivo", "Pasión irlandesa"]
+          "hints": ["Very emotional ballad", "Sing from the heart"]
         }
       }
     },
     {
       "id": "013",
-      "title": "Blinding Lights",
-      "artist": "The Weeknd",
-      "album": "After Hours",
-      "year": 2019,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "title": "Get Up (I Feel Like Being a) Sex Machine",
+      "artist": "James Brown",
+      "album": "Sex Machine",
+      "year": 1970,
+      "genre": "Funk/Soul",
+      "decade": "1970s",
+      "popularity": 86,
+      "duration": 312000,
+      "audioFile": "013_sex_machine.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Blinding Lights",
+          "question": "What is the full title of this song?",
+          "answer": "Get Up (I Feel Like Being a) Sex Machine",
           "points": 1,
-          "hints": ["The Weeknd", "Sonido retro de los 80"]
+          "hints": ["It's about getting up", "Very funky and danceable"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "The Weeknd",
+          "question": "Who is the King of Funk that sings this song?",
+          "answer": "James Brown",
           "points": 2,
-          "hints": ["Artista canadiense", "Nombre real: Abel Tesfaye"]
+          "hints": ["The Godfather of Soul", "Mr. Dynamite"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "2010s",
+          "question": "What decade is this song from?",
+          "answer": "1970s",
           "points": 3,
-          "hints": ["Muy reciente", "2019"]
+          "hints": ["Early 70s", "Golden era of funk"]
         },
         "lyrics": {
-          "question": "Completa: 'I said, ooh...'",
-          "answer": "I'm blinded by the lights",
+          "question": "How is James Brown known?",
+          "answer": "The Godfather of Soul",
           "points": 3,
-          "hints": ["Línea del coro", "Cegado por las luces"]
+          "hints": ["Legendary nickname", "Godfather of a musical genre"]
         },
         "challenge": {
-          "question": "Baila el TikTok dance de Blinding Lights",
-          "answer": "Completar baile viral",
+          "question": "Dance funk like James Brown with splits",
+          "answer": "Complete funk dance",
           "points": 5,
           "challengeType": "dance",
-          "hints": ["Viral en TikTok", "Movimientos retro"]
+          "hints": ["Explosive movements", "Splits and spins"]
         }
       }
     },
     {
       "id": "014",
-      "title": "Bad Guy",
-      "artist": "Billie Eilish",
-      "album": "When We All Fall Asleep, Where Do We Go?",
-      "year": 2019,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
+      "title": "(I Can't Get No) Satisfaction",
+      "artist": "The Rolling Stones",
+      "album": "Out of Our Heads",
+      "year": 1965,
+      "genre": "Rock/Blues Rock",
+      "decade": "1960s",
+      "popularity": 96,
+      "duration": 223000,
+      "audioFile": "014_satisfaction.mp3",
+      "audioSource": "local",
       "hasAudio": true,
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questionCount": 5,
+      "lastUpdated": "2024-01-15T10:00:00.000Z",
       "questions": {
         "song": {
-          "question": "¿Cuál es la canción?",
-          "answer": "Bad Guy",
+          "question": "What is the title of this rock anthem?",
+          "answer": "Satisfaction",
           "points": 1,
-          "hints": ["Billie Eilish", "Bajo característico"]
+          "hints": ["One of the most famous anthems", "Iconic guitar riff"]
         },
         "artist": {
-          "question": "¿Quién canta esta canción?",
-          "answer": "Billie Eilish",
+          "question": "Which band performs this song?",
+          "answer": "The Rolling Stones",
           "points": 2,
-          "hints": ["Artista muy joven", "Ganó múltiples Grammys"]
+          "hints": ["The Stones", "Keith Richards created the riff"]
         },
         "decade": {
-          "question": "¿De qué década es esta canción?",
-          "answer": "2010s",
+          "question": "What decade is this song from?",
+          "answer": "1960s",
           "points": 3,
-          "hints": ["Muy reciente", "2019"]
+          "hints": ["Mid-60s", "British Invasion era"]
         },
         "lyrics": {
-          "question": "Completa: 'I'm the...'",
-          "answer": "bad guy",
+          "question": "Who wrote the famous guitar riff?",
+          "answer": "Keith Richards",
           "points": 3,
-          "hints": ["Título de la canción", "El chico malo"]
+          "hints": ["Stones guitarist", "He dreamed it and recorded it while sleeping"]
         },
         "challenge": {
-          "question": "Haz la cara seria de Billie Eilish",
-          "answer": "Completar expresión",
+          "question": "Play the iconic riff with air guitar",
+          "answer": "Complete iconic riff",
           "points": 5,
-          "challengeType": "pose",
-          "hints": ["Cara seria", "Sin sonreír"]
+          "challengeType": "airguitar",
+          "hints": ["Most famous rock riff", "Just two main notes"]
         }
       }
     }
   ],
   "metadata": {
-    "version": "3.0.0",
+    "version": "2.1.0",
     "totalTracks": 14,
-    "lastUpdated": "2024-12-11T22:00:00.000Z",
-    "audioSource": "deezer",
-    "supportedFormats": ["deezer"],
+    "lastUpdated": "2024-08-18T10:00:00.000Z",
+    "supportedFormats": [".mp3", ".wav", ".m4a"],
     "supportedCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-    "supportedDifficulties": ["easy", "medium", "hard"],
-    "qrFormat": "HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s",
-    "genres": ["REGGAETON", "ROCK", "POP", "ELECTRONIC", "R&B", "HIP_HOP"],
-    "decades": ["1970s", "1980s", "1990s", "2000s", "2010s"]
+    "supportedDifficulties": ["easy", "medium", "hard", "expert"],
+    "genres": [
+      "Reggaeton",
+      "Rock",
+      "Hard Rock",
+      "Funk",
+      "Electronic",
+      "Progressive Rock",
+      "Alternative Rock",
+      "Disco",
+      "Soul",
+      "Blues Rock"
+    ],
+    "decades": ["1960s", "1970s", "1980s", "1990s", "2010s"]
   }
 }

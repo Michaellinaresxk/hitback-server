@@ -190,7 +190,7 @@ app.get('/api/test/tracks', (req, res) => {
 // TEST ENDPOINT - Deezer
 app.get('/api/test/deezer', async (req, res) => {
   try {
-    const deezerService = require('../services/DeezerService');
+    const deezerService = require('./services/DeezerService');
     const healthCheck = await deezerService.healthCheck();
 
     res.json({
@@ -213,7 +213,7 @@ app.get('/api/test/deezer', async (req, res) => {
 // TEST ENDPOINT - Deezer Fallback
 app.post('/api/test/deezer-fallback', async (req, res) => {
   try {
-    const DeezerService = require('../services/DeezerService');
+    const DeezerService = require('./services/DeezerService');
 
     // Simular un track sin audio local
     const testTrack = {
