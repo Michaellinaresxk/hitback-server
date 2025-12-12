@@ -14,11 +14,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Despacito", "points": 1, "hints": ["Hit de reggaeton", "Luis Fonsi"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Luis Fonsi", "points": 2, "hints": ["Colaboración con Daddy Yankee"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Se hizo viral en YouTube"] },
-        "lyrics": { "question": "Completa: 'Sí, sabes que ya llevo un rato...'", "answer": "mirándote", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Baila 10 segundos de Despacito", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Despacito",
+          "points": 1,
+          "hints": ["Hit de reggaeton", "Luis Fonsi"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Luis Fonsi",
+          "points": 2,
+          "hints": ["Colaboración con Daddy Yankee"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Se hizo viral en YouTube"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Sí, sabes que ya llevo un rato...'",
+          "answer": "mirándote",
+          "points": 3,
+          "hints": ["Primera línea"]
+        },
+        "challenge": {
+          "question": "Baila 10 segundos de Despacito",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -35,11 +60,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Bohemian Rhapsody", "points": 1, "hints": ["Tiene parte operática"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Queen", "points": 2, "hints": ["Freddie Mercury"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Época dorada del rock"] },
-        "lyrics": { "question": "Completa: 'Is this the real life, is this just...'", "answer": "fantasy", "points": 3, "hints": ["Inicio icónico"] },
-        "challenge": { "question": "Imita a Freddie Mercury cantando", "answer": "Completar imitación", "points": 5, "challengeType": "imitate" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Bohemian Rhapsody",
+          "points": 1,
+          "hints": ["Tiene parte operática"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Queen",
+          "points": 2,
+          "hints": ["Freddie Mercury"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Época dorada del rock"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Is this the real life, is this just...'",
+          "answer": "fantasy",
+          "points": 3,
+          "hints": ["Inicio icónico"]
+        },
+        "challenge": {
+          "question": "Imita a Freddie Mercury cantando",
+          "answer": "Completar imitación",
+          "points": 5,
+          "challengeType": "imitate"
+        }
       }
     },
     {
@@ -56,11 +106,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Billie Jean", "points": 1, "hints": ["Del álbum Thriller"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Michael Jackson", "points": 2, "hints": ["El Rey del Pop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Era dorada del pop"] },
-        "lyrics": { "question": "Completa: 'Billie Jean is not my...'", "answer": "lover", "points": 3, "hints": ["Coro principal"] },
-        "challenge": { "question": "Haz el moonwalk", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Billie Jean",
+          "points": 1,
+          "hints": ["Del álbum Thriller"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Michael Jackson",
+          "points": 2,
+          "hints": ["El Rey del Pop"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Era dorada del pop"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Billie Jean is not my...'",
+          "answer": "lover",
+          "points": 3,
+          "hints": ["Coro principal"]
+        },
+        "challenge": {
+          "question": "Haz el moonwalk",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -77,11 +152,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Smells Like Teen Spirit", "points": 1, "hints": ["Himno del grunge"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Nirvana", "points": 2, "hints": ["Kurt Cobain"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Era del grunge"] },
-        "lyrics": { "question": "Completa: 'Here we are now...'", "answer": "entertain us", "points": 3, "hints": ["Coro famoso"] },
-        "challenge": { "question": "Canta el coro con actitud grunge", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Smells Like Teen Spirit",
+          "points": 1,
+          "hints": ["Himno del grunge"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Nirvana",
+          "points": 2,
+          "hints": ["Kurt Cobain"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Era del grunge"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Here we are now...'",
+          "answer": "entertain us",
+          "points": 3,
+          "hints": ["Coro famoso"]
+        },
+        "challenge": {
+          "question": "Canta el coro con actitud grunge",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -98,11 +198,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Crazy in Love", "points": 1, "hints": ["Debut solista de Beyoncé"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Beyoncé", "points": 2, "hints": ["Queen B"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Inicio de los 2000"] },
-        "lyrics": { "question": "Completa: 'Got me looking so...'", "answer": "crazy right now", "points": 3, "hints": ["Coro principal"] },
-        "challenge": { "question": "Baila como Beyoncé", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Crazy in Love",
+          "points": 1,
+          "hints": ["Debut solista de Beyoncé"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Beyoncé",
+          "points": 2,
+          "hints": ["Queen B"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Inicio de los 2000"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Got me looking so...'",
+          "answer": "crazy right now",
+          "points": 3,
+          "hints": ["Coro principal"]
+        },
+        "challenge": {
+          "question": "Baila como Beyoncé",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -119,11 +244,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Blinding Lights", "points": 1, "hints": ["Sonido retro 80s"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Weeknd", "points": 2, "hints": ["Artista canadiense"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de pandemia"] },
-        "lyrics": { "question": "Completa: 'I'm blinded by the...'", "answer": "lights", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Haz la coreografía del video", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Blinding Lights",
+          "points": 1,
+          "hints": ["Sonido retro 80s"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Weeknd",
+          "points": 2,
+          "hints": ["Artista canadiense"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit de pandemia"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I'm blinded by the...'",
+          "answer": "lights",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Haz la coreografía del video",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -140,11 +290,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Hotel California", "points": 1, "hints": ["Hotel misterioso"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Eagles", "points": 2, "hints": ["Banda californiana"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Rock clásico de los 70"] },
-        "lyrics": { "question": "Completa: 'Welcome to the Hotel...'", "answer": "California", "points": 3, "hints": ["Nombre del hotel"] },
-        "challenge": { "question": "Toca guitarra air guitar en el solo", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Hotel California",
+          "points": 1,
+          "hints": ["Hotel misterioso"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Eagles",
+          "points": 2,
+          "hints": ["Banda californiana"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Rock clásico de los 70"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Welcome to the Hotel...'",
+          "answer": "California",
+          "points": 3,
+          "hints": ["Nombre del hotel"]
+        },
+        "challenge": {
+          "question": "Toca guitarra air guitar en el solo",
+          "answer": "Completar performance",
+          "points": 5,
+          "challengeType": "performance"
+        }
       }
     },
     {
@@ -161,11 +336,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Sweet Child O' Mine", "points": 1, "hints": ["Riff de guitarra icónico"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Guns N' Roses", "points": 2, "hints": ["Axl Rose es el vocalista"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Era del hair metal"] },
-        "lyrics": { "question": "Completa: 'She's got a smile that it seems to me...'", "answer": "reminds me of childhood memories", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Imita el riff de guitarra", "answer": "Completar imitación", "points": 5, "challengeType": "imitate" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Sweet Child O' Mine",
+          "points": 1,
+          "hints": ["Riff de guitarra icónico"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Guns N' Roses",
+          "points": 2,
+          "hints": ["Axl Rose es el vocalista"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Era del hair metal"]
+        },
+        "lyrics": {
+          "question": "Completa: 'She's got a smile that it seems to me...'",
+          "answer": "reminds me of childhood memories",
+          "points": 3,
+          "hints": ["Primera línea"]
+        },
+        "challenge": {
+          "question": "Imita el riff de guitarra",
+          "answer": "Completar imitación",
+          "points": 5,
+          "challengeType": "imitate"
+        }
       }
     },
     {
@@ -182,11 +382,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Wonderwall", "points": 1, "hints": ["La más tocada en guitarra"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Oasis", "points": 2, "hints": ["Hermanos Gallagher"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Britpop"] },
-        "lyrics": { "question": "Completa: 'Because maybe, you're gonna be the one that...'", "answer": "saves me", "points": 3, "hints": ["Coro famoso"] },
-        "challenge": { "question": "Canta el coro completo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Wonderwall",
+          "points": 1,
+          "hints": ["La más tocada en guitarra"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Oasis",
+          "points": 2,
+          "hints": ["Hermanos Gallagher"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Britpop"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Because maybe, you're gonna be the one that...'",
+          "answer": "saves me",
+          "points": 3,
+          "hints": ["Coro famoso"]
+        },
+        "challenge": {
+          "question": "Canta el coro completo",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -203,11 +428,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "In Da Club", "points": 1, "hints": ["Go shawty, it's your birthday"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "50 Cent", "points": 2, "hints": ["Rapper de Nueva York"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Era dorada del hip-hop comercial"] },
-        "lyrics": { "question": "Completa: 'Go shawty, it's your...'", "answer": "birthday", "points": 3, "hints": ["Intro icónico"] },
-        "challenge": { "question": "Rapea el primer verso", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "In Da Club",
+          "points": 1,
+          "hints": ["Go shawty, it's your birthday"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "50 Cent",
+          "points": 2,
+          "hints": ["Rapper de Nueva York"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Era dorada del hip-hop comercial"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Go shawty, it's your...'",
+          "answer": "birthday",
+          "points": 3,
+          "hints": ["Intro icónico"]
+        },
+        "challenge": {
+          "question": "Rapea el primer verso",
+          "answer": "Completar rap",
+          "points": 5,
+          "challengeType": "rap"
+        }
       }
     },
     {
@@ -224,11 +474,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Bad Guy", "points": 1, "hints": ["Duh!"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Billie Eilish", "points": 2, "hints": ["Artista Gen Z"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Final de la década"] },
-        "lyrics": { "question": "Completa: 'I'm the bad guy...'", "answer": "duh", "points": 3, "hints": ["Final del coro"] },
-        "challenge": { "question": "Haz la cara de Billie Eilish", "answer": "Completar pose", "points": 5, "challengeType": "pose" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Bad Guy",
+          "points": 1,
+          "hints": ["Duh!"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Billie Eilish",
+          "points": 2,
+          "hints": ["Artista Gen Z"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Final de la década"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I'm the bad guy...'",
+          "answer": "duh",
+          "points": 3,
+          "hints": ["Final del coro"]
+        },
+        "challenge": {
+          "question": "Haz la cara de Billie Eilish",
+          "answer": "Completar pose",
+          "points": 5,
+          "challengeType": "pose"
+        }
       }
     },
     {
@@ -245,11 +520,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "As It Was", "points": 1, "hints": ["Hit de 2022"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Harry Styles", "points": 2, "hints": ["Ex One Direction"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Post-pandemia"] },
-        "lyrics": { "question": "Completa: 'You know it's not the same as it...'", "answer": "was", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila como Harry en el video", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "As It Was",
+          "points": 1,
+          "hints": ["Hit de 2022"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Harry Styles",
+          "points": 2,
+          "hints": ["Ex One Direction"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Post-pandemia"]
+        },
+        "lyrics": {
+          "question": "Completa: 'You know it's not the same as it...'",
+          "answer": "was",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila como Harry en el video",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -266,11 +566,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Stayin' Alive", "points": 1, "hints": ["Soundtrack de Saturday Night Fever"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Bee Gees", "points": 2, "hints": ["Hermanos Gibb"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Era disco"] },
-        "lyrics": { "question": "Completa: 'Ah, ha, ha, ha, stayin'...'", "answer": "alive", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila disco como John Travolta", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Stayin' Alive",
+          "points": 1,
+          "hints": ["Soundtrack de Saturday Night Fever"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bee Gees",
+          "points": 2,
+          "hints": ["Hermanos Gibb"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Era disco"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Ah, ha, ha, ha, stayin'...'",
+          "answer": "alive",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila disco como John Travolta",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -287,11 +612,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Like a Prayer", "points": 1, "hints": ["Canción controversial"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Madonna", "points": 2, "hints": ["Reina del Pop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Final de los 80"] },
-        "lyrics": { "question": "Completa: 'Life is a mystery, everyone must...'", "answer": "stand alone", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Haz una pose de Madonna", "answer": "Completar pose", "points": 5, "challengeType": "pose" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Like a Prayer",
+          "points": 1,
+          "hints": ["Canción controversial"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Madonna",
+          "points": 2,
+          "hints": ["Reina del Pop"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Final de los 80"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Life is a mystery, everyone must...'",
+          "answer": "stand alone",
+          "points": 3,
+          "hints": ["Primera línea"]
+        },
+        "challenge": {
+          "question": "Haz una pose de Madonna",
+          "answer": "Completar pose",
+          "points": 5,
+          "challengeType": "pose"
+        }
       }
     },
     {
@@ -308,11 +658,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Wannabe", "points": 1, "hints": ["If you wanna be my lover"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Spice Girls", "points": 2, "hints": ["Girl Power"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Pop de los 90"] },
-        "lyrics": { "question": "Completa: 'If you wanna be my lover, you gotta get with my...'", "answer": "friends", "points": 3, "hints": ["Coro famoso"] },
-        "challenge": { "question": "Baila como las Spice Girls", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Wannabe",
+          "points": 1,
+          "hints": ["If you wanna be my lover"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Spice Girls",
+          "points": 2,
+          "hints": ["Girl Power"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Pop de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'If you wanna be my lover, you gotta get with my...'",
+          "answer": "friends",
+          "points": 3,
+          "hints": ["Coro famoso"]
+        },
+        "challenge": {
+          "question": "Baila como las Spice Girls",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -329,11 +704,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Yeah!", "points": 1, "hints": ["YEAH! OKAY!"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Usher", "points": 2, "hints": ["Rey del R&B"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Hit de club de los 2000"] },
-        "lyrics": { "question": "Completa: 'Yeah, yeah, yeah...'", "answer": "okay", "points": 3, "hints": ["Lil Jon grita esto"] },
-        "challenge": { "question": "Baila como Usher", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Yeah!",
+          "points": 1,
+          "hints": ["YEAH! OKAY!"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Usher",
+          "points": 2,
+          "hints": ["Rey del R&B"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Hit de club de los 2000"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Yeah, yeah, yeah...'",
+          "answer": "okay",
+          "points": 3,
+          "hints": ["Lil Jon grita esto"]
+        },
+        "challenge": {
+          "question": "Baila como Usher",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -350,11 +750,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Shape of You", "points": 1, "hints": ["I'm in love with your body"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ed Sheeran", "points": 2, "hints": ["Pelirrojo británico"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Mega hit de streaming"] },
-        "lyrics": { "question": "Completa: 'I'm in love with the shape of...'", "answer": "you", "points": 3, "hints": ["Coro principal"] },
-        "challenge": { "question": "Canta el coro completo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Shape of You",
+          "points": 1,
+          "hints": ["I'm in love with your body"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Ed Sheeran",
+          "points": 2,
+          "hints": ["Pelirrojo británico"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Mega hit de streaming"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I'm in love with the shape of...'",
+          "answer": "you",
+          "points": 3,
+          "hints": ["Coro principal"]
+        },
+        "challenge": {
+          "question": "Canta el coro completo",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -371,11 +796,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Anti-Hero", "points": 1, "hints": ["It's me, hi, I'm the problem"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Taylor Swift", "points": 2, "hints": ["Swifties"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Álbum Midnights"] },
-        "lyrics": { "question": "Completa: 'It's me, hi, I'm the problem it's...'", "answer": "me", "points": 3, "hints": ["Línea viral"] },
-        "challenge": { "question": "Canta la parte viral", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Anti-Hero",
+          "points": 1,
+          "hints": ["It's me, hi, I'm the problem"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Taylor Swift",
+          "points": 2,
+          "hints": ["Swifties"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Álbum Midnights"]
+        },
+        "lyrics": {
+          "question": "Completa: 'It's me, hi, I'm the problem it's...'",
+          "answer": "me",
+          "points": 3,
+          "hints": ["Línea viral"]
+        },
+        "challenge": {
+          "question": "Canta la parte viral",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -392,11 +842,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Stairway to Heaven", "points": 1, "hints": ["8 minutos de épica"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Led Zeppelin", "points": 2, "hints": ["Robert Plant y Jimmy Page"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Rock progresivo de los 70"] },
-        "lyrics": { "question": "Completa: 'There's a lady who's sure all that glitters is...'", "answer": "gold", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Air guitar en el solo final", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Stairway to Heaven",
+          "points": 1,
+          "hints": ["8 minutos de épica"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Led Zeppelin",
+          "points": 2,
+          "hints": ["Robert Plant y Jimmy Page"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Rock progresivo de los 70"]
+        },
+        "lyrics": {
+          "question": "Completa: 'There's a lady who's sure all that glitters is...'",
+          "answer": "gold",
+          "points": 3,
+          "hints": ["Primera línea"]
+        },
+        "challenge": {
+          "question": "Air guitar en el solo final",
+          "answer": "Completar performance",
+          "points": 5,
+          "challengeType": "performance"
+        }
       }
     },
     {
@@ -413,11 +888,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Take On Me", "points": 1, "hints": ["Video en blanco y negro animado"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "a-ha", "points": 2, "hints": ["Banda noruega"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Synth-pop de los 80"] },
-        "lyrics": { "question": "Completa: 'Take on me, take me...'", "answer": "on", "points": 3, "hints": ["Coro repetitivo"] },
-        "challenge": { "question": "Canta la nota alta del coro", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Take On Me",
+          "points": 1,
+          "hints": ["Video en blanco y negro animado"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "a-ha",
+          "points": 2,
+          "hints": ["Banda noruega"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Synth-pop de los 80"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Take on me, take me...'",
+          "answer": "on",
+          "points": 3,
+          "hints": ["Coro repetitivo"]
+        },
+        "challenge": {
+          "question": "Canta la nota alta del coro",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -434,11 +934,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Creep", "points": 1, "hints": ["I'm a creep, I'm a weirdo"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Radiohead", "points": 2, "hints": ["Thom Yorke"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Rock alternativo de los 90"] },
-        "lyrics": { "question": "Completa: 'I'm a creep, I'm a...'", "answer": "weirdo", "points": 3, "hints": ["Auto-descripción"] },
-        "challenge": { "question": "Canta con la angustia de Thom Yorke", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Creep",
+          "points": 1,
+          "hints": ["I'm a creep, I'm a weirdo"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Radiohead",
+          "points": 2,
+          "hints": ["Thom Yorke"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Rock alternativo de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I'm a creep, I'm a...'",
+          "answer": "weirdo",
+          "points": 3,
+          "hints": ["Auto-descripción"]
+        },
+        "challenge": {
+          "question": "Canta con la angustia de Thom Yorke",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -455,11 +980,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Hips Don't Lie", "points": 1, "hints": ["Las caderas no mienten"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Shakira", "points": 2, "hints": ["Colombiana famosa"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Mundial de fútbol 2006"] },
-        "lyrics": { "question": "Completa: 'Oh baby when you talk like that, you make a woman go...'", "answer": "mad", "points": 3, "hints": ["Reacción a las palabras"] },
-        "challenge": { "question": "Mueve las caderas como Shakira", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Hips Don't Lie",
+          "points": 1,
+          "hints": ["Las caderas no mienten"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Shakira",
+          "points": 2,
+          "hints": ["Colombiana famosa"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Mundial de fútbol 2006"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Oh baby when you talk like that, you make a woman go...'",
+          "answer": "mad",
+          "points": 3,
+          "hints": ["Reacción a las palabras"]
+        },
+        "challenge": {
+          "question": "Mueve las caderas como Shakira",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -476,11 +1026,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Uptown Funk", "points": 1, "hints": ["Don't believe me just watch"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Bruno Mars", "points": 2, "hints": ["Con Mark Ronson"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit de 2014"] },
-        "lyrics": { "question": "Completa: 'Uptown funk you up, uptown funk you...'", "answer": "up", "points": 3, "hints": ["Repetición del coro"] },
-        "challenge": { "question": "Haz el baile de Uptown Funk", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Uptown Funk",
+          "points": 1,
+          "hints": ["Don't believe me just watch"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bruno Mars",
+          "points": 2,
+          "hints": ["Con Mark Ronson"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Hit de 2014"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Uptown funk you up, uptown funk you...'",
+          "answer": "up",
+          "points": 3,
+          "hints": ["Repetición del coro"]
+        },
+        "challenge": {
+          "question": "Haz el baile de Uptown Funk",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -497,11 +1072,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Flowers", "points": 1, "hints": ["I can buy myself flowers"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Miley Cyrus", "points": 2, "hints": ["Ex Hannah Montana"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2023"] },
-        "lyrics": { "question": "Completa: 'I can buy myself...'", "answer": "flowers", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Canta el coro de empoderamiento", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Flowers",
+          "points": 1,
+          "hints": ["I can buy myself flowers"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Miley Cyrus",
+          "points": 2,
+          "hints": ["Ex Hannah Montana"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit de 2023"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I can buy myself...'",
+          "answer": "flowers",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Canta el coro de empoderamiento",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -518,11 +1118,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Dancing Queen", "points": 1, "hints": ["You can dance, you can jive"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "ABBA", "points": 2, "hints": ["Banda sueca"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Era disco"] },
-        "lyrics": { "question": "Completa: 'You are the dancing...'", "answer": "queen", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila disco estilo ABBA", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Dancing Queen",
+          "points": 1,
+          "hints": ["You can dance, you can jive"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "ABBA",
+          "points": 2,
+          "hints": ["Banda sueca"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Era disco"]
+        },
+        "lyrics": {
+          "question": "Completa: 'You are the dancing...'",
+          "answer": "queen",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila disco estilo ABBA",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -539,11 +1164,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Livin' on a Prayer", "points": 1, "hints": ["Woah, we're halfway there"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Bon Jovi", "points": 2, "hints": ["Jon Bon Jovi"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Hair metal de los 80"] },
-        "lyrics": { "question": "Completa: 'Woah, we're halfway...'", "answer": "there", "points": 3, "hints": ["Coro épico"] },
-        "challenge": { "question": "Canta el WOAH con todo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Livin' on a Prayer",
+          "points": 1,
+          "hints": ["Woah, we're halfway there"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bon Jovi",
+          "points": 2,
+          "hints": ["Jon Bon Jovi"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Hair metal de los 80"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Woah, we're halfway...'",
+          "answer": "there",
+          "points": 3,
+          "hints": ["Coro épico"]
+        },
+        "challenge": {
+          "question": "Canta el WOAH con todo",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -560,11 +1210,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Losing My Religion", "points": 1, "hints": ["Mandolina icónica"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "R.E.M.", "points": 2, "hints": ["Michael Stipe"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Rock alternativo de los 90"] },
-        "lyrics": { "question": "Completa: 'That's me in the corner, that's me in the...'", "answer": "spotlight", "points": 3, "hints": ["Perdiendo la religión"] },
-        "challenge": { "question": "Haz los gestos dramáticos del video", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Losing My Religion",
+          "points": 1,
+          "hints": ["Mandolina icónica"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "R.E.M.",
+          "points": 2,
+          "hints": ["Michael Stipe"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Rock alternativo de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'That's me in the corner, that's me in the...'",
+          "answer": "spotlight",
+          "points": 3,
+          "hints": ["Perdiendo la religión"]
+        },
+        "challenge": {
+          "question": "Haz los gestos dramáticos del video",
+          "answer": "Completar performance",
+          "points": 5,
+          "challengeType": "performance"
+        }
       }
     },
     {
@@ -581,11 +1256,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Hey Ya!", "points": 1, "hints": ["Shake it like a Polaroid picture"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "OutKast", "points": 2, "hints": ["André 3000"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Hit de 2003"] },
-        "lyrics": { "question": "Completa: 'Shake it, shake it like a Polaroid...'", "answer": "picture", "points": 3, "hints": ["Línea icónica"] },
-        "challenge": { "question": "Sacude como una foto Polaroid", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Hey Ya!",
+          "points": 1,
+          "hints": ["Shake it like a Polaroid picture"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "OutKast",
+          "points": 2,
+          "hints": ["André 3000"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Hit de 2003"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Shake it, shake it like a Polaroid...'",
+          "answer": "picture",
+          "points": 3,
+          "hints": ["Línea icónica"]
+        },
+        "challenge": {
+          "question": "Sacude como una foto Polaroid",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -602,11 +1302,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Rolling in the Deep", "points": 1, "hints": ["We could have had it all"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Adele", "points": 2, "hints": ["Voz poderosa británica"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Inicio de la década"] },
-        "lyrics": { "question": "Completa: 'We could have had it...'", "answer": "all", "points": 3, "hints": ["Coro potente"] },
-        "challenge": { "question": "Canta con la potencia de Adele", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Rolling in the Deep",
+          "points": 1,
+          "hints": ["We could have had it all"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Adele",
+          "points": 2,
+          "hints": ["Voz poderosa británica"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Inicio de la década"]
+        },
+        "lyrics": {
+          "question": "Completa: 'We could have had it...'",
+          "answer": "all",
+          "points": 3,
+          "hints": ["Coro potente"]
+        },
+        "challenge": {
+          "question": "Canta con la potencia de Adele",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -623,11 +1348,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Vampire", "points": 1, "hints": ["Hit de 2023"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Olivia Rodrigo", "points": 2, "hints": ["Ex Disney"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Álbum Guts"] },
-        "lyrics": { "question": "Completa: 'You're a vampire...'", "answer": "I'm a victim", "points": 3, "hints": ["Acusación"] },
-        "challenge": { "question": "Canta con drama adolescente", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Vampire",
+          "points": 1,
+          "hints": ["Hit de 2023"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Olivia Rodrigo",
+          "points": 2,
+          "hints": ["Ex Disney"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Álbum Guts"]
+        },
+        "lyrics": {
+          "question": "Completa: 'You're a vampire...'",
+          "answer": "I'm a victim",
+          "points": 3,
+          "hints": ["Acusación"]
+        },
+        "challenge": {
+          "question": "Canta con drama adolescente",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -644,11 +1394,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "La Bamba", "points": 1, "hints": ["Canción tradicional mexicana"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ritchie Valens", "points": 2, "hints": ["Pionero del rock latino"] },
-        "decade": { "question": "¿De qué década es la versión clásica?", "answer": "1970s", "points": 3, "hints": ["Popularizada en los 70-80"] },
-        "lyrics": { "question": "Completa: 'Para bailar la...'", "answer": "bamba", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila La Bamba", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "La Bamba",
+          "points": 1,
+          "hints": ["Canción tradicional mexicana"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Ritchie Valens",
+          "points": 2,
+          "hints": ["Pionero del rock latino"]
+        },
+        "decade": {
+          "question": "¿De qué década es la versión clásica?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Popularizada en los 70-80"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Para bailar la...'",
+          "answer": "bamba",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila La Bamba",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -665,11 +1440,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Every Breath You Take", "points": 1, "hints": ["I'll be watching you"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Police", "points": 2, "hints": ["Sting es el vocalista"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["New wave de los 80"] },
-        "lyrics": { "question": "Completa: 'Every breath you take, every move you...'", "answer": "make", "points": 3, "hints": ["Observando cada movimiento"] },
-        "challenge": { "question": "Canta con voz misteriosa", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Every Breath You Take",
+          "points": 1,
+          "hints": ["I'll be watching you"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Police",
+          "points": 2,
+          "hints": ["Sting es el vocalista"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["New wave de los 80"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Every breath you take, every move you...'",
+          "answer": "make",
+          "points": 3,
+          "hints": ["Observando cada movimiento"]
+        },
+        "challenge": {
+          "question": "Canta con voz misteriosa",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -686,11 +1486,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Bitter Sweet Symphony", "points": 1, "hints": ["Violines épicos"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Verve", "points": 2, "hints": ["Banda británica"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Britpop tardío"] },
-        "lyrics": { "question": "Completa: 'Cause it's a bittersweet...'", "answer": "symphony", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Camina como en el video", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Bitter Sweet Symphony",
+          "points": 1,
+          "hints": ["Violines épicos"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Verve",
+          "points": 2,
+          "hints": ["Banda británica"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Britpop tardío"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Cause it's a bittersweet...'",
+          "answer": "symphony",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Camina como en el video",
+          "answer": "Completar performance",
+          "points": 5,
+          "challengeType": "performance"
+        }
       }
     },
     {
@@ -707,11 +1532,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Lose Yourself", "points": 1, "hints": ["Mom's spaghetti"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Eminem", "points": 2, "hints": ["Slim Shady"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["De la película 8 Mile"] },
-        "lyrics": { "question": "Completa: 'His palms are sweaty, knees weak, arms are heavy, there's vomit on his sweater already...'", "answer": "mom's spaghetti", "points": 3, "hints": ["Meme famoso"] },
-        "challenge": { "question": "Rapea el primer verso", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Lose Yourself",
+          "points": 1,
+          "hints": ["Mom's spaghetti"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Eminem",
+          "points": 2,
+          "hints": ["Slim Shady"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["De la película 8 Mile"]
+        },
+        "lyrics": {
+          "question": "Completa: 'His palms are sweaty, knees weak, arms are heavy, there's vomit on his sweater already...'",
+          "answer": "mom's spaghetti",
+          "points": 3,
+          "hints": ["Meme famoso"]
+        },
+        "challenge": {
+          "question": "Rapea el primer verso",
+          "answer": "Completar rap",
+          "points": 5,
+          "challengeType": "rap"
+        }
       }
     },
     {
@@ -728,11 +1578,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Happy", "points": 1, "hints": ["Because I'm happy"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Pharrell Williams", "points": 2, "hints": ["Productor y cantante"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["De película de Minions"] },
-        "lyrics": { "question": "Completa: 'Because I'm...'", "answer": "happy", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila feliz por 10 segundos", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Happy",
+          "points": 1,
+          "hints": ["Because I'm happy"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Pharrell Williams",
+          "points": 2,
+          "hints": ["Productor y cantante"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["De película de Minions"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Because I'm...'",
+          "answer": "happy",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila feliz por 10 segundos",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -749,11 +1624,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Kill Bill", "points": 1, "hints": ["Referencia a película de Tarantino"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "SZA", "points": 2, "hints": ["R&B alternativo"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de TikTok 2023"] },
-        "lyrics": { "question": "Completa: 'I might kill my ex...'", "answer": "not the best idea", "points": 3, "hints": ["Pensamientos oscuros"] },
-        "challenge": { "question": "Canta con actitud R&B", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Kill Bill",
+          "points": 1,
+          "hints": ["Referencia a película de Tarantino"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "SZA",
+          "points": 2,
+          "hints": ["R&B alternativo"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit de TikTok 2023"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I might kill my ex...'",
+          "answer": "not the best idea",
+          "points": 3,
+          "hints": ["Pensamientos oscuros"]
+        },
+        "challenge": {
+          "question": "Canta con actitud R&B",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -770,11 +1670,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "September", "points": 1, "hints": ["Do you remember?"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Earth, Wind & Fire", "points": 2, "hints": ["Banda de funk/disco"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Disco de los 70"] },
-        "lyrics": { "question": "Completa: 'Do you remember the 21st night of...'", "answer": "September", "points": 3, "hints": ["Mes del título"] },
-        "challenge": { "question": "Baila funk/disco", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "September",
+          "points": 1,
+          "hints": ["Do you remember?"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Earth, Wind & Fire",
+          "points": 2,
+          "hints": ["Banda de funk/disco"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Disco de los 70"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Do you remember the 21st night of...'",
+          "answer": "September",
+          "points": 3,
+          "hints": ["Mes del título"]
+        },
+        "challenge": {
+          "question": "Baila funk/disco",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -791,19 +1716,44 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Jump", "points": 1, "hints": ["Might as well jump"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Van Halen", "points": 2, "hints": ["Eddie Van Halen"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Álbum llamado 1984"] },
-        "lyrics": { "question": "Completa: 'Might as well...'", "answer": "jump", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Salta mientras cantas el coro", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Jump",
+          "points": 1,
+          "hints": ["Might as well jump"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Van Halen",
+          "points": 2,
+          "hints": ["Eddie Van Halen"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Álbum llamado 1984"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Might as well...'",
+          "answer": "jump",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Salta mientras cantas el coro",
+          "answer": "Completar performance",
+          "points": 5,
+          "challengeType": "performance"
+        }
       }
     },
     {
       "id": "039",
-      "title": "Smack My Bitch Up",
+      "title": "Firestarter",
       "artist": "The Prodigy",
       "album": "The Fat of the Land",
-      "year": 1997,
+      "year": 1996,
       "genre": "ELECTRONIC",
       "decade": "1990s",
       "difficulty": "HARD",
@@ -812,11 +1762,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Smack My Bitch Up", "points": 1, "hints": ["Canción controversial"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Prodigy", "points": 2, "hints": ["Big beat británico"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Era del big beat"] },
-        "lyrics": { "question": "¿Es principalmente instrumental o tiene letra?", "answer": "Sample repetitivo", "points": 3, "hints": ["Muy poca letra"] },
-        "challenge": { "question": "Baila electrónico agresivo", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Firestarter",
+          "points": 1,
+          "hints": ["I'm the firestarter"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Prodigy",
+          "points": 2,
+          "hints": ["Big beat británico"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Era del big beat"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I'm the...'",
+          "answer": "firestarter",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila electrónico agresivo",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -833,11 +1808,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Umbrella", "points": 1, "hints": ["Ella, ella, eh, eh, eh"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Rihanna", "points": 2, "hints": ["Artista de Barbados"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Hit de 2007"] },
-        "lyrics": { "question": "Completa: 'Under my umbrella, ella, ella...'", "answer": "eh, eh, eh", "points": 3, "hints": ["Coro pegajoso"] },
-        "challenge": { "question": "Haz la coreografía del paraguas", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Umbrella",
+          "points": 1,
+          "hints": ["Ella, ella, eh, eh, eh"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Rihanna",
+          "points": 2,
+          "hints": ["Artista de Barbados"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Hit de 2007"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Under my umbrella, ella, ella...'",
+          "answer": "eh, eh, eh",
+          "points": 3,
+          "hints": ["Coro pegajoso"]
+        },
+        "challenge": {
+          "question": "Haz la coreografía del paraguas",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -854,11 +1854,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Thinking Out Loud", "points": 1, "hints": ["Canción de bodas popular"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ed Sheeran", "points": 2, "hints": ["Pelirrojo con guitarra"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit romántico de 2014"] },
-        "lyrics": { "question": "Completa: 'And darling I will be loving you till we're...'", "answer": "70", "points": 3, "hints": ["Edad avanzada"] },
-        "challenge": { "question": "Canta con romanticismo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Thinking Out Loud",
+          "points": 1,
+          "hints": ["Canción de bodas popular"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Ed Sheeran",
+          "points": 2,
+          "hints": ["Pelirrojo con guitarra"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Hit romántico de 2014"]
+        },
+        "lyrics": {
+          "question": "Completa: 'And darling I will be loving you till we're...'",
+          "answer": "70",
+          "points": 3,
+          "hints": ["Edad avanzada"]
+        },
+        "challenge": {
+          "question": "Canta con romanticismo",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -875,11 +1900,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Cruel Summer", "points": 1, "hints": ["Verano cruel"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Taylor Swift", "points": 2, "hints": ["Era Lover"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Final de la década"] },
-        "lyrics": { "question": "Completa: 'It's a cruel...'", "answer": "summer", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Canta el bridge dramático", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Cruel Summer",
+          "points": 1,
+          "hints": ["Verano cruel"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Taylor Swift",
+          "points": 2,
+          "hints": ["Era Lover"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Final de la década"]
+        },
+        "lyrics": {
+          "question": "Completa: 'It's a cruel...'",
+          "answer": "summer",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Canta el bridge dramático",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -896,11 +1946,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Espresso", "points": 1, "hints": ["That's that me espresso"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Sabrina Carpenter", "points": 2, "hints": ["Ex Disney"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit viral de 2024"] },
-        "lyrics": { "question": "Completa: 'That's that me...'", "answer": "espresso", "points": 3, "hints": ["Café italiano"] },
-        "challenge": { "question": "Haz el baile viral", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Espresso",
+          "points": 1,
+          "hints": ["That's that me espresso"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Sabrina Carpenter",
+          "points": 2,
+          "hints": ["Ex Disney"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit viral de 2024"]
+        },
+        "lyrics": {
+          "question": "Completa: 'That's that me...'",
+          "answer": "espresso",
+          "points": 3,
+          "hints": ["Café italiano"]
+        },
+        "challenge": {
+          "question": "Haz el baile viral",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -917,11 +1992,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Rapper's Delight", "points": 1, "hints": ["Primera canción de hip-hop mainstream"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Sugarhill Gang", "points": 2, "hints": ["Pioneros del hip-hop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Nacimiento del hip-hop"] },
-        "lyrics": { "question": "Completa: 'I said a hip hop the hippie the hippie to the hip hip...'", "answer": "hop", "points": 3, "hints": ["Intro legendario"] },
-        "challenge": { "question": "Rapea el intro clásico", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Rapper's Delight",
+          "points": 1,
+          "hints": ["Primera canción de hip-hop mainstream"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Sugarhill Gang",
+          "points": 2,
+          "hints": ["Pioneros del hip-hop"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Nacimiento del hip-hop"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I said a hip hop the hippie the hippie to the hip hip...'",
+          "answer": "hop",
+          "points": 3,
+          "hints": ["Intro legendario"]
+        },
+        "challenge": {
+          "question": "Rapea el intro clásico",
+          "answer": "Completar rap",
+          "points": 5,
+          "challengeType": "rap"
+        }
       }
     },
     {
@@ -938,11 +2038,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Purple Rain", "points": 1, "hints": ["Lluvia púrpura"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Prince", "points": 2, "hints": ["El Artista Antes Conocido Como"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Película del mismo nombre"] },
-        "lyrics": { "question": "Completa: 'Purple rain, purple...'", "answer": "rain", "points": 3, "hints": ["Título repetido"] },
-        "challenge": { "question": "Toca guitarra air guitar estilo Prince", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Purple Rain",
+          "points": 1,
+          "hints": ["Lluvia púrpura"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Prince",
+          "points": 2,
+          "hints": ["El Artista Antes Conocido Como"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Película del mismo nombre"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Purple rain, purple...'",
+          "answer": "rain",
+          "points": 3,
+          "hints": ["Título repetido"]
+        },
+        "challenge": {
+          "question": "Toca guitarra air guitar estilo Prince",
+          "answer": "Completar performance",
+          "points": 5,
+          "challengeType": "performance"
+        }
       }
     },
     {
@@ -959,11 +2084,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "No Diggity", "points": 1, "hints": ["No doubt"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Blackstreet", "points": 2, "hints": ["Con Dr. Dre"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["R&B de los 90"] },
-        "lyrics": { "question": "Completa: 'No diggity, no...'", "answer": "doubt", "points": 3, "hints": ["Sin duda"] },
-        "challenge": { "question": "Canta con flow R&B", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "No Diggity",
+          "points": 1,
+          "hints": ["No doubt"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Blackstreet",
+          "points": 2,
+          "hints": ["Con Dr. Dre"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["R&B de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'No diggity, no...'",
+          "answer": "doubt",
+          "points": 3,
+          "hints": ["Sin duda"]
+        },
+        "challenge": {
+          "question": "Canta con flow R&B",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -980,11 +2130,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Mr. Brightside", "points": 1, "hints": ["Coming out of my cage"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Killers", "points": 2, "hints": ["Banda de Las Vegas"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Indie rock de los 2000"] },
-        "lyrics": { "question": "Completa: 'Coming out of my cage and I've been doing just...'", "answer": "fine", "points": 3, "hints": ["Inicio icónico"] },
-        "challenge": { "question": "Canta el coro con pasión", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Mr. Brightside",
+          "points": 1,
+          "hints": ["Coming out of my cage"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Killers",
+          "points": 2,
+          "hints": ["Banda de Las Vegas"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Indie rock de los 2000"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Coming out of my cage and I've been doing just...'",
+          "answer": "fine",
+          "points": 3,
+          "hints": ["Inicio icónico"]
+        },
+        "challenge": {
+          "question": "Canta el coro con pasión",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -1001,11 +2176,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Someone Like You", "points": 1, "hints": ["Balada de desamor"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Adele", "points": 2, "hints": ["Álbum 21"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit de 2011"] },
-        "lyrics": { "question": "Completa: 'Never mind I'll find someone like...'", "answer": "you", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Canta con emoción el coro", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Someone Like You",
+          "points": 1,
+          "hints": ["Balada de desamor"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Adele",
+          "points": 2,
+          "hints": ["Álbum 21"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Hit de 2011"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Never mind I'll find someone like...'",
+          "answer": "you",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Canta con emoción el coro",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -1022,11 +2222,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Levitating", "points": 1, "hints": ["Sonido disco moderno"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Dua Lipa", "points": 2, "hints": ["Artista británica-albanesa"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Álbum Future Nostalgia"] },
-        "lyrics": { "question": "Completa: 'I got you moonlight, you're my...'", "answer": "starlight", "points": 3, "hints": ["Luz de estrella"] },
-        "challenge": { "question": "Baila disco moderno", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Levitating",
+          "points": 1,
+          "hints": ["Sonido disco moderno"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Dua Lipa",
+          "points": 2,
+          "hints": ["Artista británica-albanesa"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Álbum Future Nostalgia"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I got you moonlight, you're my...'",
+          "answer": "starlight",
+          "points": 3,
+          "hints": ["Luz de estrella"]
+        },
+        "challenge": {
+          "question": "Baila disco moderno",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1043,11 +2268,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Y.M.C.A.", "points": 1, "hints": ["Baile con letras"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Village People", "points": 2, "hints": ["Grupo disco icónico"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Era disco"] },
-        "lyrics": { "question": "Completa: 'It's fun to stay at the...'", "answer": "Y.M.C.A.", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Haz las letras Y-M-C-A con los brazos", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Y.M.C.A.",
+          "points": 1,
+          "hints": ["Baile con letras"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Village People",
+          "points": 2,
+          "hints": ["Grupo disco icónico"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 3,
+          "hints": ["Era disco"]
+        },
+        "lyrics": {
+          "question": "Completa: 'It's fun to stay at the...'",
+          "answer": "Y.M.C.A.",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Haz las letras Y-M-C-A con los brazos",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1064,11 +2314,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Don't Stop Believin'", "points": 1, "hints": ["Just a small town girl"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Journey", "points": 2, "hints": ["Steve Perry"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Arena rock de los 80"] },
-        "lyrics": { "question": "Completa: 'Just a small town girl, livin' in a...'", "answer": "lonely world", "points": 3, "hints": ["Mundo solitario"] },
-        "challenge": { "question": "Canta el coro épico", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Don't Stop Believin'",
+          "points": 1,
+          "hints": ["Just a small town girl"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Journey",
+          "points": 2,
+          "hints": ["Steve Perry"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 3,
+          "hints": ["Arena rock de los 80"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Just a small town girl, livin' in a...'",
+          "answer": "lonely world",
+          "points": 3,
+          "hints": ["Mundo solitario"]
+        },
+        "challenge": {
+          "question": "Canta el coro épico",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -1085,11 +2360,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Zombie", "points": 1, "hints": ["In your head"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Cranberries", "points": 2, "hints": ["Dolores O'Riordan"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Rock alternativo de los 90"] },
-        "lyrics": { "question": "Completa: 'In your head, in your...'", "answer": "head", "points": 3, "hints": ["Repetición"] },
-        "challenge": { "question": "Canta con la intensidad de Dolores", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Zombie",
+          "points": 1,
+          "hints": ["In your head"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Cranberries",
+          "points": 2,
+          "hints": ["Dolores O'Riordan"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Rock alternativo de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'In your head, in your...'",
+          "answer": "head",
+          "points": 3,
+          "hints": ["Repetición"]
+        },
+        "challenge": {
+          "question": "Canta con la intensidad de Dolores",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -1106,11 +2406,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Toxic", "points": 1, "hints": ["Video de azafata"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Britney Spears", "points": 2, "hints": ["Princesa del Pop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Pop de los 2000"] },
-        "lyrics": { "question": "Completa: 'With a taste of your lips I'm on a...'", "answer": "ride", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Baila como Britney", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Toxic",
+          "points": 1,
+          "hints": ["Video de azafata"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Britney Spears",
+          "points": 2,
+          "hints": ["Princesa del Pop"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2000s",
+          "points": 3,
+          "hints": ["Pop de los 2000"]
+        },
+        "lyrics": {
+          "question": "Completa: 'With a taste of your lips I'm on a...'",
+          "answer": "ride",
+          "points": 3,
+          "hints": ["Primera línea"]
+        },
+        "challenge": {
+          "question": "Baila como Britney",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1127,11 +2452,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Señorita", "points": 1, "hints": ["Dúo romántico"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Shawn Mendes y Camila Cabello", "points": 2, "hints": ["Ex pareja"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit de verano 2019"] },
-        "lyrics": { "question": "Completa: 'I love it when you call me...'", "answer": "señorita", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila sensualmente el coro", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Señorita",
+          "points": 1,
+          "hints": ["Dúo romántico"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Shawn Mendes y Camila Cabello",
+          "points": 2,
+          "hints": ["Ex pareja"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Hit de verano 2019"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I love it when you call me...'",
+          "answer": "señorita",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila sensualmente el coro",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1148,11 +2498,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Paint The Town Red", "points": 1, "hints": ["Bitch I'm a cow"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Doja Cat", "points": 2, "hints": ["Rapera viral"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2023"] },
-        "lyrics": { "question": "Completa: 'Yeah, bitch, I said what I...'", "answer": "said", "points": 3, "hints": ["Actitud directa"] },
-        "challenge": { "question": "Rapea con actitud", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Paint The Town Red",
+          "points": 1,
+          "hints": ["Hit viral de 2023"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Doja Cat",
+          "points": 2,
+          "hints": ["Rapera viral"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit de 2023"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Yeah, bitch, I said what I...'",
+          "answer": "said",
+          "points": 3,
+          "hints": ["Actitud directa"]
+        },
+        "challenge": {
+          "question": "Rapea con actitud",
+          "answer": "Completar rap",
+          "points": 5,
+          "challengeType": "rap"
+        }
       }
     },
     {
@@ -1169,11 +2544,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Livin' La Vida Loca", "points": 1, "hints": ["She's into superstitions"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ricky Martin", "points": 2, "hints": ["Rey del pop latino"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Explosión latina de los 90"] },
-        "lyrics": { "question": "Completa: 'Upside inside out, she's livin' la vida...'", "answer": "loca", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila como Ricky Martin", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Livin' La Vida Loca",
+          "points": 1,
+          "hints": ["She's into superstitions"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Ricky Martin",
+          "points": 2,
+          "hints": ["Rey del pop latino"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Explosión latina de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Upside inside out, she's livin' la vida...'",
+          "answer": "loca",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila como Ricky Martin",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1190,11 +2590,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Get Lucky", "points": 1, "hints": ["We're up all night"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Daft Punk", "points": 2, "hints": ["Robots franceses"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Último álbum de Daft Punk"] },
-        "lyrics": { "question": "Completa: 'We're up all night to get...'", "answer": "lucky", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila disco futurista", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Get Lucky",
+          "points": 1,
+          "hints": ["We're up all night"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Daft Punk",
+          "points": 2,
+          "hints": ["Robots franceses"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2010s",
+          "points": 3,
+          "hints": ["Último álbum de Daft Punk"]
+        },
+        "lyrics": {
+          "question": "Completa: 'We're up all night to get...'",
+          "answer": "lucky",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila disco futurista",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1211,11 +2636,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Peaches", "points": 1, "hints": ["I got my peaches out in Georgia"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Justin Bieber", "points": 2, "hints": ["Pop canadiense"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2021"] },
-        "lyrics": { "question": "Completa: 'I got my peaches out in...'", "answer": "Georgia", "points": 3, "hints": ["Estado de USA"] },
-        "challenge": { "question": "Canta con vibras chill", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Peaches",
+          "points": 1,
+          "hints": ["I got my peaches out in Georgia"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Justin Bieber",
+          "points": 2,
+          "hints": ["Pop canadiense"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit de 2021"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I got my peaches out in...'",
+          "answer": "Georgia",
+          "points": 3,
+          "hints": ["Estado de USA"]
+        },
+        "challenge": {
+          "question": "Canta con vibras chill",
+          "answer": "Completar canto",
+          "points": 5,
+          "challengeType": "sing"
+        }
       }
     },
     {
@@ -1232,11 +2682,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Macarena", "points": 1, "hints": ["Baile de fiesta universal"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Los del Río", "points": 2, "hints": ["Dúo español"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Hit de los 90"] },
-        "lyrics": { "question": "Completa: 'Dale a tu cuerpo alegría...'", "answer": "Macarena", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila la Macarena completa", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Macarena",
+          "points": 1,
+          "hints": ["Baile de fiesta universal"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Los del Río",
+          "points": 2,
+          "hints": ["Dúo español"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1990s",
+          "points": 3,
+          "hints": ["Hit de los 90"]
+        },
+        "lyrics": {
+          "question": "Completa: 'Dale a tu cuerpo alegría...'",
+          "answer": "Macarena",
+          "points": 3,
+          "hints": ["Título de la canción"]
+        },
+        "challenge": {
+          "question": "Baila la Macarena completa",
+          "answer": "Completar baile",
+          "points": 5,
+          "challengeType": "dance"
+        }
       }
     },
     {
@@ -1253,1302 +2728,36 @@
       "hasQuestions": true,
       "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
       "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Industry Baby", "points": 1, "hints": ["Baby back, ayy"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Lil Nas X", "points": 2, "hints": ["Old Town Road"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2021"] },
-        "lyrics": { "question": "Completa: 'I told you long ago on the road, I got what they waiting...'", "answer": "for", "points": 3, "hints": ["Esperando por"] },
-        "challenge": { "question": "Rapea con actitud", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
-      }
-    }
-  ],
-  "metadata": {
-    "totalTracks": 60,
-    "lastUpdated": "2024-12-12",
-    "version": "2.0",
-    "coverage": {
-      "decades": {
-        "1970s": 10,
-        "1980s": 10,
-        "1990s": 10,
-        "2000s": 10,
-        "2010s": 10,
-        "2020s": 10
-      },
-      "genres": {
-        "ROCK": 15,
-        "POP": 22,
-        "LATIN": 7,
-        "HIPHOP": 9,
-        "DISCO": 4,
-        "ELECTRONIC": 3
-      },
-      "difficulties": {
-        "EASY": 38,
-        "MEDIUM": 17,
-        "HARD": 5
-      }
-    }
-  }
-}{
-  "tracks": [
-    {
-      "id": "001",
-      "title": "Despacito",
-      "artist": "Luis Fonsi ft. Daddy Yankee",
-      "album": "Vida",
-      "year": 2017,
-      "genre": "LATIN",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Despacito", "points": 1, "hints": ["Hit de reggaeton", "Luis Fonsi"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Luis Fonsi", "points": 2, "hints": ["Colaboración con Daddy Yankee"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Se hizo viral en YouTube"] },
-        "lyrics": { "question": "Completa: 'Sí, sabes que ya llevo un rato...'", "answer": "mirándote", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Baila 10 segundos de Despacito", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "002",
-      "title": "Bohemian Rhapsody",
-      "artist": "Queen",
-      "album": "A Night at the Opera",
-      "year": 1975,
-      "genre": "ROCK",
-      "decade": "1970s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Bohemian Rhapsody", "points": 1, "hints": ["Tiene parte operática"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Queen", "points": 2, "hints": ["Freddie Mercury"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Época dorada del rock"] },
-        "lyrics": { "question": "Completa: 'Is this the real life, is this just...'", "answer": "fantasy", "points": 3, "hints": ["Inicio icónico"] },
-        "challenge": { "question": "Imita a Freddie Mercury cantando", "answer": "Completar imitación", "points": 5, "challengeType": "imitate" }
-      }
-    },
-    {
-      "id": "003",
-      "title": "Billie Jean",
-      "artist": "Michael Jackson",
-      "album": "Thriller",
-      "year": 1982,
-      "genre": "POP",
-      "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Billie Jean", "points": 1, "hints": ["Del álbum Thriller"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Michael Jackson", "points": 2, "hints": ["El Rey del Pop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Era dorada del pop"] },
-        "lyrics": { "question": "Completa: 'Billie Jean is not my...'", "answer": "lover", "points": 3, "hints": ["Coro principal"] },
-        "challenge": { "question": "Haz el moonwalk", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "004",
-      "title": "Smells Like Teen Spirit",
-      "artist": "Nirvana",
-      "album": "Nevermind",
-      "year": 1991,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Smells Like Teen Spirit", "points": 1, "hints": ["Himno del grunge"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Nirvana", "points": 2, "hints": ["Kurt Cobain"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Era del grunge"] },
-        "lyrics": { "question": "Completa: 'Here we are now...'", "answer": "entertain us", "points": 3, "hints": ["Coro famoso"] },
-        "challenge": { "question": "Canta el coro con actitud grunge", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "005",
-      "title": "Crazy in Love",
-      "artist": "Beyoncé ft. Jay-Z",
-      "album": "Dangerously in Love",
-      "year": 2003,
-      "genre": "POP",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Crazy in Love", "points": 1, "hints": ["Debut solista de Beyoncé"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Beyoncé", "points": 2, "hints": ["Queen B"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Inicio de los 2000"] },
-        "lyrics": { "question": "Completa: 'Got me looking so...'", "answer": "crazy right now", "points": 3, "hints": ["Coro principal"] },
-        "challenge": { "question": "Baila como Beyoncé", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "006",
-      "title": "Blinding Lights",
-      "artist": "The Weeknd",
-      "album": "After Hours",
-      "year": 2020,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Blinding Lights", "points": 1, "hints": ["Sonido retro 80s"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Weeknd", "points": 2, "hints": ["Artista canadiense"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de pandemia"] },
-        "lyrics": { "question": "Completa: 'I'm blinded by the...'", "answer": "lights", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Haz la coreografía del video", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "007",
-      "title": "Hotel California",
-      "artist": "Eagles",
-      "album": "Hotel California",
-      "year": 1977,
-      "genre": "ROCK",
-      "decade": "1970s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Hotel California", "points": 1, "hints": ["Hotel misterioso"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Eagles", "points": 2, "hints": ["Banda californiana"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Rock clásico de los 70"] },
-        "lyrics": { "question": "Completa: 'Welcome to the Hotel...'", "answer": "California", "points": 3, "hints": ["Nombre del hotel"] },
-        "challenge": { "question": "Toca guitarra air guitar en el solo", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
-      }
-    },
-    {
-      "id": "008",
-      "title": "Sweet Child O' Mine",
-      "artist": "Guns N' Roses",
-      "album": "Appetite for Destruction",
-      "year": 1987,
-      "genre": "ROCK",
-      "decade": "1980s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Sweet Child O' Mine", "points": 1, "hints": ["Riff de guitarra icónico"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Guns N' Roses", "points": 2, "hints": ["Axl Rose es el vocalista"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Era del hair metal"] },
-        "lyrics": { "question": "Completa: 'She's got a smile that it seems to me...'", "answer": "reminds me of childhood memories", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Imita el riff de guitarra", "answer": "Completar imitación", "points": 5, "challengeType": "imitate" }
-      }
-    },
-    {
-      "id": "009",
-      "title": "Wonderwall",
-      "artist": "Oasis",
-      "album": "(What's the Story) Morning Glory?",
-      "year": 1995,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Wonderwall", "points": 1, "hints": ["La más tocada en guitarra"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Oasis", "points": 2, "hints": ["Hermanos Gallagher"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Britpop"] },
-        "lyrics": { "question": "Completa: 'Because maybe, you're gonna be the one that...'", "answer": "saves me", "points": 3, "hints": ["Coro famoso"] },
-        "challenge": { "question": "Canta el coro completo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "010",
-      "title": "In Da Club",
-      "artist": "50 Cent",
-      "album": "Get Rich or Die Tryin'",
-      "year": 2003,
-      "genre": "HIPHOP",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "In Da Club", "points": 1, "hints": ["Go shawty, it's your birthday"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "50 Cent", "points": 2, "hints": ["Rapper de Nueva York"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Era dorada del hip-hop comercial"] },
-        "lyrics": { "question": "Completa: 'Go shawty, it's your...'", "answer": "birthday", "points": 3, "hints": ["Intro icónico"] },
-        "challenge": { "question": "Rapea el primer verso", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
-      }
-    },
-    {
-      "id": "011",
-      "title": "Bad Guy",
-      "artist": "Billie Eilish",
-      "album": "When We All Fall Asleep, Where Do We Go?",
-      "year": 2019,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Bad Guy", "points": 1, "hints": ["Duh!"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Billie Eilish", "points": 2, "hints": ["Artista Gen Z"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Final de la década"] },
-        "lyrics": { "question": "Completa: 'I'm the bad guy...'", "answer": "duh", "points": 3, "hints": ["Final del coro"] },
-        "challenge": { "question": "Haz la cara de Billie Eilish", "answer": "Completar pose", "points": 5, "challengeType": "pose" }
-      }
-    },
-    {
-      "id": "012",
-      "title": "As It Was",
-      "artist": "Harry Styles",
-      "album": "Harry's House",
-      "year": 2022,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "As It Was", "points": 1, "hints": ["Hit de 2022"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Harry Styles", "points": 2, "hints": ["Ex One Direction"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Post-pandemia"] },
-        "lyrics": { "question": "Completa: 'You know it's not the same as it...'", "answer": "was", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila como Harry en el video", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "013",
-      "title": "Stayin' Alive",
-      "artist": "Bee Gees",
-      "album": "Saturday Night Fever",
-      "year": 1977,
-      "genre": "DISCO",
-      "decade": "1970s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Stayin' Alive", "points": 1, "hints": ["Soundtrack de Saturday Night Fever"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Bee Gees", "points": 2, "hints": ["Hermanos Gibb"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Era disco"] },
-        "lyrics": { "question": "Completa: 'Ah, ha, ha, ha, stayin'...'", "answer": "alive", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila disco como John Travolta", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "014",
-      "title": "Like a Prayer",
-      "artist": "Madonna",
-      "album": "Like a Prayer",
-      "year": 1989,
-      "genre": "POP",
-      "decade": "1980s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Like a Prayer", "points": 1, "hints": ["Canción controversial"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Madonna", "points": 2, "hints": ["Reina del Pop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Final de los 80"] },
-        "lyrics": { "question": "Completa: 'Life is a mystery, everyone must...'", "answer": "stand alone", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Haz una pose de Madonna", "answer": "Completar pose", "points": 5, "challengeType": "pose" }
-      }
-    },
-    {
-      "id": "015",
-      "title": "Wannabe",
-      "artist": "Spice Girls",
-      "album": "Spice",
-      "year": 1996,
-      "genre": "POP",
-      "decade": "1990s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Wannabe", "points": 1, "hints": ["If you wanna be my lover"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Spice Girls", "points": 2, "hints": ["Girl Power"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Pop de los 90"] },
-        "lyrics": { "question": "Completa: 'If you wanna be my lover, you gotta get with my...'", "answer": "friends", "points": 3, "hints": ["Coro famoso"] },
-        "challenge": { "question": "Baila como las Spice Girls", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "016",
-      "title": "Yeah!",
-      "artist": "Usher ft. Lil Jon & Ludacris",
-      "album": "Confessions",
-      "year": 2004,
-      "genre": "HIPHOP",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Yeah!", "points": 1, "hints": ["YEAH! OKAY!"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Usher", "points": 2, "hints": ["Rey del R&B"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Hit de club de los 2000"] },
-        "lyrics": { "question": "Completa: 'Yeah, yeah, yeah...'", "answer": "okay", "points": 3, "hints": ["Lil Jon grita esto"] },
-        "challenge": { "question": "Baila como Usher", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "017",
-      "title": "Shape of You",
-      "artist": "Ed Sheeran",
-      "album": "÷ (Divide)",
-      "year": 2017,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Shape of You", "points": 1, "hints": ["I'm in love with your body"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ed Sheeran", "points": 2, "hints": ["Pelirrojo británico"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Mega hit de streaming"] },
-        "lyrics": { "question": "Completa: 'I'm in love with the shape of...'", "answer": "you", "points": 3, "hints": ["Coro principal"] },
-        "challenge": { "question": "Canta el coro completo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "018",
-      "title": "Anti-Hero",
-      "artist": "Taylor Swift",
-      "album": "Midnights",
-      "year": 2022,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Anti-Hero", "points": 1, "hints": ["It's me, hi, I'm the problem"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Taylor Swift", "points": 2, "hints": ["Swifties"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Álbum Midnights"] },
-        "lyrics": { "question": "Completa: 'It's me, hi, I'm the problem it's...'", "answer": "me", "points": 3, "hints": ["Línea viral"] },
-        "challenge": { "question": "Canta la parte viral", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "019",
-      "title": "Stairway to Heaven",
-      "artist": "Led Zeppelin",
-      "album": "Led Zeppelin IV",
-      "year": 1971,
-      "genre": "ROCK",
-      "decade": "1970s",
-      "difficulty": "HARD",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Stairway to Heaven", "points": 1, "hints": ["8 minutos de épica"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Led Zeppelin", "points": 2, "hints": ["Robert Plant y Jimmy Page"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Rock progresivo de los 70"] },
-        "lyrics": { "question": "Completa: 'There's a lady who's sure all that glitters is...'", "answer": "gold", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Air guitar en el solo final", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
-      }
-    },
-    {
-      "id": "020",
-      "title": "Take On Me",
-      "artist": "a-ha",
-      "album": "Hunting High and Low",
-      "year": 1985,
-      "genre": "POP",
-      "decade": "1980s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Take On Me", "points": 1, "hints": ["Video en blanco y negro animado"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "a-ha", "points": 2, "hints": ["Banda noruega"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Synth-pop de los 80"] },
-        "lyrics": { "question": "Completa: 'Take on me, take me...'", "answer": "on", "points": 3, "hints": ["Coro repetitivo"] },
-        "challenge": { "question": "Canta la nota alta del coro", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "021",
-      "title": "Creep",
-      "artist": "Radiohead",
-      "album": "Pablo Honey",
-      "year": 1992,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Creep", "points": 1, "hints": ["I'm a creep, I'm a weirdo"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Radiohead", "points": 2, "hints": ["Thom Yorke"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Rock alternativo de los 90"] },
-        "lyrics": { "question": "Completa: 'I'm a creep, I'm a...'", "answer": "weirdo", "points": 3, "hints": ["Auto-descripción"] },
-        "challenge": { "question": "Canta con la angustia de Thom Yorke", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "022",
-      "title": "Hips Don't Lie",
-      "artist": "Shakira ft. Wyclef Jean",
-      "album": "Oral Fixation Vol. 2",
-      "year": 2006,
-      "genre": "LATIN",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Hips Don't Lie", "points": 1, "hints": ["Las caderas no mienten"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Shakira", "points": 2, "hints": ["Colombiana famosa"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Mundial de fútbol 2006"] },
-        "lyrics": { "question": "Completa: 'Oh baby when you talk like that, you make a woman go...'", "answer": "mad", "points": 3, "hints": ["Reacción a las palabras"] },
-        "challenge": { "question": "Mueve las caderas como Shakira", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "023",
-      "title": "Uptown Funk",
-      "artist": "Bruno Mars ft. Mark Ronson",
-      "album": "Uptown Special",
-      "year": 2014,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Uptown Funk", "points": 1, "hints": ["Don't believe me just watch"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Bruno Mars", "points": 2, "hints": ["Con Mark Ronson"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit de 2014"] },
-        "lyrics": { "question": "Completa: 'Uptown funk you up, uptown funk you...'", "answer": "up", "points": 3, "hints": ["Repetición del coro"] },
-        "challenge": { "question": "Haz el baile de Uptown Funk", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "024",
-      "title": "Flowers",
-      "artist": "Miley Cyrus",
-      "album": "Endless Summer Vacation",
-      "year": 2023,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Flowers", "points": 1, "hints": ["I can buy myself flowers"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Miley Cyrus", "points": 2, "hints": ["Ex Hannah Montana"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2023"] },
-        "lyrics": { "question": "Completa: 'I can buy myself...'", "answer": "flowers", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Canta el coro de empoderamiento", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "025",
-      "title": "Dancing Queen",
-      "artist": "ABBA",
-      "album": "Arrival",
-      "year": 1976,
-      "genre": "DISCO",
-      "decade": "1970s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Dancing Queen", "points": 1, "hints": ["You can dance, you can jive"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "ABBA", "points": 2, "hints": ["Banda sueca"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Era disco"] },
-        "lyrics": { "question": "Completa: 'You are the dancing...'", "answer": "queen", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila disco estilo ABBA", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "026",
-      "title": "Livin' on a Prayer",
-      "artist": "Bon Jovi",
-      "album": "Slippery When Wet",
-      "year": 1986,
-      "genre": "ROCK",
-      "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Livin' on a Prayer", "points": 1, "hints": ["Woah, we're halfway there"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Bon Jovi", "points": 2, "hints": ["Jon Bon Jovi"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Hair metal de los 80"] },
-        "lyrics": { "question": "Completa: 'Woah, we're halfway...'", "answer": "there", "points": 3, "hints": ["Coro épico"] },
-        "challenge": { "question": "Canta el WOAH con todo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "027",
-      "title": "Losing My Religion",
-      "artist": "R.E.M.",
-      "album": "Out of Time",
-      "year": 1991,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Losing My Religion", "points": 1, "hints": ["Mandolina icónica"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "R.E.M.", "points": 2, "hints": ["Michael Stipe"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Rock alternativo de los 90"] },
-        "lyrics": { "question": "Completa: 'That's me in the corner, that's me in the...'", "answer": "spotlight", "points": 3, "hints": ["Perdiendo la religión"] },
-        "challenge": { "question": "Haz los gestos dramáticos del video", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
-      }
-    },
-    {
-      "id": "028",
-      "title": "Hey Ya!",
-      "artist": "OutKast",
-      "album": "Speakerboxxx/The Love Below",
-      "year": 2003,
-      "genre": "HIPHOP",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Hey Ya!", "points": 1, "hints": ["Shake it like a Polaroid picture"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "OutKast", "points": 2, "hints": ["André 3000"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Hit de 2003"] },
-        "lyrics": { "question": "Completa: 'Shake it, shake it like a Polaroid...'", "answer": "picture", "points": 3, "hints": ["Línea icónica"] },
-        "challenge": { "question": "Sacude como una foto Polaroid", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "029",
-      "title": "Rolling in the Deep",
-      "artist": "Adele",
-      "album": "21",
-      "year": 2010,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Rolling in the Deep", "points": 1, "hints": ["We could have had it all"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Adele", "points": 2, "hints": ["Voz poderosa británica"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Inicio de la década"] },
-        "lyrics": { "question": "Completa: 'We could have had it...'", "answer": "all", "points": 3, "hints": ["Coro potente"] },
-        "challenge": { "question": "Canta con la potencia de Adele", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "030",
-      "title": "Vampire",
-      "artist": "Olivia Rodrigo",
-      "album": "Guts",
-      "year": 2023,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Vampire", "points": 1, "hints": ["Hit de 2023"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Olivia Rodrigo", "points": 2, "hints": ["Ex Disney"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Álbum Guts"] },
-        "lyrics": { "question": "Completa: 'You're a vampire...'", "answer": "I'm a victim", "points": 3, "hints": ["Acusación"] },
-        "challenge": { "question": "Canta con drama adolescente", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "031",
-      "title": "La Bamba",
-      "artist": "Ritchie Valens",
-      "album": "Ritchie Valens",
-      "year": 1958,
-      "genre": "LATIN",
-      "decade": "1970s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "La Bamba", "points": 1, "hints": ["Canción tradicional mexicana"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ritchie Valens", "points": 2, "hints": ["Pionero del rock latino"] },
-        "decade": { "question": "¿De qué década es la versión clásica?", "answer": "1970s", "points": 3, "hints": ["Popularizada en los 70-80"] },
-        "lyrics": { "question": "Completa: 'Para bailar la...'", "answer": "bamba", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila La Bamba", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "032",
-      "title": "Every Breath You Take",
-      "artist": "The Police",
-      "album": "Synchronicity",
-      "year": 1983,
-      "genre": "ROCK",
-      "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Every Breath You Take", "points": 1, "hints": ["I'll be watching you"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Police", "points": 2, "hints": ["Sting es el vocalista"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["New wave de los 80"] },
-        "lyrics": { "question": "Completa: 'Every breath you take, every move you...'", "answer": "make", "points": 3, "hints": ["Observando cada movimiento"] },
-        "challenge": { "question": "Canta con voz misteriosa", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "033",
-      "title": "Bitter Sweet Symphony",
-      "artist": "The Verve",
-      "album": "Urban Hymns",
-      "year": 1997,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Bitter Sweet Symphony", "points": 1, "hints": ["Violines épicos"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Verve", "points": 2, "hints": ["Banda británica"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Britpop tardío"] },
-        "lyrics": { "question": "Completa: 'Cause it's a bittersweet...'", "answer": "symphony", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Camina como en el video", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
-      }
-    },
-    {
-      "id": "034",
-      "title": "Lose Yourself",
-      "artist": "Eminem",
-      "album": "8 Mile Soundtrack",
-      "year": 2002,
-      "genre": "HIPHOP",
-      "decade": "2000s",
-      "difficulty": "HARD",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Lose Yourself", "points": 1, "hints": ["Mom's spaghetti"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Eminem", "points": 2, "hints": ["Slim Shady"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["De la película 8 Mile"] },
-        "lyrics": { "question": "Completa: 'His palms are sweaty, knees weak, arms are heavy, there's vomit on his sweater already...'", "answer": "mom's spaghetti", "points": 3, "hints": ["Meme famoso"] },
-        "challenge": { "question": "Rapea el primer verso", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
-      }
-    },
-    {
-      "id": "035",
-      "title": "Happy",
-      "artist": "Pharrell Williams",
-      "album": "Despicable Me 2 Soundtrack",
-      "year": 2013,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Happy", "points": 1, "hints": ["Because I'm happy"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Pharrell Williams", "points": 2, "hints": ["Productor y cantante"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["De película de Minions"] },
-        "lyrics": { "question": "Completa: 'Because I'm...'", "answer": "happy", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila feliz por 10 segundos", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "036",
-      "title": "Kill Bill",
-      "artist": "SZA",
-      "album": "SOS",
-      "year": 2022,
-      "genre": "HIPHOP",
-      "decade": "2020s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Kill Bill", "points": 1, "hints": ["Referencia a película de Tarantino"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "SZA", "points": 2, "hints": ["R&B alternativo"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de TikTok 2023"] },
-        "lyrics": { "question": "Completa: 'I might kill my ex...'", "answer": "not the best idea", "points": 3, "hints": ["Pensamientos oscuros"] },
-        "challenge": { "question": "Canta con actitud R&B", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "037",
-      "title": "September",
-      "artist": "Earth, Wind & Fire",
-      "album": "The Best of Earth, Wind & Fire",
-      "year": 1978,
-      "genre": "DISCO",
-      "decade": "1970s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "September", "points": 1, "hints": ["Do you remember?"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Earth, Wind & Fire", "points": 2, "hints": ["Banda de funk/disco"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Disco de los 70"] },
-        "lyrics": { "question": "Completa: 'Do you remember the 21st night of...'", "answer": "September", "points": 3, "hints": ["Mes del título"] },
-        "challenge": { "question": "Baila funk/disco", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "038",
-      "title": "Jump",
-      "artist": "Van Halen",
-      "album": "1984",
-      "year": 1984,
-      "genre": "ROCK",
-      "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Jump", "points": 1, "hints": ["Might as well jump"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Van Halen", "points": 2, "hints": ["Eddie Van Halen"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Álbum llamado 1984"] },
-        "lyrics": { "question": "Completa: 'Might as well...'", "answer": "jump", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Salta mientras cantas el coro", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
-      }
-    },
-    {
-      "id": "039",
-      "title": "Smack My Bitch Up",
-      "artist": "The Prodigy",
-      "album": "The Fat of the Land",
-      "year": 1997,
-      "genre": "ELECTRONIC",
-      "decade": "1990s",
-      "difficulty": "HARD",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Smack My Bitch Up", "points": 1, "hints": ["Canción controversial"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Prodigy", "points": 2, "hints": ["Big beat británico"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Era del big beat"] },
-        "lyrics": { "question": "¿Es principalmente instrumental o tiene letra?", "answer": "Sample repetitivo", "points": 3, "hints": ["Muy poca letra"] },
-        "challenge": { "question": "Baila electrónico agresivo", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "040",
-      "title": "Umbrella",
-      "artist": "Rihanna ft. Jay-Z",
-      "album": "Good Girl Gone Bad",
-      "year": 2007,
-      "genre": "POP",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Umbrella", "points": 1, "hints": ["Ella, ella, eh, eh, eh"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Rihanna", "points": 2, "hints": ["Artista de Barbados"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Hit de 2007"] },
-        "lyrics": { "question": "Completa: 'Under my umbrella, ella, ella...'", "answer": "eh, eh, eh", "points": 3, "hints": ["Coro pegajoso"] },
-        "challenge": { "question": "Haz la coreografía del paraguas", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "041",
-      "title": "Thinking Out Loud",
-      "artist": "Ed Sheeran",
-      "album": "×",
-      "year": 2014,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Thinking Out Loud", "points": 1, "hints": ["Canción de bodas popular"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ed Sheeran", "points": 2, "hints": ["Pelirrojo con guitarra"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit romántico de 2014"] },
-        "lyrics": { "question": "Completa: 'And darling I will be loving you till we're...'", "answer": "70", "points": 3, "hints": ["Edad avanzada"] },
-        "challenge": { "question": "Canta con romanticismo", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "042",
-      "title": "Cruel Summer",
-      "artist": "Taylor Swift",
-      "album": "Lover",
-      "year": 2019,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Cruel Summer", "points": 1, "hints": ["Verano cruel"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Taylor Swift", "points": 2, "hints": ["Era Lover"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Final de la década"] },
-        "lyrics": { "question": "Completa: 'It's a cruel...'", "answer": "summer", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Canta el bridge dramático", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "043",
-      "title": "Espresso",
-      "artist": "Sabrina Carpenter",
-      "album": "Single",
-      "year": 2024,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Espresso", "points": 1, "hints": ["That's that me espresso"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Sabrina Carpenter", "points": 2, "hints": ["Ex Disney"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit viral de 2024"] },
-        "lyrics": { "question": "Completa: 'That's that me...'", "answer": "espresso", "points": 3, "hints": ["Café italiano"] },
-        "challenge": { "question": "Haz el baile viral", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "044",
-      "title": "Rappers Delight",
-      "artist": "The Sugarhill Gang",
-      "album": "Sugarhill Gang",
-      "year": 1979,
-      "genre": "HIPHOP",
-      "decade": "1970s",
-      "difficulty": "HARD",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Rapper's Delight", "points": 1, "hints": ["Primera canción de hip-hop mainstream"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Sugarhill Gang", "points": 2, "hints": ["Pioneros del hip-hop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Nacimiento del hip-hop"] },
-        "lyrics": { "question": "Completa: 'I said a hip hop the hippie the hippie to the hip hip...'", "answer": "hop", "points": 3, "hints": ["Intro legendario"] },
-        "challenge": { "question": "Rapea el intro clásico", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
-      }
-    },
-    {
-      "id": "045",
-      "title": "Purple Rain",
-      "artist": "Prince",
-      "album": "Purple Rain",
-      "year": 1984,
-      "genre": "POP",
-      "decade": "1980s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Purple Rain", "points": 1, "hints": ["Lluvia púrpura"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Prince", "points": 2, "hints": ["El Artista Antes Conocido Como"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Película del mismo nombre"] },
-        "lyrics": { "question": "Completa: 'Purple rain, purple...'", "answer": "rain", "points": 3, "hints": ["Título repetido"] },
-        "challenge": { "question": "Toca guitarra air guitar estilo Prince", "answer": "Completar performance", "points": 5, "challengeType": "performance" }
-      }
-    },
-    {
-      "id": "046",
-      "title": "No Diggity",
-      "artist": "Blackstreet ft. Dr. Dre",
-      "album": "Another Level",
-      "year": 1996,
-      "genre": "HIPHOP",
-      "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "No Diggity", "points": 1, "hints": ["No doubt"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Blackstreet", "points": 2, "hints": ["Con Dr. Dre"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["R&B de los 90"] },
-        "lyrics": { "question": "Completa: 'No diggity, no...'", "answer": "doubt", "points": 3, "hints": ["Sin duda"] },
-        "challenge": { "question": "Canta con flow R&B", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "047",
-      "title": "Mr. Brightside",
-      "artist": "The Killers",
-      "album": "Hot Fuss",
-      "year": 2004,
-      "genre": "ROCK",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Mr. Brightside", "points": 1, "hints": ["Coming out of my cage"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Killers", "points": 2, "hints": ["Banda de Las Vegas"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Indie rock de los 2000"] },
-        "lyrics": { "question": "Completa: 'Coming out of my cage and I've been doing just...'", "answer": "fine", "points": 3, "hints": ["Inicio icónico"] },
-        "challenge": { "question": "Canta el coro con pasión", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "048",
-      "title": "Someone Like You",
-      "artist": "Adele",
-      "album": "21",
-      "year": 2011,
-      "genre": "POP",
-      "decade": "2010s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Someone Like You", "points": 1, "hints": ["Balada de desamor"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Adele", "points": 2, "hints": ["Álbum 21"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit de 2011"] },
-        "lyrics": { "question": "Completa: 'Never mind I'll find someone like...'", "answer": "you", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Canta con emoción el coro", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "049",
-      "title": "Levitating",
-      "artist": "Dua Lipa",
-      "album": "Future Nostalgia",
-      "year": 2020,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Levitating", "points": 1, "hints": ["Sonido disco moderno"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Dua Lipa", "points": 2, "hints": ["Artista británica-albanesa"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Álbum Future Nostalgia"] },
-        "lyrics": { "question": "Completa: 'I got you moonlight, you're my...'", "answer": "starlight", "points": 3, "hints": ["Luz de estrella"] },
-        "challenge": { "question": "Baila disco moderno", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "050",
-      "title": "Y.M.C.A.",
-      "artist": "Village People",
-      "album": "Cruisin'",
-      "year": 1978,
-      "genre": "DISCO",
-      "decade": "1970s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Y.M.C.A.", "points": 1, "hints": ["Baile con letras"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Village People", "points": 2, "hints": ["Grupo disco icónico"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1970s", "points": 3, "hints": ["Era disco"] },
-        "lyrics": { "question": "Completa: 'It's fun to stay at the...'", "answer": "Y.M.C.A.", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Haz las letras Y-M-C-A con los brazos", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "051",
-      "title": "Don't Stop Believin'",
-      "artist": "Journey",
-      "album": "Escape",
-      "year": 1981,
-      "genre": "ROCK",
-      "decade": "1980s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Don't Stop Believin'", "points": 1, "hints": ["Just a small town girl"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Journey", "points": 2, "hints": ["Steve Perry"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1980s", "points": 3, "hints": ["Arena rock de los 80"] },
-        "lyrics": { "question": "Completa: 'Just a small town girl, livin' in a...'", "answer": "lonely world", "points": 3, "hints": ["Mundo solitario"] },
-        "challenge": { "question": "Canta el coro épico", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "052",
-      "title": "Zombie",
-      "artist": "The Cranberries",
-      "album": "No Need to Argue",
-      "year": 1994,
-      "genre": "ROCK",
-      "decade": "1990s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Zombie", "points": 1, "hints": ["In your head"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "The Cranberries", "points": 2, "hints": ["Dolores O'Riordan"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Rock alternativo de los 90"] },
-        "lyrics": { "question": "Completa: 'In your head, in your...'", "answer": "head", "points": 3, "hints": ["Repetición"] },
-        "challenge": { "question": "Canta con la intensidad de Dolores", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "053",
-      "title": "Toxic",
-      "artist": "Britney Spears",
-      "album": "In the Zone",
-      "year": 2004,
-      "genre": "POP",
-      "decade": "2000s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Toxic", "points": 1, "hints": ["Video de azafata"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Britney Spears", "points": 2, "hints": ["Princesa del Pop"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2000s", "points": 3, "hints": ["Pop de los 2000"] },
-        "lyrics": { "question": "Completa: 'With a taste of your lips I'm on a...'", "answer": "ride", "points": 3, "hints": ["Primera línea"] },
-        "challenge": { "question": "Baila como Britney", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "054",
-      "title": "Señorita",
-      "artist": "Shawn Mendes & Camila Cabello",
-      "album": "Single",
-      "year": 2019,
-      "genre": "LATIN",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Señorita", "points": 1, "hints": ["Dúo romántico"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Shawn Mendes y Camila Cabello", "points": 2, "hints": ["Ex pareja"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Hit de verano 2019"] },
-        "lyrics": { "question": "Completa: 'I love it when you call me...'", "answer": "señorita", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila sensualmente el coro", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "055",
-      "title": "Paint The Town Red",
-      "artist": "Doja Cat",
-      "album": "Scarlet",
-      "year": 2023,
-      "genre": "HIPHOP",
-      "decade": "2020s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Paint The Town Red", "points": 1, "hints": ["Bitch I'm a cow"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Doja Cat", "points": 2, "hints": ["Rapera viral"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2023"] },
-        "lyrics": { "question": "Completa: 'Yeah, bitch, I said what I...'", "answer": "said", "points": 3, "hints": ["Actitud directa"] },
-        "challenge": { "question": "Rapea con actitud", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
-      }
-    },
-    {
-      "id": "056",
-      "title": "Livin' La Vida Loca",
-      "artist": "Ricky Martin",
-      "album": "Ricky Martin",
-      "year": 1999,
-      "genre": "LATIN",
-      "decade": "1990s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Livin' La Vida Loca", "points": 1, "hints": ["She's into superstitions"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Ricky Martin", "points": 2, "hints": ["Rey del pop latino"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Explosión latina de los 90"] },
-        "lyrics": { "question": "Completa: 'Upside inside out, she's livin' la vida...'", "answer": "loca", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila como Ricky Martin", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "057",
-      "title": "Get Lucky",
-      "artist": "Daft Punk ft. Pharrell Williams",
-      "album": "Random Access Memories",
-      "year": 2013,
-      "genre": "ELECTRONIC",
-      "decade": "2010s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Get Lucky", "points": 1, "hints": ["We're up all night"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Daft Punk", "points": 2, "hints": ["Robots franceses"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2010s", "points": 3, "hints": ["Último álbum de Daft Punk"] },
-        "lyrics": { "question": "Completa: 'We're up all night to get...'", "answer": "lucky", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila disco futurista", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "058",
-      "title": "Peaches",
-      "artist": "Justin Bieber ft. Daniel Caesar & Giveon",
-      "album": "Justice",
-      "year": 2021,
-      "genre": "POP",
-      "decade": "2020s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Peaches", "points": 1, "hints": ["I got my peaches out in Georgia"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Justin Bieber", "points": 2, "hints": ["Pop canadiense"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2021"] },
-        "lyrics": { "question": "Completa: 'I got my peaches out in...'", "answer": "Georgia", "points": 3, "hints": ["Estado de USA"] },
-        "challenge": { "question": "Canta con vibras chill", "answer": "Completar canto", "points": 5, "challengeType": "sing" }
-      }
-    },
-    {
-      "id": "059",
-      "title": "Macarena",
-      "artist": "Los del Río",
-      "album": "A mí me gusta",
-      "year": 1993,
-      "genre": "LATIN",
-      "decade": "1990s",
-      "difficulty": "EASY",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Macarena", "points": 1, "hints": ["Baile de fiesta universal"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Los del Río", "points": 2, "hints": ["Dúo español"] },
-        "decade": { "question": "¿De qué década es?", "answer": "1990s", "points": 3, "hints": ["Hit de los 90"] },
-        "lyrics": { "question": "Completa: 'Dale a tu cuerpo alegría...'", "answer": "Macarena", "points": 3, "hints": ["Título de la canción"] },
-        "challenge": { "question": "Baila la Macarena completa", "answer": "Completar baile", "points": 5, "challengeType": "dance" }
-      }
-    },
-    {
-      "id": "060",
-      "title": "Industry Baby",
-      "artist": "Lil Nas X ft. Jack Harlow",
-      "album": "Montero",
-      "year": 2021,
-      "genre": "HIPHOP",
-      "decade": "2020s",
-      "difficulty": "MEDIUM",
-      "audioSource": "deezer",
-      "hasAudio": true,
-      "hasQuestions": true,
-      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
-      "questions": {
-        "song": { "question": "¿Cuál es la canción?", "answer": "Industry Baby", "points": 1, "hints": ["Baby back, ayy"] },
-        "artist": { "question": "¿Quién canta esta canción?", "answer": "Lil Nas X", "points": 2, "hints": ["Old Town Road"] },
-        "decade": { "question": "¿De qué década es?", "answer": "2020s", "points": 3, "hints": ["Hit de 2021"] },
-        "lyrics": { "question": "Completa: 'I told you long ago on the road, I got what they waiting...'", "answer": "for", "points": 3, "hints": ["Esperando por"] },
-        "challenge": { "question": "Rapea con actitud", "answer": "Completar rap", "points": 5, "challengeType": "rap" }
+        "song": {
+          "question": "¿Cuál es la canción?",
+          "answer": "Industry Baby",
+          "points": 1,
+          "hints": ["Baby back, ayy"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Lil Nas X",
+          "points": 2,
+          "hints": ["Old Town Road"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "2020s",
+          "points": 3,
+          "hints": ["Hit de 2021"]
+        },
+        "lyrics": {
+          "question": "Completa: 'I told you long ago on the road, I got what they waiting...'",
+          "answer": "for",
+          "points": 3,
+          "hints": ["Esperando por"]
+        },
+        "challenge": {
+          "question": "Rapea con actitud",
+          "answer": "Completar rap",
+          "points": 5,
+          "challengeType": "rap"
+        }
       }
     }
   ],
