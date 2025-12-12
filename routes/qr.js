@@ -1,414 +1,400 @@
-// routes/qr.js - VERSION CON DEEZER INTEGRADO
+/**
+ * 🎯 QR Routes - FORMATO NUEVO ESCALABLE + DEEZER
+ * ✅ Formato: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
+ * ✅ Siempre usa Deezer para audio
+ */
 
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
 const router = express.Router();
 
-// ðŸ› ï¸ FUNCION PARA CARGAR TRACKS CON MANEJO DE ERRORES
-function loadTracks() {
-  try {
-    const possiblePaths = [
-      path.join(process.cwd(), 'data/tracks.json'),
-      path.join(__dirname, '../data/tracks.json'),
-      path.join(__dirname, '../../data/tracks.json'),
-      path.join(process.cwd(), 'tracks.json'),
-      path.join(__dirname, '../tracks.json'),
-    ];
+// Importar servicios
+const QRService = require('../services/QRService');
+const TrackService = require('../services/TrackService');
+const DeezerService = require('../services/DeezerService');
 
-    let tracksData = null;
-    let usedPath = null;
+// Instanciar QRService
+const qrService = new QRService();
 
-    for (const filePath of possiblePaths) {
-      try {
-        if (fs.existsSync(filePath)) {
-          const fileContent = fs.readFileSync(filePath, 'utf8');
-          tracksData = JSON.parse(fileContent);
-          usedPath = filePath;
-          console.log(`âœ… Tracks loaded from: ${filePath}`);
-          break;
-        }
-      } catch (error) {
-        console.log(`âš ï¸ Failed to load from ${filePath}: ${error.message}`);
-        continue;
-      }
-    }
-
-    if (!tracksData) {
-      throw new Error('tracks.json not found in any expected location');
-    }
-
-    if (!tracksData.tracks || !Array.isArray(tracksData.tracks)) {
-      throw new Error('Invalid tracks.json structure - missing tracks array');
-    }
-
-    console.log(`ðŸ“Š Loaded ${tracksData.tracks.length} tracks from ${usedPath}`);
-    return tracksData.tracks;
-
-  } catch (error) {
-    console.error('âŒ Error loading tracks:', error.message);
-    console.error('ðŸ“ Current working directory:', process.cwd());
-    console.error('ðŸ“ __dirname:', __dirname);
-    throw new Error(`Failed to load tracks: ${error.message}`);
+/**
+ * 🎯 GENERAR PREGUNTA PARA UN TRACK
+ */
+function generateQuestion(track, cardType) {
+  // Si el track tiene preguntas predefinidas, usarlas
+  if (track.questions && track.questions[cardType]) {
+    return track.questions[cardType];
   }
-}
 
-// ðŸŽ¯ PARSEAR QR CODE CON VALIDACION
-function parseQRCode(qrCode) {
-  try {
-    console.log(`ðŸ” Parsing QR code: ${qrCode}`);
-    const qrPattern = /^HITBACK_(\d{3})_([A-Z]+)_([A-Z]+)$/;
-    const match = qrCode.match(qrPattern);
-
-    if (!match) {
-      throw new Error(`Invalid QR code format: ${qrCode}. Expected: HITBACK_001_SONG_EASY`);
-    }
-
-    const [, trackId, questionType, difficulty] = match;
-    console.log(`âœ… QR parsed - Track: ${trackId}, Type: ${questionType}, Difficulty: ${difficulty}`);
-
-    return {
-      trackId,
-      questionType: questionType.toLowerCase(),
-      difficulty: difficulty.toLowerCase()
-    };
-
-  } catch (error) {
-    console.error('âŒ QR parsing error:', error.message);
-    throw error;
-  }
-}
-
-// ðŸŽµ ENCONTRAR TRACK CON LOGGING DETALLADO
-function findTrack(tracks, trackId) {
-  try {
-    console.log(`ðŸ” Looking for track ID: ${trackId}`);
-    console.log(`ðŸ“‹ Available track IDs: ${tracks.map(t => t.id).join(', ')}`);
-
-    const track = tracks.find(t => t.id === trackId);
-
-    if (!track) {
-      throw new Error(`Track not found: ${trackId}. Available tracks: ${tracks.map(t => t.id).join(', ')}`);
-    }
-
-    console.log(`âœ… Track found: ${track.title} by ${track.artist}`);
-    return track;
-
-  } catch (error) {
-    console.error('âŒ Track lookup error:', error.message);
-    throw error;
-  }
-}
-
-// ðŸŽ¯ GENERAR PREGUNTA CON FALLBACKS
-function generateQuestion(track, questionType) {
-  try {
-    console.log(`ðŸŽ¯ Generating question - Type: ${questionType}`);
-
-    if (!track.questions || typeof track.questions !== 'object') {
-      console.warn(`âš ï¸ Track ${track.id} has no questions object, using defaults`);
-      return generateDefaultQuestion(track, questionType);
-    }
-
-    const question = track.questions[questionType];
-
-    if (!question) {
-      console.warn(`âš ï¸ Question type '${questionType}' not found for track ${track.id}, using default`);
-      return generateDefaultQuestion(track, questionType);
-    }
-
-    console.log(`âœ… Question generated: ${question.question}`);
-    return question;
-
-  } catch (error) {
-    console.error('âŒ Question generation error:', error.message);
-    return generateDefaultQuestion(track, questionType);
-  }
-}
-
-// ðŸŽ¯ PREGUNTAS POR DEFECTO
-function generateDefaultQuestion(track, questionType) {
-  const defaultQuestions = {
+  // Preguntas por defecto
+  const defaults = {
     song: {
-      question: "Â¿CuÃ¡l es la canciÃ³n?",
+      question: "¿Cuál es el nombre de esta canción?",
       answer: track.title,
       points: 1,
-      hints: ["Escucha la canciÃ³n", "Piensa en el tÃ­tulo"]
+      hints: ["Escucha atentamente la melodía", "Es un éxito conocido"]
     },
     artist: {
-      question: "Â¿QuiÃ©n canta esta canciÃ³n?",
+      question: "¿Quién interpreta esta canción?",
       answer: track.artist,
       points: 2,
-      hints: ["Escucha la voz", "Piensa en el intÃ©rprete"]
+      hints: ["Reconoce la voz", "Piensa en el estilo musical"]
     },
     decade: {
-      question: "Â¿De quÃ© dÃ©cada es esta canciÃ³n?",
+      question: "¿De qué década es esta canción?",
       answer: track.decade || `${Math.floor(track.year / 10) * 10}s`,
       points: 3,
-      hints: ["Piensa en el aÃ±o", "Â¿CuÃ¡ndo se hizo popular?"]
+      hints: ["Escucha el estilo de producción", "¿Suena retro o moderno?"]
     },
     lyrics: {
-      question: "Â¿Reconoces esta canciÃ³n por su letra?",
+      question: "Completa la letra de esta canción...",
       answer: track.title,
       points: 3,
-      hints: ["Escucha la letra", "Â¿QuÃ© dice la canciÃ³n?"]
+      hints: ["Presta atención a la letra", "Es una frase conocida"]
     },
     challenge: {
-      question: `Haz un desafÃ­o relacionado con ${track.title}`,
-      answer: "Completar desafÃ­o",
+      question: `¡Demuestra tu talento con "${track.title}"!`,
+      answer: "Completar el desafío",
       points: 5,
-      hints: ["SÃ© creativo", "Demuestra tu conocimiento"]
+      challengeType: "performance",
+      hints: ["Sé creativo", "Diviértete"]
     }
   };
 
-  return defaultQuestions[questionType] || defaultQuestions.song;
+  return defaults[cardType] || defaults.song;
 }
 
-// ðŸŽµ GENERAR INFO DE AUDIO - SISTEMA HÃBRIDO CON DEEZER
-async function generateAudioInfo(track, serverUrl = 'http://192.168.1.10:3000') {
+/**
+ * 🎵 OBTENER AUDIO DE DEEZER
+ */
+async function getAudioFromDeezer(track) {
   const audioInfo = {
     hasAudio: false,
     url: null,
-    source: null,
-    duration: 0,
+    source: 'deezer',
+    duration: 30,
     metadata: null
   };
 
   try {
-    // 1ï¸âƒ£ PRIORIDAD: Audio local (control total, sin restricciones)
-    if (track.hasAudio && track.audioFile) {
-      const localUrl = `${serverUrl}/audio/tracks/${track.audioFile}`;
-      console.log(`âœ… Audio local disponible: ${track.audioFile}`);
+    console.log(`🎵 Buscando en Deezer: "${track.title}" - ${track.artist}`);
+
+    const deezerTrack = await DeezerService.searchTrack(track.title, track.artist);
+
+    if (deezerTrack && deezerTrack.previewUrl) {
+      console.log(`✅ Preview de Deezer encontrado`);
 
       audioInfo.hasAudio = true;
-      audioInfo.url = localUrl;
-      audioInfo.source = 'local';
-      audioInfo.duration = Math.floor((track.duration || 180000) / 1000);
+      audioInfo.url = deezerTrack.previewUrl;
+      audioInfo.duration = 30;
+      audioInfo.metadata = {
+        deezerLink: deezerTrack.link,
+        albumArt: deezerTrack.cover?.large || deezerTrack.cover?.medium,
+        album: deezerTrack.album,
+        artistId: deezerTrack.artistId,
+        explicit: deezerTrack.explicit || false
+      };
+    } else {
+      console.log(`⚠️ No se encontró preview en Deezer para: ${track.title}`);
     }
-
-    // 2ï¸âƒ£ FALLBACK: Deezer preview (si no hay audio local)
-    if (!audioInfo.hasAudio) {
-      try {
-        console.log(`ðŸ” No hay audio local, buscando en Deezer...`);
-        const DeezerService = require('../services/DeezerService');
-        const deezerTrack = await DeezerService.searchTrack(track.title, track.artist);
-
-        if (deezerTrack && deezerTrack.previewUrl) {
-          console.log(`âœ… Deezer preview encontrado: ${deezerTrack.title}`);
-
-          audioInfo.hasAudio = true;
-          audioInfo.url = deezerTrack.previewUrl;
-          audioInfo.source = 'deezer';
-          audioInfo.duration = 30; // Previews son 30 segundos
-
-          // Metadata de Deezer
-          audioInfo.metadata = {
-            deezerLink: deezerTrack.link,
-            albumArt: deezerTrack.cover.large,
-            explicit: deezerTrack.explicit
-          };
-        } else {
-          console.log(`âš ï¸ No se encontrÃ³ preview en Deezer`);
-        }
-      } catch (deezerError) {
-        console.log(`âš ï¸ Deezer no disponible: ${deezerError.message}`);
-      }
-    }
-
-    // 3ï¸âƒ£ Si tenemos audio local, enriquecer con metadata de Deezer
-    if (audioInfo.source === 'local') {
-      try {
-        console.log(`ðŸ” Obteniendo metadata de Deezer para enriquecer...`);
-        const DeezerService = require('../services/DeezerService');
-        const deezerTrack = await DeezerService.searchTrack(track.title, track.artist);
-
-        if (deezerTrack) {
-          console.log(`âœ… Metadata de Deezer obtenida`);
-          audioInfo.metadata = {
-            deezerLink: deezerTrack.link,
-            albumArt: deezerTrack.cover.large,
-            explicit: deezerTrack.explicit
-          };
-        }
-      } catch (e) {
-        // No crÃ­tico, seguimos sin metadata
-        console.log(`âš ï¸ No se pudo obtener metadata de Deezer`);
-      }
-    }
-
-    return audioInfo;
-
   } catch (error) {
-    console.error('âŒ Error generando audio info:', error.message);
-    return audioInfo;
+    console.error(`❌ Error buscando en Deezer: ${error.message}`);
   }
+
+  return audioInfo;
 }
 
-// ðŸš€ RUTA PRINCIPAL - QR SCAN CON MANEJO ROBUSTO DE ERRORES
+/**
+ * 🚀 RUTA PRINCIPAL: ESCANEAR QR
+ * POST /api/qr/scan/:qrCode
+ */
 router.post('/scan/:qrCode', async (req, res) => {
   const startTime = Date.now();
   const { qrCode } = req.params;
 
-  try {
-    console.log(`\nðŸŽ¯ ===== QR SCAN REQUEST =====`);
-    console.log(`ðŸ“± QR Code: ${qrCode}`);
-    console.log(`ðŸŒ IP: ${req.ip}`);
-    console.log(`â° Timestamp: ${new Date().toISOString()}`);
-    console.log(`===============================\n`);
+  console.log(`\n${'═'.repeat(50)}`);
+  console.log(`🎯 QR SCAN: ${qrCode}`);
+  console.log(`⏰ ${new Date().toISOString()}`);
+  console.log(`${'═'.repeat(50)}\n`);
 
-    // 1. Validar parÃ¡metros
-    if (!qrCode || typeof qrCode !== 'string' || qrCode.length === 0) {
-      throw new Error('QR code is required and must be a non-empty string');
+  try {
+    // 1. Parsear QR (soporta ambos formatos)
+    const parsedQR = qrService.parseQRCode(qrCode);
+    console.log(`📱 Formato: ${parsedQR.format}`);
+
+    // 2. Obtener track según el formato
+    let track;
+
+    if (parsedQR.format === 'NEW') {
+      // ✅ FORMATO NUEVO: Selección aleatoria con filtros
+      console.log(`🎲 Selección aleatoria con filtros:`);
+      console.log(`   Dificultad: ${parsedQR.difficulty}`);
+      console.log(`   Género: ${parsedQR.genre}`);
+      console.log(`   Década: ${parsedQR.decade}`);
+
+      track = TrackService.getRandomTrack({
+        difficulty: parsedQR.difficulty.toUpperCase(),
+        genre: parsedQR.genre,
+        decade: parsedQR.decade
+      });
+    } else {
+      // ⚠️ FORMATO ANTIGUO: Track específico por ID
+      console.log(`📌 Buscando track por ID: ${parsedQR.trackId}`);
+      track = TrackService.getTrackById(parsedQR.trackId);
     }
 
-    // 2. Cargar tracks
-    console.log('ðŸ“‹ Loading tracks...');
-    const tracks = loadTracks();
+    if (!track) {
+      throw new Error('No se encontró ningún track con los filtros especificados');
+    }
 
-    // 3. Parsear QR code
-    console.log('ðŸ” Parsing QR code...');
-    const { trackId, questionType, difficulty } = parseQRCode(qrCode);
+    console.log(`✅ Track seleccionado: "${track.title}" - ${track.artist}`);
 
-    // 4. Buscar track
-    console.log('ðŸŽµ Finding track...');
-    const track = findTrack(tracks, trackId);
+    // 3. Obtener audio de Deezer
+    const audio = await getAudioFromDeezer(track);
 
-    // 5. Generar pregunta
-    console.log('ðŸŽ¯ Generating question...');
-    const question = generateQuestion(track, questionType);
+    // 4. Generar pregunta
+    const question = generateQuestion(track, parsedQR.cardType);
 
-    // 6. Generar informaciÃ³n de audio (AHORA ES ASYNC!)
-    console.log('ðŸŽµ Generating audio info...');
-    const serverUrl = `${req.protocol}://${req.get('host')}`;
-    const audio = await generateAudioInfo(track, serverUrl);
-
-    // 7. Preparar respuesta
+    // 5. Construir respuesta
     const responseData = {
       scan: {
         qrCode,
+        format: parsedQR.format,
         timestamp: new Date().toISOString(),
-        points: question.points || 1,
-        difficulty,
-        processingTime: Date.now() - startTime
+        points: parsedQR.points,
+        difficulty: parsedQR.difficulty,
+        processingTime: Date.now() - startTime,
+        filters: parsedQR.format === 'NEW' ? {
+          genre: parsedQR.genre,
+          decade: parsedQR.decade,
+          cardType: parsedQR.cardType
+        } : null
       },
       track: {
         id: track.id,
         title: track.title,
         artist: track.artist,
-        album: track.album,
-        year: track.year,
-        genre: track.genre,
-        difficulty: difficulty
+        album: track.album || null,
+        year: track.year || null,
+        genre: track.genre || null,
+        decade: track.decade || null,
+        difficulty: track.difficulty || null
       },
       question: {
-        type: questionType,
+        type: parsedQR.cardType,
         question: question.question,
         answer: question.answer,
-        points: question.points || 1,
-        hints: question.hints || []
+        points: parsedQR.points,
+        hints: question.hints || [],
+        challengeType: question.challengeType || null
       },
-      audio: audio
+      audio
     };
 
-    console.log(`\nâœ… ===== QR SCAN SUCCESS =====`);
-    console.log(`ðŸŽµ Track: ${track.title} - ${track.artist}`);
-    console.log(`ðŸŽ¯ Question: ${question.question}`);
-    console.log(`ðŸŽµ Audio: ${audio.hasAudio ? `âœ… ${audio.source}` : 'âŒ Not available'}`);
-    console.log(`â±ï¸ Processing time: ${Date.now() - startTime}ms`);
-    console.log(`===============================\n`);
+    console.log(`\n✅ SCAN EXITOSO`);
+    console.log(`   Track: ${track.title}`);
+    console.log(`   Audio: ${audio.hasAudio ? '✅ Deezer' : '❌ No disponible'}`);
+    console.log(`   Tiempo: ${Date.now() - startTime}ms\n`);
 
-    // 8. Enviar respuesta exitosa
-    res.sendSuccess(responseData, `QR scan successful for ${track.title}`);
-
-  } catch (error) {
-    console.error(`\nâŒ ===== QR SCAN ERROR =====`);
-    console.error(`ðŸ“± QR Code: ${qrCode}`);
-    console.error(`âŒ Error: ${error.message}`);
-    console.error(`ðŸ“Š Stack: ${error.stack}`);
-    console.error(`â±ï¸ Processing time: ${Date.now() - startTime}ms`);
-    console.error(`===============================\n`);
-
-    let statusCode = 500;
-    let errorCode = 'INTERNAL_ERROR';
-
-    if (error.message.includes('not found') || error.message.includes('Invalid QR code format')) {
-      statusCode = 404;
-      errorCode = 'QR_NOT_FOUND';
-    } else if (error.message.includes('Failed to load tracks')) {
-      statusCode = 503;
-      errorCode = 'SERVICE_UNAVAILABLE';
+    // 6. Enviar respuesta
+    if (res.sendSuccess) {
+      res.sendSuccess(responseData, `QR scan successful: ${track.title}`);
+    } else {
+      res.json({
+        success: true,
+        message: `QR scan successful: ${track.title}`,
+        data: responseData
+      });
     }
 
-    res.status(statusCode).json({
+  } catch (error) {
+    console.error(`\n❌ ERROR EN SCAN: ${error.message}\n`);
+
+    const statusCode =
+      error.message.includes('no encontrado') || error.message.includes('not found') ? 404 :
+        error.message.includes('inválido') || error.message.includes('invalid') || error.name === 'QRError' ? 400 :
+          500;
+
+    const errorResponse = {
       success: false,
       error: {
         message: error.message,
-        code: errorCode,
-        timestamp: new Date().toISOString(),
-        qrCode: qrCode,
-        processingTime: Date.now() - startTime
+        code: statusCode === 404 ? 'NOT_FOUND' : statusCode === 400 ? 'INVALID_FORMAT' : 'SERVER_ERROR',
+        qrCode,
+        processingTime: Date.now() - startTime,
+        help: qrService.getHelpInfo()
       }
+    };
+
+    if (res.sendError) {
+      res.status(statusCode).sendError(error.message, errorResponse.error.code, statusCode);
+    } else {
+      res.status(statusCode).json(errorResponse);
+    }
+  }
+});
+
+/**
+ * 🔗 GET también funciona (para testing en browser)
+ */
+router.get('/scan/:qrCode', async (req, res, next) => {
+  // Redirigir al POST
+  return router.handle(req, res, next);
+});
+
+/**
+ * 🧪 VALIDAR QR SIN ESCANEAR
+ * GET /api/qr/validate/:qrCode
+ */
+router.get('/validate/:qrCode', (req, res) => {
+  const { qrCode } = req.params;
+
+  try {
+    const parsed = qrService.parseQRCode(qrCode);
+
+    const response = {
+      isValid: true,
+      format: parsed.format,
+      parsed: {
+        cardType: parsed.cardType,
+        difficulty: parsed.difficulty,
+        genre: parsed.genre,
+        decade: parsed.decade,
+        points: parsed.points
+      }
+    };
+
+    if (res.sendSuccess) {
+      res.sendSuccess(response, 'QR válido');
+    } else {
+      res.json({ success: true, data: response });
+    }
+
+  } catch (error) {
+    const response = {
+      isValid: false,
+      error: error.message,
+      help: qrService.getHelpInfo()
+    };
+
+    if (res.sendSuccess) {
+      res.sendSuccess(response, 'Resultado de validación');
+    } else {
+      res.json({ success: true, data: response });
+    }
+  }
+});
+
+/**
+ * 📊 ESTADÍSTICAS DE QR
+ * GET /api/qr/stats
+ */
+router.get('/stats', (req, res) => {
+  try {
+    const tracks = TrackService.getAllTracks();
+
+    const stats = {
+      totalTracks: tracks.length,
+      byGenre: {},
+      byDecade: {},
+      byDifficulty: {},
+      possibleCombinations: 0
+    };
+
+    tracks.forEach(track => {
+      const genre = track.genre || 'Unknown';
+      const decade = track.decade || 'Unknown';
+      const difficulty = track.difficulty || 'Unknown';
+
+      stats.byGenre[genre] = (stats.byGenre[genre] || 0) + 1;
+      stats.byDecade[decade] = (stats.byDecade[decade] || 0) + 1;
+      stats.byDifficulty[difficulty] = (stats.byDifficulty[difficulty] || 0) + 1;
+    });
+
+    // Calcular combinaciones posibles (5 tipos × 4 dificultades × tracks)
+    stats.possibleCombinations = tracks.length * 5 * 4;
+
+    if (res.sendSuccess) {
+      res.sendSuccess(stats, 'QR Statistics');
+    } else {
+      res.json({ success: true, data: stats });
+    }
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: { message: error.message }
     });
   }
 });
 
-// ðŸ§ª RUTA DE VALIDACION DE QR
-router.get('/validate/:qrCode', (req, res) => {
-  try {
-    const { qrCode } = req.params;
-    console.log(`ðŸ” Validating QR: ${qrCode}`);
+/**
+ * 🏗️ GENERAR QR CODES DE EJEMPLO
+ * GET /api/qr/generate
+ */
+router.get('/generate', (req, res) => {
+  const { type, difficulty, genre, decade } = req.query;
 
-    const parsed = parseQRCode(qrCode);
+  const examples = [
+    qrService.generateQRCode({ cardType: type || 'SONG', difficulty: difficulty || 'EASY', genre: genre || 'ANY', decade: decade || 'ANY' }),
+    qrService.generateQRCode({ cardType: 'ARTIST', difficulty: 'MEDIUM', genre: 'ROCK', decade: '1980s' }),
+    qrService.generateQRCode({ cardType: 'DECADE', difficulty: 'HARD', genre: 'POP', decade: '2010s' }),
+    qrService.generateQRCode({ cardType: 'CHALLENGE', difficulty: 'EXPERT', genre: 'REGGAETON', decade: 'ANY' }),
+  ];
 
-    res.sendSuccess({
-      isValid: true,
-      parsed: parsed
-    }, 'QR code is valid');
+  const response = {
+    generated: examples[0],
+    examples,
+    format: 'HITBACK_TYPE:{type}_DIFF:{difficulty}_GENRE:{genre}_DECADE:{decade}',
+    validValues: qrService.getHelpInfo()
+  };
 
-  } catch (error) {
-    console.error('âŒ QR validation error:', error.message);
-
-    res.sendSuccess({
-      isValid: false,
-      error: error.message
-    }, 'QR code validation result');
+  if (res.sendSuccess) {
+    res.sendSuccess(response, 'QR codes generated');
+  } else {
+    res.json({ success: true, data: response });
   }
 });
 
-// ðŸŽµ RUTA PARA LISTAR TRACKS DISPONIBLES
+/**
+ * 📋 LISTAR TRACKS CON QR INFO
+ * GET /api/qr/tracks
+ */
 router.get('/tracks', (req, res) => {
   try {
-    console.log('ðŸ“‹ Listing available tracks...');
+    const tracks = TrackService.getAllTracks();
 
-    const tracks = loadTracks();
-
-    const tracksList = tracks.map(track => ({
+    const tracksWithQR = tracks.map(track => ({
       id: track.id,
       title: track.title,
       artist: track.artist,
-      hasAudio: track.hasAudio,
-      availableQRs: [
-        `HITBACK_${track.id}_SONG_EASY`,
-        `HITBACK_${track.id}_ARTIST_EASY`,
-        `HITBACK_${track.id}_DECADE_MEDIUM`,
-        `HITBACK_${track.id}_LYRICS_MEDIUM`,
-        `HITBACK_${track.id}_CHALLENGE_HARD`
-      ]
+      genre: track.genre,
+      decade: track.decade,
+      difficulty: track.difficulty,
+      sampleQRs: {
+        song: qrService.generateQRCode({
+          cardType: 'SONG',
+          difficulty: track.difficulty || 'EASY',
+          genre: track.genre || 'ANY',
+          decade: track.decade || 'ANY'
+        }),
+        artist: qrService.generateQRCode({
+          cardType: 'ARTIST',
+          difficulty: track.difficulty || 'EASY',
+          genre: track.genre || 'ANY',
+          decade: track.decade || 'ANY'
+        })
+      }
     }));
 
-    res.sendSuccess({
-      tracks: tracksList,
-      total: tracksList.length
-    }, 'Available tracks');
+    if (res.sendSuccess) {
+      res.sendSuccess({ tracks: tracksWithQR, total: tracksWithQR.length }, 'Tracks with QR info');
+    } else {
+      res.json({ success: true, data: { tracks: tracksWithQR, total: tracksWithQR.length } });
+    }
 
   } catch (error) {
-    console.error('âŒ Error listing tracks:', error.message);
     res.status(500).json({
       success: false,
-      error: {
-        message: error.message,
-        code: 'TRACKS_LOAD_ERROR'
-      }
+      error: { message: error.message }
     });
   }
 });

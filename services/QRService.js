@@ -1,139 +1,112 @@
+/**
+ * 🎯 QR Service - FORMATO NUEVO ESCALABLE
+ * ✅ Formato: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
+ * ✅ Compatible con formato antiguo: HITBACK_001_SONG_EASY
+ */
 
-const { QRError, ValidationError } = require('../utils/errors');
 const logger = require('../utils/logger');
+
+// Crear error personalizado si no existe
+class QRError extends Error {
+  constructor(message) {
+    super(message);
+    this.name = 'QRError';
+  }
+}
 
 class QRService {
   constructor() {
     this.QR_PREFIX = 'HITBACK';
     this.VALID_CARD_TYPES = ['song', 'artist', 'decade', 'lyrics', 'challenge'];
-    this.VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'expert'];
+    this.VALID_DIFFICULTIES = ['easy', 'medium', 'hard', 'expert', 'any'];
+    this.VALID_GENRES = ['rock', 'pop', 'reggaeton', 'hip_hop', 'electronic', 'r&b', 'country', 'jazz', 'any'];
+    this.VALID_DECADES = ['1960s', '1970s', '1980s', '1990s', '2000s', '2010s', '2020s', 'any'];
   }
 
   /**
-   * Valida el formato del código QR
-   * @param {string} qrCode - Código QR a validar
-   * @returns {boolean} - True si es válido
+   * 🎯 PARSEAR QR CODE - SOPORTA AMBOS FORMATOS
+   * @param {string} qrCode - Código QR a parsear
+   * @returns {Object} - Datos parseados
    */
-  validateQRFormat(qrCode) {
+  parseQRCode(qrCode) {
     if (!qrCode || typeof qrCode !== 'string') {
-      return false;
+      throw new QRError('QR code inválido o vacío');
     }
 
-    const parts = qrCode.split('_');
+    console.log(`📱 Parseando QR: ${qrCode}`);
 
-    // Debe tener exactamente 4 partes: HITBACK_ID_TYPE_DIFFICULTY
-    if (parts.length !== 4) {
-      return false;
+    // ✅ FORMATO NUEVO: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
+    const newFormatRegex = /^HITBACK_TYPE:(\w+)_DIFF:(\w+)_GENRE:(\w+)_DECADE:([\w]+)$/;
+    const newMatch = qrCode.match(newFormatRegex);
+
+    if (newMatch) {
+      const [, cardType, difficulty, genre, decade] = newMatch;
+
+      // Validar valores
+      if (!this.VALID_CARD_TYPES.includes(cardType.toLowerCase())) {
+        throw new QRError(`Tipo de carta inválido: ${cardType}. Válidos: ${this.VALID_CARD_TYPES.join(', ')}`);
+      }
+      if (!this.VALID_DIFFICULTIES.includes(difficulty.toLowerCase())) {
+        throw new QRError(`Dificultad inválida: ${difficulty}. Válidas: ${this.VALID_DIFFICULTIES.join(', ')}`);
+      }
+
+      console.log(`✅ Formato NUEVO detectado: type=${cardType}, diff=${difficulty}, genre=${genre}, decade=${decade}`);
+
+      return {
+        format: 'NEW',
+        qrCode,
+        cardType: cardType.toLowerCase(),
+        difficulty: difficulty.toLowerCase(),
+        genre: genre.toUpperCase(),
+        decade: decade,
+        isScalable: true,
+        points: this.calculateBasePoints(cardType.toLowerCase(), difficulty.toLowerCase())
+      };
     }
 
-    const [prefix, trackId, cardType, difficulty] = parts;
+    // ⚠️ FORMATO ANTIGUO: HITBACK_001_SONG_EASY
+    const legacyRegex = /^HITBACK_(\d{3})_([A-Z]+)_([A-Z]+)$/;
+    const legacyMatch = qrCode.match(legacyRegex);
 
-    // Validar cada parte
-    return (
-      prefix === this.QR_PREFIX &&
-      this.isValidTrackId(trackId) &&
-      this.isValidCardType(cardType.toLowerCase()) &&
-      this.isValidDifficulty(difficulty.toLowerCase())
+    if (legacyMatch) {
+      const [, trackId, cardType, difficulty] = legacyMatch;
+
+      console.log(`⚠️ Formato ANTIGUO detectado: trackId=${trackId}, type=${cardType}, diff=${difficulty}`);
+
+      return {
+        format: 'LEGACY',
+        qrCode,
+        trackId,
+        cardType: cardType.toLowerCase(),
+        difficulty: difficulty.toLowerCase(),
+        genre: 'ANY',
+        decade: 'ANY',
+        isScalable: false,
+        points: this.calculateBasePoints(cardType.toLowerCase(), difficulty.toLowerCase())
+      };
+    }
+
+    // ❌ Formato no reconocido
+    throw new QRError(
+      `Formato de QR no reconocido: ${qrCode}. ` +
+      `Formato válido: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s`
     );
   }
 
   /**
-   * Parsea un código QR y extrae sus componentes
-   * @param {string} qrCode - Código QR a parsear
-   * @returns {Object} - Datos extraídos del QR
-   * @throws {QRError} - Si el formato es inválido
+   * ✅ VALIDAR FORMATO DE QR
    */
-  parseQRCode(qrCode) {
-    logger.debug(`Parsing QR code: ${qrCode}`);
-
-    if (!this.validateQRFormat(qrCode)) {
-      throw new QRError(`Invalid QR code format: ${qrCode}`);
+  validateQRFormat(qrCode) {
+    try {
+      this.parseQRCode(qrCode);
+      return true;
+    } catch {
+      return false;
     }
-
-    const [prefix, trackId, cardType, difficulty] = qrCode.split('_');
-
-    const parsedData = {
-      qrCode,
-      trackId,
-      cardType: cardType.toLowerCase(),
-      difficulty: difficulty.toLowerCase(),
-      points: this.calculateBasePoints(cardType.toLowerCase(), difficulty.toLowerCase())
-    };
-
-    logger.debug(`QR parsed successfully:`, parsedData);
-    return parsedData;
   }
 
   /**
-   * Genera códigos QR para un track específico
-   * @param {string} trackId - ID del track
-   * @returns {Array} - Array de códigos QR generados
-   */
-  generateQRCodesForTrack(trackId) {
-    if (!this.isValidTrackId(trackId)) {
-      throw new ValidationError(`Invalid track ID: ${trackId}`);
-    }
-
-    const qrCodes = [];
-
-    this.VALID_CARD_TYPES.forEach(cardType => {
-      this.VALID_DIFFICULTIES.forEach(difficulty => {
-        const qrCode = this.buildQRCode(trackId, cardType, difficulty);
-        qrCodes.push({
-          qrCode,
-          trackId,
-          cardType,
-          difficulty,
-          points: this.calculateBasePoints(cardType, difficulty)
-        });
-      });
-    });
-
-    logger.info(`Generated ${qrCodes.length} QR codes for track ${trackId}`);
-    return qrCodes;
-  }
-
-  /**
-   * Genera todos los códigos QR posibles para múltiples tracks
-   * @param {Array} trackIds - Array de IDs de tracks
-   * @returns {Array} - Array de todos los códigos QR
-   */
-  generateAllQRCodes(trackIds) {
-    if (!Array.isArray(trackIds)) {
-      throw new ValidationError('trackIds must be an array');
-    }
-
-    const allQRCodes = [];
-
-    trackIds.forEach(trackId => {
-      try {
-        const trackQRs = this.generateQRCodesForTrack(trackId);
-        allQRCodes.push(...trackQRs);
-      } catch (error) {
-        logger.warn(`Failed to generate QR codes for track ${trackId}:`, error.message);
-      }
-    });
-
-    logger.info(`Generated ${allQRCodes.length} total QR codes for ${trackIds.length} tracks`);
-    return allQRCodes;
-  }
-
-  /**
-   * Construye un código QR con los componentes dados
-   * @param {string} trackId - ID del track
-   * @param {string} cardType - Tipo de carta
-   * @param {string} difficulty - Dificultad
-   * @returns {string} - Código QR construido
-   */
-  buildQRCode(trackId, cardType, difficulty) {
-    return `${this.QR_PREFIX}_${trackId}_${cardType.toUpperCase()}_${difficulty.toUpperCase()}`;
-  }
-
-  /**
-   * Calcula puntos base según el tipo de carta y dificultad
-   * @param {string} cardType - Tipo de carta
-   * @param {string} difficulty - Dificultad
-   * @returns {number} - Puntos calculados
+   * 🔢 CALCULAR PUNTOS BASE
    */
   calculateBasePoints(cardType, difficulty) {
     const basePoints = {
@@ -148,7 +121,8 @@ class QRService {
       easy: 1,
       medium: 1.5,
       hard: 2,
-      expert: 3
+      expert: 3,
+      any: 1
     };
 
     const base = basePoints[cardType] || 1;
@@ -158,41 +132,45 @@ class QRService {
   }
 
   /**
-   * Valida si un ID de track es válido
-   * @param {string} trackId - ID a validar
-   * @returns {boolean} - True si es válido
+   * 🏗️ GENERAR QR CODE (formato nuevo)
    */
-  isValidTrackId(trackId) {
-    return /^[a-zA-Z0-9]{3,10}$/.test(trackId);
+  generateQRCode(options = {}) {
+    const {
+      cardType = 'SONG',
+      difficulty = 'EASY',
+      genre = 'ANY',
+      decade = 'ANY'
+    } = options;
+
+    return `HITBACK_TYPE:${cardType.toUpperCase()}_DIFF:${difficulty.toUpperCase()}_GENRE:${genre.toUpperCase()}_DECADE:${decade}`;
   }
 
   /**
-   * Valida si un tipo de carta es válido
-   * @param {string} cardType - Tipo de carta a validar
-   * @returns {boolean} - True si es válido
+   * 📋 GENERAR TODOS LOS QR CODES PARA UN TRACK (formato antiguo - compatibilidad)
    */
-  isValidCardType(cardType) {
-    return this.VALID_CARD_TYPES.includes(cardType.toLowerCase());
+  generateQRCodesForTrack(trackId) {
+    const qrCodes = [];
+
+    this.VALID_CARD_TYPES.forEach(cardType => {
+      ['easy', 'medium', 'hard', 'expert'].forEach(difficulty => {
+        qrCodes.push({
+          qrCode: `HITBACK_${trackId}_${cardType.toUpperCase()}_${difficulty.toUpperCase()}`,
+          trackId,
+          cardType,
+          difficulty,
+          points: this.calculateBasePoints(cardType, difficulty)
+        });
+      });
+    });
+
+    return qrCodes;
   }
 
   /**
-   * Valida si una dificultad es válida
-   * @param {string} difficulty - Dificultad a validar
-   * @returns {boolean} - True si es válida
-   */
-  isValidDifficulty(difficulty) {
-    return this.VALID_DIFFICULTIES.includes(difficulty.toLowerCase());
-  }
-
-  /**
-   * Obtiene estadísticas de códigos QR
-   * @param {Array} qrCodes - Array de códigos QR
-   * @returns {Object} - Estadísticas
+   * 📊 OBTENER ESTADÍSTICAS
    */
   getQRStats(qrCodes) {
-    if (!Array.isArray(qrCodes)) {
-      return {};
-    }
+    if (!Array.isArray(qrCodes)) return {};
 
     const stats = {
       total: qrCodes.length,
@@ -202,13 +180,8 @@ class QRService {
     };
 
     qrCodes.forEach(qr => {
-      // Por tipo de carta
       stats.byCardType[qr.cardType] = (stats.byCardType[qr.cardType] || 0) + 1;
-
-      // Por dificultad
       stats.byDifficulty[qr.difficulty] = (stats.byDifficulty[qr.difficulty] || 0) + 1;
-
-      // Total de puntos
       stats.totalPoints += qr.points || 0;
     });
 
@@ -216,24 +189,17 @@ class QRService {
   }
 
   /**
-   * Busca códigos QR por criterios
-   * @param {Array} qrCodes - Array de códigos QR
-   * @param {Object} filters - Filtros de búsqueda
-   * @returns {Array} - Códigos QR filtrados
+   * 📋 INFO DE AYUDA PARA ERRORES
    */
-  filterQRCodes(qrCodes, filters = {}) {
-    if (!Array.isArray(qrCodes)) {
-      return [];
-    }
-
-    return qrCodes.filter(qr => {
-      const matchesTrackId = !filters.trackId || qr.trackId === filters.trackId;
-      const matchesCardType = !filters.cardType || qr.cardType === filters.cardType;
-      const matchesDifficulty = !filters.difficulty || qr.difficulty === filters.difficulty;
-      const matchesMinPoints = !filters.minPoints || qr.points >= filters.minPoints;
-
-      return matchesTrackId && matchesCardType && matchesDifficulty && matchesMinPoints;
-    });
+  getHelpInfo() {
+    return {
+      newFormat: 'HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s',
+      legacyFormat: 'HITBACK_001_SONG_EASY',
+      validTypes: this.VALID_CARD_TYPES.map(t => t.toUpperCase()),
+      validDifficulties: this.VALID_DIFFICULTIES.map(d => d.toUpperCase()),
+      validGenres: this.VALID_GENRES.map(g => g.toUpperCase()),
+      validDecades: this.VALID_DECADES
+    };
   }
 }
 
