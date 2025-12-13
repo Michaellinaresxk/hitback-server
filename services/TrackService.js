@@ -2,6 +2,7 @@
  * 🎵 Track Service - Sistema Escalable ACTUALIZADO
  * ✅ Soporta filtros del formato nuevo: genre, decade, difficulty
  * ✅ Selección aleatoria inteligente con fallbacks
+ * ✅ NUEVO: Sistema anti-duplicados por partida
  */
 
 const fs = require('fs');
@@ -12,7 +13,55 @@ class TrackService {
     this.tracks = [];
     this.tracksPath = this.findTracksPath();
     this.loadTracks();
+
+    // ✅ NUEVO: Set para tracks usados en la partida actual
+    this.usedTrackIds = new Set();
   }
+
+  // ═══════════════════════════════════════════════════════════
+  // ✅ NUEVOS MÉTODOS PARA EVITAR DUPLICADOS
+  // ═══════════════════════════════════════════════════════════
+
+  /**
+   * 📌 Marcar track como usado
+   */
+  markTrackAsUsed(trackId) {
+    this.usedTrackIds.add(trackId);
+    console.log(`📌 Track marcado como usado: ${trackId}`);
+    console.log(`   Usados: ${this.usedTrackIds.size}/${this.tracks.length}`);
+  }
+
+  /**
+   * ❓ Verificar si un track ya fue usado
+   */
+  isTrackUsed(trackId) {
+    return this.usedTrackIds.has(trackId);
+  }
+
+  /**
+   * 🔄 Reiniciar tracks usados (llamar al iniciar nueva partida)
+   */
+  resetUsedTracks() {
+    const previousCount = this.usedTrackIds.size;
+    this.usedTrackIds.clear();
+    console.log(`🔄 Tracks usados reseteados (${previousCount} → 0)`);
+  }
+
+  /**
+   * 📊 Obtener estado de tracks usados
+   */
+  getUsedTracksStatus() {
+    return {
+      total: this.tracks.length,
+      used: this.usedTrackIds.size,
+      available: this.tracks.length - this.usedTrackIds.size,
+      usedIds: Array.from(this.usedTrackIds)
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════
+  // MÉTODOS EXISTENTES (SIN CAMBIOS)
+  // ═══════════════════════════════════════════════════════════
 
   /**
    * 📂 Encontrar la ruta correcta de tracks.json
@@ -50,7 +99,6 @@ class TrackService {
       const data = fs.readFileSync(this.tracksPath, 'utf8');
       const parsed = JSON.parse(data);
 
-      // Soportar diferentes estructuras
       if (Array.isArray(parsed)) {
         this.tracks = parsed;
       } else if (parsed.tracks && Array.isArray(parsed.tracks)) {
@@ -82,8 +130,13 @@ class TrackService {
     console.log('   Dificultades:', Object.keys(byDifficulty).length);
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // 🎲 MÉTODO PRINCIPAL MODIFICADO - AHORA EXCLUYE DUPLICADOS
+  // ═══════════════════════════════════════════════════════════
+
   /**
    * 🎲 OBTENER TRACK ALEATORIO CON FILTROS (MÉTODO PRINCIPAL)
+   * ✅ MODIFICADO: Ahora excluye tracks ya usados
    * @param {Object} filters - { difficulty, genre, decade }
    */
   getRandomTrack(filters = {}) {
@@ -91,6 +144,17 @@ class TrackService {
 
     let pool = [...this.tracks];
     const originalSize = pool.length;
+
+    // ✅ NUEVO: Filtro 0 - Excluir tracks ya usados
+    pool = pool.filter(t => !this.usedTrackIds.has(t.id));
+    console.log(`   ├─ Excluyendo usados: ${pool.length}/${originalSize} disponibles`);
+
+    // Si ya usamos todos los tracks, resetear automáticamente
+    if (pool.length === 0) {
+      console.log(`⚠️ Todos los tracks usados. Reseteando automáticamente...`);
+      this.resetUsedTracks();
+      pool = [...this.tracks];
+    }
 
     // Filtro 1: Dificultad
     if (filters.difficulty && filters.difficulty !== 'ANY') {
@@ -116,7 +180,7 @@ class TrackService {
       console.log(`   └─ Década "${filters.decade}": ${pool.length} tracks`);
     }
 
-    // Si no hay resultados, usar fallback
+    // Si no hay resultados después de filtros, usar fallback
     if (pool.length === 0) {
       console.log(`⚠️ Sin coincidencias exactas (0/${originalSize}), usando fallback...`);
       return this.getFallbackTrack(filters);
@@ -126,42 +190,75 @@ class TrackService {
     const randomIndex = Math.floor(Math.random() * pool.length);
     const selected = pool[randomIndex];
 
+    // ✅ NUEVO: Marcar como usado ANTES de retornar
+    this.markTrackAsUsed(selected.id);
+
     console.log(`✅ Seleccionado: "${selected.title}" - ${selected.artist}`);
     console.log(`   Pool: ${pool.length}/${originalSize} tracks\n`);
 
     return selected;
   }
 
+  // ═══════════════════════════════════════════════════════════
+  // 🔄 FALLBACK MODIFICADO - TAMBIÉN EXCLUYE DUPLICADOS
+  // ═══════════════════════════════════════════════════════════
+
   /**
    * 🔄 Fallback cuando no hay coincidencias exactas
+   * ✅ MODIFICADO: También excluye tracks usados
    */
   getFallbackTrack(filters) {
-    // Intento 1: Solo dificultad
+    // Intento 1: Solo dificultad (excluyendo usados)
     if (filters.difficulty && filters.difficulty !== 'ANY') {
       const pool = this.tracks.filter(t =>
-        t.difficulty && t.difficulty.toLowerCase() === filters.difficulty.toLowerCase()
+        t.difficulty &&
+        t.difficulty.toLowerCase() === filters.difficulty.toLowerCase() &&
+        !this.usedTrackIds.has(t.id)
       );
       if (pool.length > 0) {
         console.log(`   Fallback 1 (solo dificultad): ${pool.length} tracks`);
-        return pool[Math.floor(Math.random() * pool.length)];
+        const selected = pool[Math.floor(Math.random() * pool.length)];
+        this.markTrackAsUsed(selected.id);
+        return selected;
       }
     }
 
-    // Intento 2: Solo género
+    // Intento 2: Solo género (excluyendo usados)
     if (filters.genre && filters.genre !== 'ANY') {
       const pool = this.tracks.filter(t =>
-        t.genre && t.genre.toUpperCase() === filters.genre.toUpperCase()
+        t.genre &&
+        t.genre.toUpperCase() === filters.genre.toUpperCase() &&
+        !this.usedTrackIds.has(t.id)
       );
       if (pool.length > 0) {
         console.log(`   Fallback 2 (solo género): ${pool.length} tracks`);
-        return pool[Math.floor(Math.random() * pool.length)];
+        const selected = pool[Math.floor(Math.random() * pool.length)];
+        this.markTrackAsUsed(selected.id);
+        return selected;
       }
     }
 
-    // Intento 3: Cualquier track
-    console.log(`   Fallback 3: Track completamente aleatorio`);
-    return this.tracks[Math.floor(Math.random() * this.tracks.length)];
+    // Intento 3: Cualquier track NO usado
+    const availableTracks = this.tracks.filter(t => !this.usedTrackIds.has(t.id));
+
+    if (availableTracks.length > 0) {
+      console.log(`   Fallback 3: Track aleatorio de ${availableTracks.length} disponibles`);
+      const selected = availableTracks[Math.floor(Math.random() * availableTracks.length)];
+      this.markTrackAsUsed(selected.id);
+      return selected;
+    }
+
+    // Último recurso: Resetear y usar cualquiera
+    console.log(`⚠️ No quedan tracks disponibles. Reseteando...`);
+    this.resetUsedTracks();
+    const selected = this.tracks[Math.floor(Math.random() * this.tracks.length)];
+    this.markTrackAsUsed(selected.id);
+    return selected;
   }
+
+  // ═══════════════════════════════════════════════════════════
+  // RESTO DE MÉTODOS (SIN CAMBIOS)
+  // ═══════════════════════════════════════════════════════════
 
   /**
    * 🔍 Buscar track por ID (compatibilidad con formato antiguo)
@@ -171,7 +268,6 @@ class TrackService {
       throw new Error('ID de track requerido');
     }
 
-    // Normalizar ID (agregar ceros si es necesario)
     const normalizedId = String(id).padStart(3, '0');
 
     let track = this.tracks.find(t => t.id === id);
@@ -235,7 +331,9 @@ class TrackService {
       byDecade: this.groupBy(this.tracks, 'decade'),
       byDifficulty: this.groupBy(this.tracks, 'difficulty'),
       withQuestions: this.tracks.filter(t => t.questions).length,
-      withAudio: this.tracks.filter(t => t.hasAudio).length
+      withAudio: this.tracks.filter(t => t.hasAudio).length,
+      // ✅ NUEVO: Incluir estado de tracks usados
+      usedTracks: this.getUsedTracksStatus()
     };
   }
 
@@ -270,6 +368,8 @@ class TrackService {
   reload() {
     console.log('🔄 Recargando tracks...');
     this.loadTracks();
+    // También resetear usados al recargar
+    this.resetUsedTracks();
   }
 
   /**
@@ -306,7 +406,9 @@ class TrackService {
         genres: Object.keys(this.groupBy(this.tracks, 'genre')).length,
         decades: Object.keys(this.groupBy(this.tracks, 'decade')).length,
         difficulties: Object.keys(this.groupBy(this.tracks, 'difficulty')).length
-      }
+      },
+      // ✅ NUEVO
+      usedTracks: this.getUsedTracksStatus()
     };
   }
 }

@@ -1,13 +1,5 @@
-/**
- * 🎯 QR Routes - FORMATO NUEVO ESCALABLE + DEEZER
- * ✅ Formato: HITBACK_TYPE:SONG_DIFF:EASY_GENRE:ROCK_DECADE:1980s
- * ✅ Siempre usa Deezer para audio
- */
-
 const express = require('express');
 const router = express.Router();
-
-// Importar servicios
 const QRService = require('../services/QRService');
 const TrackService = require('../services/TrackService');
 const DeezerService = require('../services/DeezerService');
@@ -392,6 +384,55 @@ router.get('/tracks', (req, res) => {
     }
 
   } catch (error) {
+    res.status(500).json({
+      success: false,
+      error: { message: error.message }
+    });
+  }
+});
+
+
+
+router.post('/reset-used', (req, res) => {
+  try {
+    TrackService.resetUsedTracks();
+
+    const status = TrackService.getUsedTracksStatus();
+
+    res.json({
+      success: true,
+      message: 'Tracks usados reseteados correctamente',
+      data: status
+    });
+  } catch (error) {
+    console.error('❌ Error reseteando tracks:', error);
+    res.status(500).json({
+      success: false,
+      error: { message: error.message }
+    });
+  }
+});
+
+/**
+ * 📊 OBTENER ESTADO DE TRACKS USADOS
+ * GET /api/qr/used-status
+ * 
+ * Para debugging y UI
+ */
+router.get('/used-status', (req, res) => {
+  try {
+    const status = TrackService.getUsedTracksStatus();
+
+    res.json({
+      success: true,
+      message: `${status.available} tracks disponibles de ${status.total}`,
+      data: {
+        ...status,
+        percentageUsed: Math.round((status.used / status.total) * 100)
+      }
+    });
+  } catch (error) {
+    console.error('❌ Error obteniendo estado:', error);
     res.status(500).json({
       success: false,
       error: { message: error.message }
