@@ -1323,13 +1323,13 @@
         "lyrics": {
           "question": "Completa: 'We could have had it...'",
           "answer": "all",
-          "points": 2,
+          "points": 1,
           "hints": ["Coro potente"]
         },
         "challenge": {
           "question": "Canta con la potencia de Adele",
           "answer": "Completar canto",
-          "points": 3,
+          "points": 2,
           "challengeType": "sing"
         }
       }
@@ -1541,25 +1541,25 @@
         "artist": {
           "question": "¿Quién canta esta canción?",
           "answer": "Eminem",
-          "points": 2,
+          "points": 1,
           "hints": ["Slim Shady"]
         },
         "decade": {
           "question": "¿De qué década es?",
           "answer": "2000s",
-          "points": 3,
+          "points": 2,
           "hints": ["De la película 8 Mile"]
         },
         "lyrics": {
           "question": "Completa: 'His palms are sweaty, knees weak, arms are heavy, there's vomit on his sweater already...'",
           "answer": "mom's spaghetti",
-          "points": 3,
+          "points": 1,
           "hints": ["Meme famoso"]
         },
         "challenge": {
           "question": "Rapea el primer verso",
           "answer": "Completar rap",
-          "points": 5,
+          "points": 2,
           "challengeType": "rap"
         }
       }
@@ -1587,25 +1587,25 @@
         "artist": {
           "question": "¿Quién canta esta canción?",
           "answer": "Pharrell Williams",
-          "points": 2,
+          "points": 1,
           "hints": ["Productor y cantante"]
         },
         "decade": {
           "question": "¿De qué década es?",
           "answer": "2010s",
-          "points": 3,
+          "points": 1,
           "hints": ["De película de Minions"]
         },
         "lyrics": {
           "question": "Completa: 'Because I'm...'",
           "answer": "happy",
-          "points": 3,
+          "points": 1,
           "hints": ["Título de la canción"]
         },
         "challenge": {
           "question": "Baila feliz por 10 segundos",
           "answer": "Completar baile",
-          "points": 5,
+          "points": 1,
           "challengeType": "dance"
         }
       }
@@ -1639,19 +1639,19 @@
         "decade": {
           "question": "¿De qué década es?",
           "answer": "2020s",
-          "points": 3,
+          "points": 1,
           "hints": ["Hit de TikTok 2023"]
         },
         "lyrics": {
           "question": "Completa: 'I might kill my ex...'",
           "answer": "not the best idea",
-          "points": 3,
+          "points": 1,
           "hints": ["Pensamientos oscuros"]
         },
         "challenge": {
           "question": "Canta con actitud R&B",
           "answer": "Completar canto",
-          "points": 5,
+          "points": 1,
           "challengeType": "sing"
         }
       }
@@ -8426,10 +8426,1145 @@
           "challengeType": "rap"
         }
       }
+    },
+    {
+      "id": "184 ",
+      "title": "With or Without You",
+      "artist": "U2",
+      "album": "The Joshua Tree",
+      "year": 1987,
+      "genre": "Alternative Rock",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción, una de las baladas más famosas de U2?",
+          "answer": "With or Without You",
+          "points": 1,
+          "hints": ["Contigo o sin ti", "Parte del álbum 'The Joshua Tree'"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "U2",
+          "points": 1,
+          "hints": ["Banda irlandesa", "Liderada por Bono"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "185",
+      "title": "Shout",
+      "artist": "Tears for Fears",
+      "album": "Songs from the Big Chair",
+      "year": 1984,
+      "genre": "New Wave",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción que te pide que 'lo grites'?",
+          "answer": "Shout",
+          "points": 1,
+          "hints": ["Grita", "Del mismo álbum que 'Everybody Wants to Rule the World'"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Tears for Fears",
+          "points": 1,
+          "hints": ["Lágrimas por los miedos", "Dúo británico"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "186",
+      "title": "Another One Bites the Dust",
+      "artist": "Queen",
+      "album": "The Game",
+      "year": 1980,
+      "genre": "Funk Rock",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción famosa por su línea de bajo?",
+          "answer": "Another One Bites the Dust",
+          "points": 1,
+          "hints": ["Otro que muerde el polvo", "Inspiración Disco/Funk"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Queen",
+          "points": 1,
+          "hints": ["Banda de Freddie Mercury", "Reina"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Justo en el inicio de la década"]
+        }
+      }
+    },
+    {
+      "id": "187",
+      "title": "Girls, Girls, Girls",
+      "artist": "Mötley Crüe",
+      "album": "Girls, Girls, Girls",
+      "year": 1987,
+      "genre": "Glam Metal",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción, un himno del Glam Metal sobre mujeres?",
+          "answer": "Girls, Girls, Girls",
+          "points": 1,
+          "hints": ["Chicas, chicas, chicas", "Menciona clubes de striptease"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Mötley Crüe",
+          "points": 1,
+          "hints": ["Banda salvaje de Los Ángeles", "Crüe suena a 'crew'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "188",
+      "title": "Should I Stay or Should I Go",
+      "artist": "The Clash",
+      "album": "Combat Rock",
+      "year": 1982,
+      "genre": "New Wave",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción sobre una decisión difícil?",
+          "answer": "Should I Stay or Should I Go",
+          "points": 1,
+          "hints": ["¿Debo quedarme o irme?", "Conocida por su coro bilingüe"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Clash",
+          "points": 1,
+          "hints": ["Banda británica de Punk Rock", "El choque"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Principios de los 80"]
+        }
+      }
+    },
+    {
+      "id": "189",
+      "title": "Still Loving You",
+      "artist": "Scorpions",
+      "album": "Love at First Sting",
+      "year": 1984,
+      "genre": "Hard Rock",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la Power Ballad de Scorpions?",
+          "answer": "Still Loving You",
+          "points": 1,
+          "hints": ["Todavía te amo", "Canción de amor poderosa"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Scorpions",
+          "points": 1,
+          "hints": ["Banda alemana", "Escorpiones"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "190",
+      "title": "Born in the U.S.A.",
+      "artist": "Bruce Springsteen",
+      "album": "Born in the U.S.A.",
+      "year": 1984,
+      "genre": "Heartland Rock",
+      "decade": "1980s",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción de Springsteen con un potente riff de sintetizador?",
+          "answer": "Born in the U.S.A.",
+          "points": 1,
+          "hints": ["Nacido en...", "Malinterpretada a menudo como patriótica"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bruce Springsteen",
+          "points": 1,
+          "hints": ["Conocido como 'The Boss'", "El Jefe"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "191",
+      "title": "Love Bites",
+      "artist": "Def Leppard",
+      "album": "Hysteria",
+      "year": 1987,
+      "genre": "Glam Metal",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción de Def Leppard con un coro potente?",
+          "answer": "Love Bites",
+          "points": 1,
+          "hints": ["El amor muerde", "Parte del álbum 'Hysteria'"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Def Leppard",
+          "points": 1,
+          "hints": ["Banda británica de Hard Rock", "Leopardo Sordo"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "192",
+      "title": "Dorosłe Dzieci",
+      "artist": "Turbo",
+      "album": "Dorosłe Dzieci",
+      "year": 1982,
+      "genre": "Hard Rock Polaco",
+      "decade": "1980s",
+      "difficulty": "POLISH_MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la poderosa balada de Hard Rock polaco de los 80?",
+          "answer": "Dorosłe Dzieci",
+          "points": 1,
+          "hints": ["Niños adultos", "Canción de la banda Turbo"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Turbo",
+          "points": 1,
+          "hints": ["Banda polaca de Heavy Metal/Hard Rock", "Turbo"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Principios de los 80"]
+        }
+      }
+    },
+    {
+      "id": "193",
+      "title": "Video Killed the Radio Star",
+      "artist": "The Buggles",
+      "album": "The Age of Plastic",
+      "year": 1979,
+      "genre": "New Wave / Synth-Pop",
+      "decade": "1970s",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción que fue el primer video emitido en MTV en 1981?",
+          "answer": "Video Killed the Radio Star",
+          "points": 1,
+          "hints": [
+            "El video mató a la estrella de la radio",
+            "Reflexión sobre el cambio tecnológico"
+          ]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Buggles",
+          "points": 1,
+          "hints": ["Dúo británico", "Los Buggles"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 1,
+          "hints": ["Finales de los 70"]
+        }
+      }
+    },
+    {
+      "id": "194",
+      "title": "Papa Don't Preach",
+      "artist": "Madonna",
+      "album": "True Blue",
+      "year": 1986,
+      "genre": "Pop",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el éxito de Madonna que trata sobre un embarazo adolescente?",
+          "answer": "Papa Don't Preach",
+          "points": 1,
+          "hints": ["Papá no sermonees", "Parte del álbum 'True Blue'"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Madonna",
+          "points": 1,
+          "hints": ["La Reina del Pop", "Comparte artista con 'Like a Prayer'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "195",
+      "title": "Personal Jesus",
+      "artist": "Depeche Mode",
+      "album": "Violator",
+      "year": 1989,
+      "genre": "Synth-Rock",
+      "decade": "1980s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción que tiene un riff de guitarra distintivo y fue versionada por Johnny Cash?",
+          "answer": "Personal Jesus",
+          "points": 1,
+          "hints": ["Jesús Personal", "Inspirada en Priscilla Presley"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Depeche Mode",
+          "points": 1,
+          "hints": ["Comparten banda con 'Enjoy the Silence'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "196",
+      "title": "Heart of Glass",
+      "artist": "Blondie",
+      "album": "Parallel Lines",
+      "year": 1978,
+      "genre": "New Wave / Disco",
+      "decade": "1970s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción, famosa por fusionar New Wave con Disco?",
+          "answer": "Heart of Glass",
+          "points": 1,
+          "hints": ["Corazón de cristal", "Cantada por Debbie Harry"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Blondie",
+          "points": 1,
+          "hints": ["Banda estadounidense", "Rubia"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 1,
+          "hints": ["Finales de los 70"]
+        }
+      }
+    },
+    {
+      "id": "197",
+      "title": "Szklana Pogoda",
+      "artist": "Lombard",
+      "album": "Śmierć dyskotece!",
+      "year": 1983,
+      "genre": "New Wave Polaco",
+      "decade": "1980s",
+      "difficulty": "POLISH_MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el éxito polaco de New Wave que significa 'Tiempo de Cristal'?",
+          "answer": "Szklana Pogoda",
+          "points": 1,
+          "hints": ["Clásico de Lombard", "Cantada por Małgorzata Ostrowska"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Lombard",
+          "points": 1,
+          "hints": ["Banda polaca de Rock y New Wave", "Lombardo"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Principios de los 80"]
+        }
+      }
+    },
+    {
+      "id": "198",
+      "title": "Biała Armia",
+      "artist": "Bajm",
+      "album": "Biała armia",
+      "year": 1985,
+      "genre": "Pop Rock Polaco",
+      "decade": "1980s",
+      "difficulty": "POLISH_EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el himno de Pop Rock polaco que significa 'Ejército Blanco'?",
+          "answer": "Biała Armia",
+          "points": 1,
+          "hints": ["Un gran éxito de mediados de los 80", "Liderado por Beata Kozidrak"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bajm",
+          "points": 1,
+          "hints": ["Banda polaca de Pop Rock", "Bajm"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "199",
+      "title": "Kapitan Nemo",
+      "artist": "Lady Pank",
+      "album": "Taki, a nie inny",
+      "year": 1986,
+      "genre": "Pop Rock Polaco",
+      "decade": "1980s",
+      "difficulty": "POLISH_MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción de Lady Pank inspirada en un personaje de Julio Verne?",
+          "answer": "Kapitan Nemo",
+          "points": 1,
+          "hints": ["Capitán Nemo", "Menciona un submarino"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Lady Pank",
+          "points": 1,
+          "hints": ["Comparten banda con 'Mniej niż zero'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "200",
+      "title": "Black and White",
+      "artist": "Maanam",
+      "album": "Mental Cut",
+      "year": 1984,
+      "genre": "New Wave Polaco",
+      "decade": "1980s",
+      "difficulty": "POLISH_MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción en inglés de la icónica banda Maanam?",
+          "answer": "Black and White",
+          "points": 1,
+          "hints": ["Blanco y Negro", "Maanam tenía una vocalista muy carismática (Kora)"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Maanam",
+          "points": 1,
+          "hints": ["Banda polaca de Rock/New Wave", "Un nombre que suena a mantra"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "201",
+      "title": "Agnieszka",
+      "artist": "Dżem",
+      "album": "Cegła",
+      "year": 1979,
+      "genre": "Blues Rock Polaco",
+      "decade": "1970s",
+      "difficulty": "POLISH_EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el clásico de Blues Rock polaco dedicado a una mujer llamada Agnieszka?",
+          "answer": "Agnieszka",
+          "points": 1,
+          "hints": ["Un nombre de mujer popular en Polonia", "Banda liderada por Ryszard Riedel"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Dżem",
+          "points": 1,
+          "hints": ["Banda polaca de Blues Rock", "Mermelada"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 1,
+          "hints": ["Finales de los 70 (aunque su éxito se consolidó en los 80)"]
+        }
+      }
+    },
+    {
+      "id": "202",
+      "title": "Take a Chance on Me",
+      "artist": "ABBA",
+      "album": "The Album",
+      "year": 1977,
+      "genre": "Pop / Disco",
+      "country": "Suecia",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el éxito de ABBA con un ritmo vocal distintivo?",
+          "answer": "Take a Chance on Me",
+          "points": 1,
+          "hints": ["Dame una oportunidad", "Famosa por su vocalización repetitiva 'Oh oh'"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "ABBA",
+          "points": 1,
+          "hints": ["Dúo de parejas sueco", "Un nombre con cuatro letras"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 1,
+          "hints": ["Finales de los 70"]
+        }
+      }
+    },
+    {
+      "id": "203",
+      "title": "Conga",
+      "artist": "Miami Sound Machine",
+      "album": "Primitive Love",
+      "year": 1985,
+      "genre": "Dance-Pop / Latin Pop",
+      "country": "Cuba / EE. UU. (Latinoamérica)",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el éxito bailable que combina ritmos latinos con Pop en los 80?",
+          "answer": "Conga",
+          "points": 1,
+          "hints": ["Ritmo cubano", "La línea de bajo es icónica"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Miami Sound Machine",
+          "points": 1,
+          "hints": ["Liderado por Gloria Estefan", "Máquina de sonido de Miami"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "204",
+      "title": "Sussudio",
+      "artist": "Phil Collins",
+      "album": "No Jacket Required",
+      "year": 1985,
+      "genre": "Pop / Funk-Rock",
+      "country": "Reino Unido",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción con un título inventado, con un gran sonido de batería?",
+          "answer": "Sussudio",
+          "points": 1,
+          "hints": ["Palabra inventada", "El famoso sonido de batería gated reverb"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Phil Collins",
+          "points": 1,
+          "hints": ["Cantante británico y baterista de Genesis", "Phil..."]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "205",
+      "title": "Africa",
+      "artist": "Toto",
+      "album": "Toto IV",
+      "year": 1982,
+      "genre": "Pop Rock",
+      "country": "EE. UU.",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción icónica que menciona la bendición de las lluvias?",
+          "answer": "Africa",
+          "points": 1,
+          "hints": ["África", "Famosa por su introducción de marimba y cuerdas"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Toto",
+          "points": 1,
+          "hints": ["Banda estadounidense conocida por sus músicos de sesión", "Toto"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Principios de los 80"]
+        }
+      }
+    },
+    {
+      "id": "206",
+      "title": "Foreigner",
+      "artist": "I Want to Know What Love Is",
+      "album": "Agent Provocateur",
+      "year": 1984,
+      "genre": "Power Ballad",
+      "country": "Reino Unido / EE. UU.",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la Power Ballad de los 80 famosa por su coro gospel?",
+          "answer": "I Want to Know What Love Is",
+          "points": 1,
+          "hints": ["Quiero saber qué es el amor", "Un éxito masivo de Foreigner"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Foreigner",
+          "points": 1,
+          "hints": ["Extranjero", "Banda de Rock con orígenes británicos y estadounidenses"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "207",
+      "title": "Heaven",
+      "artist": "Bryan Adams",
+      "album": "Reckless",
+      "year": 1985,
+      "genre": "Pop Rock Ballad",
+      "country": "Canadá",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la balada de Bryan Adams que declara que 'el cielo es un lugar en la tierra' contigo?",
+          "answer": "Heaven",
+          "points": 1,
+          "hints": ["Cielo", "Del mismo álbum que 'Summer of '69'"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bryan Adams",
+          "points": 1,
+          "hints": ["Cantante canadiense", "Comparte artista con 'Summer of '69'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Mediados de los 80"]
+        }
+      }
+    },
+    {
+      "id": "208",
+      "title": "Alone",
+      "artist": "Heart",
+      "album": "Bad Animals",
+      "year": 1987,
+      "genre": "Power Ballad",
+      "country": "EE. UU.",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la Power Ballad que la banda Heart popularizó en los 80?",
+          "answer": "Alone",
+          "points": 1,
+          "hints": ["Solo/Sola", "Originalmente grabada por I-Ten"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Heart",
+          "points": 1,
+          "hints": ["Banda liderada por las hermanas Wilson", "Corazón"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "208",
+      "title": "Is This Love",
+      "artist": "Whitesnake",
+      "album": "Whitesnake",
+      "year": 1987,
+      "genre": "Glam Metal Ballad",
+      "country": "Reino Unido",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la balada de Glam Metal que pregunta 'si esto es amor'?",
+          "answer": "Is This Love",
+          "points": 1,
+          "hints": ["¿Es esto amor?", "El video presenta a la modelo Tawny Kitaen"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Whitesnake",
+          "points": 1,
+          "hints": ["Serpiente Blanca", "Banda liderada por David Coverdale"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "209",
+      "title": "In the Air Tonight",
+      "artist": "Phil Collins",
+      "album": "Face Value",
+      "year": 1981,
+      "genre": "Art Rock / Pop Ballad",
+      "country": "Reino Unido",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción de Phil Collins famosa por su dramática entrada de batería?",
+          "answer": "In the Air Tonight",
+          "points": 1,
+          "hints": ["En el aire esta noche", "Utilizada en muchas películas y series"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Phil Collins",
+          "points": 1,
+          "hints": ["Comparte artista con 'Sussudio'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Principios de los 80"]
+        }
+      }
+    },
+    {
+      "id": "210",
+      "title": "Eternal Flame",
+      "artist": "The Bangles",
+      "album": "Everything",
+      "year": 1988,
+      "genre": "Pop Ballad",
+      "country": "EE. UU.",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la balada de The Bangles que pregunta si una llama es eterna?",
+          "answer": "Eternal Flame",
+          "points": 1,
+          "hints": ["Llama eterna", "Cantada por Susanna Hoffs"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Bangles",
+          "points": 1,
+          "hints": ["Banda femenina estadounidense", "Las Pulseras"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "211",
+      "title": "(I've Had) The Time of My Life",
+      "artist": "Bill Medley & Jennifer Warnes",
+      "album": "Dirty Dancing Soundtrack",
+      "year": 1987,
+      "genre": "Pop Ballad",
+      "country": "EE. UU.",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción ganadora del Oscar y Grammy de 'Dirty Dancing'?",
+          "answer": "(I've Had) The Time of My Life",
+          "points": 1,
+          "hints": ["El momento de mi vida", "Famosa por el levantamiento de Patrick Swayze"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Bill Medley & Jennifer Warnes",
+          "points": 1,
+          "hints": [
+            "Dúo de un hombre y una mujer",
+            "Bill Medley fue parte de The Righteous Brothers"
+          ]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Finales de los 80"]
+        }
+      }
+    },
+    {
+      "id": "212",
+      "title": "Waiting for a Girl Like You",
+      "artist": "Foreigner",
+      "album": "4",
+      "year": 1981,
+      "genre": "Power Ballad",
+      "country": "Reino Unido / EE. UU.",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la balada de Foreigner que pasó 10 semanas en el número 2 de las listas de EE. UU.?",
+          "answer": "Waiting for a Girl Like You",
+          "points": 1,
+          "hints": ["Esperando una chica como tú", "Un clásico lento y atmosférico"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Foreigner",
+          "points": 1,
+          "hints": ["Comparte banda con 'I Want to Know What Love Is'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1980s",
+          "points": 1,
+          "hints": ["Principios de los 80"]
+        }
+      }
+    },
+    {
+      "id": "213",
+      "title": "Paint It Black",
+      "artist": "The Rolling Stones",
+      "album": "Aftermath (US Version)",
+      "year": 1966,
+      "genre": "Psychedelic Rock",
+      "country": "Reino Unido",
+      "decade": "1960s",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción de The Rolling Stones con un riff distintivo de sitar?",
+          "answer": "Paint It Black",
+          "points": 1,
+          "hints": ["Píntalo de negro", "A menudo asociada a películas de guerra"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Rolling Stones",
+          "points": 1,
+          "hints": ["Piedras rodantes", "Banda liderada por Mick Jagger"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1960s",
+          "points": 1,
+          "hints": ["Mediados de los 60"]
+        }
+      }
+    },
+    {
+      "id": "214",
+      "title": "Hey Jude",
+      "artist": "The Beatles",
+      "album": "Single",
+      "year": 1968,
+      "genre": "Pop Rock",
+      "country": "Reino Unido",
+      "decade": "1960s",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la famosa balada de The Beatles que termina con un largo 'Na-na-na nananana...'?",
+          "answer": "Hey Jude",
+          "points": 1,
+          "hints": [
+            "Canción escrita por Paul McCartney para el hijo de John Lennon",
+            "Una exclamación seguida de un nombre"
+          ]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Beatles",
+          "points": 1,
+          "hints": ["Los Escarabajos", "Banda de Liverpool, formada por 4 miembros"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1960s",
+          "points": 1,
+          "hints": ["Finales de los 60"]
+        }
+      }
+    },
+    {
+      "id": "215",
+      "title": "Let It Be",
+      "artist": "The Beatles",
+      "album": "Let It Be",
+      "year": 1970,
+      "genre": "Pop Rock / Ballad",
+      "country": "Reino Unido",
+      "decade": "1970s",
+      "difficulty": "EASY",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es la canción de The Beatles que fue la última en ser lanzada antes de su separación?",
+          "answer": "Let It Be",
+          "points": 1,
+          "hints": ["Déjalo ser", "Inspirada en un sueño de Paul McCartney sobre su madre"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "The Beatles",
+          "points": 1,
+          "hints": ["Comparte banda con 'Hey Jude'"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 1,
+          "hints": ["Principios de los 70 (aunque escrita y grabada en los 60)"]
+        }
+      }
+    },
+    {
+      "id": "216",
+      "title": "More Than a Feeling",
+      "artist": "Boston",
+      "album": "Boston",
+      "year": 1976,
+      "genre": "Arena Rock / Hard Rock",
+      "country": "EE. UU.",
+      "decade": "1970s",
+      "difficulty": "MEDIUM",
+      "hasAudio": true,
+      "hasQuestions": true,
+      "availableCardTypes": ["song", "artist", "decade", "lyrics", "challenge"],
+      "questions": {
+        "song": {
+          "question": "¿Cuál es el éxito de Rock de la banda Boston con una estructura de canción compleja?",
+          "answer": "More Than a Feeling",
+          "points": 1,
+          "hints": ["Más que un sentimiento", "Famosa por su arpegio introductorio"]
+        },
+        "artist": {
+          "question": "¿Quién canta esta canción?",
+          "answer": "Boston",
+          "points": 1,
+          "hints": ["El nombre de una ciudad estadounidense", "Banda de Rock de Arena"]
+        },
+        "decade": {
+          "question": "¿De qué década es?",
+          "answer": "1970s",
+          "points": 1,
+          "hints": ["Mediados de los 70"]
+        }
+      }
     }
   ],
   "metadata": {
-    "totalTracks": 125,
+    "totalTracks": 205,
     "lastUpdated": "2024-12-12",
     "version": "2.0",
     "coverage": {
