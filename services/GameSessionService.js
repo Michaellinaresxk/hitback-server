@@ -209,6 +209,12 @@ class GameSessionService {
         number: session.round,
         track: session.currentRound.track,
         question: session.currentRound.question
+      },
+      gameMasterData: {
+        correctAnswer: question.answer,
+        trackTitle: track.title,
+        trackArtist: track.artist,
+        acceptableAnswers: question.acceptableAnswers
       }
     };
   }
