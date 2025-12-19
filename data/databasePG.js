@@ -16,7 +16,6 @@ client.query('SELECT title, artist FROM tracks;', (err, res) => {
     console.error('Error al obtener tracks:', err);
   } else {
     console.log('Tracks encontrados:', res.rows);
-    console.log('Tracks encontrados:', 'Total:', res.rowCount);
     // res.rows es un array de objetos JavaScript:
     // [ { title: 'Paint It Black', artist: 'The Rolling Stones' }, ... ]
   }
