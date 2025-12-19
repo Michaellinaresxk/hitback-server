@@ -1,40 +1,29 @@
 /**
- * 🎮 Game Session Service - Maneja partidas SIN QR
+ * 🎮 Game Session Service - HITBACK Backend
  * 
- * Flujo nuevo:
- * 1. createSession() - Crear partida con filtros (géneros, décadas)
- * 2. nextRound() - Obtener siguiente canción + pregunta aleatoria
- * 3. submitAnswer() - Registrar ganador y calcular puntos
- * 4. getStatus() - Estado actual de la partida
- * 
- * ❌ Sin escaneo QR
- * ✅ Control 100% desde la app
+ * ✅ FIX: Sistema de tokens ÚNICOS
+ * - Cada jugador tiene 3 tokens: [1, 2, 3] (valores +1, +2, +3)
+ * - Al apostar: el token se REMUEVE del array (disabled)
+ * - Si acierta: puntos = base + valor del token
+ * - Si falla: 0 puntos, token ya usado
+ * - Tokens NO se recuperan
  */
 
-// ✅ CORREGIDO: TrackService es singleton, no clase
 const trackService = require('./TrackService');
 const QuestionService = require('./QuestionService');
 const DeezerService = require('./DeezerService');
 
 class GameSessionService {
   constructor() {
-    // ✅ CORREGIDO: Usar singleton directamente
     this.trackService = trackService;
     this.questionService = new QuestionService();
-
-    // Sesiones activas (en producción usar Redis/DB)
     this.sessions = new Map();
   }
 
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
   // 🎮 CREAR SESIÓN
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Crea una nueva sesión de juego
-   * @param {Object} config - Configuración de la partida
-   * @returns {Object} Sesión creada
-   */
   createSession(config = {}) {
     const {
       players = [],
@@ -42,73 +31,53 @@ class GameSessionService {
       decades = ['ANY'],
       difficulty = 'ANY',
       targetScore = 15,
-      timeLimit = 1200, // 20 minutos en segundos
-      tokensPerPlayer = 5,
+      timeLimit = 1200,
       powerCardsPerPlayer = 3
     } = config;
 
-    // Generar ID único
     const sessionId = this._generateSessionId();
 
-    // Crear estructura de jugadores
     const playerList = players.map((name, index) => ({
       id: `player_${index + 1}`,
       name: name || `Jugador ${index + 1}`,
       score: 0,
-      tokens: tokensPerPlayer,
+      availableTokens: [1, 2, 3], // ✅ 3 tokens ÚNICOS
       powerCards: [],
       stats: {
         correctAnswers: 0,
         wrongAnswers: 0,
-        tokensWon: 0,
-        tokensLost: 0
+        tokensUsed: []
       }
     }));
 
-    // Crear sesión
     const session = {
       id: sessionId,
-      status: 'created', // created | playing | paused | finished
+      status: 'created',
       createdAt: new Date().toISOString(),
-
-      // Configuración
       config: {
         genres,
         decades,
         difficulty,
         targetScore,
         timeLimit,
-        tokensPerPlayer,
         powerCardsPerPlayer
       },
-
-      // Jugadores
       players: playerList,
       currentPlayerIndex: 0,
-
-      // Estado del juego
       round: 0,
       usedTrackIds: [],
       currentRound: null,
-
-      // Tiempo
       timeRemaining: timeLimit,
       startedAt: null,
-
-      // Historial
       history: []
     };
 
-    // Guardar sesión
     this.sessions.set(sessionId, session);
-
-    // Resetear tracks usados en TrackService
     this.trackService.resetUsedTracks();
 
     console.log(`🎮 Sesión creada: ${sessionId}`);
     console.log(`   Jugadores: ${playerList.length}`);
-    console.log(`   Géneros: ${genres.join(', ')}`);
-    console.log(`   Décadas: ${decades.join(', ')}`);
+    console.log(`   Tokens por jugador: [1, 2, 3]`);
 
     return {
       success: true,
@@ -116,13 +85,10 @@ class GameSessionService {
     };
   }
 
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
   // ▶️ INICIAR JUEGO
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Inicia la partida
-   */
   startGame(sessionId) {
     const session = this.sessions.get(sessionId);
 
@@ -145,15 +111,10 @@ class GameSessionService {
     };
   }
 
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
   // 🎵 SIGUIENTE RONDA
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Obtiene la siguiente ronda (track + pregunta)
-   * @param {string} sessionId - ID de la sesión
-   * @param {string} forcedQuestionType - Tipo forzado (opcional, para carta SNIPER)
-   */
   async nextRound(sessionId, forcedQuestionType = null) {
     const session = this.sessions.get(sessionId);
 
@@ -165,7 +126,6 @@ class GameSessionService {
       return { success: false, error: 'El juego no está en curso' };
     }
 
-    // Verificar si alguien ganó
     const winner = this._checkWinner(session);
     if (winner) {
       session.status = 'finished';
@@ -177,10 +137,8 @@ class GameSessionService {
       };
     }
 
-    // Incrementar ronda
     session.round++;
 
-    // Obtener track aleatorio con filtros
     const filters = {
       genre: this._getRandomFromArray(session.config.genres),
       decade: this._getRandomFromArray(session.config.decades),
@@ -193,35 +151,29 @@ class GameSessionService {
       return { success: false, error: 'No hay tracks disponibles' };
     }
 
-    // 🎵 OBTENER AUDIO URL DE DEEZER
     let audioUrl = null;
     let audioSource = 'none';
 
     try {
-      console.log(`🎵 Buscando audio en Deezer: "${track.title}" - ${track.artist}`);
+      console.log(`🎵 Buscando: "${track.title}" - ${track.artist}`);
       const deezerResult = await DeezerService.searchTrack(track.title, track.artist);
 
       if (deezerResult && deezerResult.previewUrl) {
         audioUrl = deezerResult.previewUrl;
         audioSource = 'deezer';
-        console.log(`✅ Audio encontrado: ${audioUrl}`);
-      } else {
-        console.warn(`⚠️ No se encontró preview en Deezer para: ${track.title}`);
+        console.log(`✅ Audio encontrado`);
       }
     } catch (error) {
-      console.error(`❌ Error buscando en Deezer:`, error.message);
+      console.error(`❌ Error Deezer:`, error.message);
     }
 
-    // Generar pregunta
     const question = this.questionService.generateQuestion(track, forcedQuestionType);
 
-    // Guardar ronda actual
     session.currentRound = {
       roundNumber: session.round,
       trackId: track.id,
       track: {
         id: track.id,
-        // NO enviamos title/artist aún (es la respuesta!)
         genre: track.genre,
         decade: track.decade,
         audioUrl: audioUrl,
@@ -235,7 +187,6 @@ class GameSessionService {
         hints: question.hints,
         isChallenge: question.isChallenge || false
       },
-      // Respuesta guardada pero NO enviada al cliente aún
       _answer: {
         correct: question.answer,
         acceptableAnswers: question.acceptableAnswers,
@@ -244,15 +195,13 @@ class GameSessionService {
       },
       bets: {},
       startedAt: new Date().toISOString(),
-      status: 'playing' // playing | betting | answered
+      status: 'playing'
     };
 
-    // Agregar a usados
     session.usedTrackIds.push(track.id);
 
-    console.log(`🎵 Ronda ${session.round}: ${track.title} - ${track.artist}`);
-    console.log(`   Pregunta: ${question.type} (${question.points} pts)`);
-    console.log(`   Audio: ${audioSource}`);
+    console.log(`🎵 Ronda ${session.round}: ${track.title}`);
+    console.log(`   Pregunta: ${question.type} (${question.points} pts base)`);
 
     return {
       success: true,
@@ -264,14 +213,17 @@ class GameSessionService {
     };
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // 🎰 REGISTRAR APUESTAS
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // 🎰 USAR TOKEN (APOSTAR)
+  // ═══════════════════════════════════════════════════════════════
 
   /**
-   * Registra la apuesta de un jugador
+   * ✅ FIX: Usar un token ÚNICO
+   * - Verifica que el token específico esté disponible
+   * - Lo REMUEVE del array (disabled)
+   * - Guarda el valor para calcular puntos
    */
-  placeBet(sessionId, playerId, tokensBet) {
+  placeBet(sessionId, playerId, tokenValue) {
     const session = this.sessions.get(sessionId);
 
     if (!session || !session.currentRound) {
@@ -283,33 +235,46 @@ class GameSessionService {
       return { success: false, error: 'Jugador no encontrado' };
     }
 
-    // Validar tokens
-    const bet = Math.min(Math.max(0, tokensBet), player.tokens);
+    // ✅ Verificar que el token ESPECÍFICO está disponible
+    if (!player.availableTokens.includes(tokenValue)) {
+      console.log(`❌ Token +${tokenValue} no disponible para ${player.name}`);
+      console.log(`   Tokens disponibles: [${player.availableTokens.join(', ')}]`);
+      return {
+        success: false,
+        error: `Token +${tokenValue} ya fue usado`,
+        availableTokens: player.availableTokens
+      };
+    }
 
-    // Registrar apuesta
+    console.log(`🪙 ${player.name} usa token +${tokenValue}`);
+    console.log(`   Tokens antes: [${player.availableTokens.join(', ')}]`);
+
+    // ✅ REMOVER el token del array (disabled)
+    player.availableTokens = player.availableTokens.filter(t => t !== tokenValue);
+    player.stats.tokensUsed.push(tokenValue);
+
+    console.log(`   Tokens después: [${player.availableTokens.join(', ')}]`);
+
+    // Registrar la apuesta
     session.currentRound.bets[playerId] = {
-      tokens: bet,
-      multiplier: this._calculateMultiplier(bet)
+      tokenValue: tokenValue,
+      usedAt: new Date().toISOString()
     };
-
-    console.log(`🎰 ${player.name} apuesta ${bet} tokens (×${this._calculateMultiplier(bet)})`);
 
     return {
       success: true,
-      bet: session.currentRound.bets[playerId],
-      playerTokens: player.tokens
+      bet: {
+        tokenValue: tokenValue,
+        multiplier: tokenValue // Compatibilidad
+      },
+      availableTokens: player.availableTokens // ✅ Retornar tokens restantes
     };
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // ✅ REVELAR RESPUESTA Y ASIGNAR PUNTOS
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // ✅ REVELAR RESPUESTA
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Revela la respuesta y asigna puntos al ganador
-   * @param {string} sessionId 
-   * @param {string} winnerId - ID del jugador ganador (null si nadie acertó)
-   */
   revealAnswer(sessionId, winnerId = null) {
     const session = this.sessions.get(sessionId);
 
@@ -320,7 +285,6 @@ class GameSessionService {
     const round = session.currentRound;
     const answer = round._answer;
 
-    // Calcular resultados
     const results = {
       correctAnswer: answer.correct,
       trackInfo: {
@@ -329,23 +293,28 @@ class GameSessionService {
       },
       winner: null,
       pointsAwarded: 0,
-      tokensLost: {},
-      tokensWon: 0
+      basePoints: round.question.points,
+      tokenBonus: 0
     };
 
+    console.log(`\n═══ REVEAL ANSWER ═══`);
+    console.log(`Winner: ${winnerId || 'none'}`);
+    console.log(`Base points: ${round.question.points}`);
+
+    // PROCESAR GANADOR
     if (winnerId) {
       const winner = session.players.find(p => p.id === winnerId);
 
       if (winner) {
-        // Calcular puntos con multiplicador
-        const bet = round.bets[winnerId] || { tokens: 0, multiplier: 1 };
         const basePoints = round.question.points;
-        const totalPoints = Math.round(basePoints * bet.multiplier);
+        const bet = round.bets[winnerId];
+        const tokenBonus = bet ? bet.tokenValue : 0;
 
-        // Asignar puntos
+        // ✅ Total = base + token bonus
+        const totalPoints = basePoints + tokenBonus;
+
         winner.score += totalPoints;
         winner.stats.correctAnswers++;
-        winner.stats.tokensWon += bet.tokens;
 
         results.winner = {
           id: winner.id,
@@ -353,28 +322,27 @@ class GameSessionService {
           newScore: winner.score
         };
         results.pointsAwarded = totalPoints;
-        results.tokensWon = bet.tokens;
+        results.tokenBonus = tokenBonus;
 
-        console.log(`✅ ${winner.name} gana ${totalPoints} puntos (base: ${basePoints}, mult: ×${bet.multiplier})`);
+        console.log(`✅ ${winner.name} GANA:`);
+        console.log(`   Base: ${basePoints} pts`);
+        console.log(`   Token: +${tokenBonus} pts`);
+        console.log(`   Total: ${totalPoints} pts`);
       }
+    } else {
+      console.log(`😅 Nadie acertó`);
+      // Los tokens ya fueron removidos en placeBet - no se recuperan
     }
 
-    // Procesar perdedores (pierden tokens apostados)
-    session.players.forEach(player => {
-      if (player.id !== winnerId) {
-        const bet = round.bets[player.id];
-        if (bet && bet.tokens > 0) {
-          player.tokens -= bet.tokens;
-          player.stats.tokensLost += bet.tokens;
-          results.tokensLost[player.id] = bet.tokens;
-
-          console.log(`❌ ${player.name} pierde ${bet.tokens} tokens`);
-        }
-        player.stats.wrongAnswers++;
-      }
+    // Log estado de jugadores
+    console.log(`\n📊 Estado:`);
+    session.players.forEach(p => {
+      const bet = round.bets[p.id];
+      const tokenUsed = bet ? `(usó +${bet.tokenValue})` : '';
+      console.log(`   ${p.name}: ${p.score} pts, tokens: [${p.availableTokens.join(', ')}] ${tokenUsed}`);
     });
 
-    // Guardar en historial
+    // Historial
     session.history.push({
       round: round.roundNumber,
       trackId: round.trackId,
@@ -384,7 +352,6 @@ class GameSessionService {
       timestamp: new Date().toISOString()
     });
 
-    // Limpiar ronda actual
     session.currentRound = null;
 
     // Verificar ganador del juego
@@ -393,27 +360,29 @@ class GameSessionService {
       session.status = 'finished';
       results.gameOver = true;
       results.gameWinner = gameWinner;
+      console.log(`🏆 GAME OVER - ${gameWinner.name}`);
     }
+
+    console.log(`═══════════════════════\n`);
 
     return {
       success: true,
       results,
+      // ✅ Retornar availableTokens en lugar de tokens (número)
       players: session.players.map(p => ({
         id: p.id,
         name: p.name,
         score: p.score,
-        tokens: p.tokens
+        availableTokens: p.availableTokens,
+        tokens: p.availableTokens.length // Compatibilidad
       }))
     };
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // 📊 ESTADO DEL JUEGO
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // 📊 ESTADO
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Obtiene el estado actual de la sesión
-   */
   getStatus(sessionId) {
     const session = this.sessions.get(sessionId);
 
@@ -427,9 +396,6 @@ class GameSessionService {
     };
   }
 
-  /**
-   * Obtiene todas las sesiones activas
-   */
   getAllSessions() {
     const sessions = [];
     this.sessions.forEach((session, id) => {
@@ -444,13 +410,10 @@ class GameSessionService {
     return sessions;
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // ⚡ CARTAS DE PODER
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // ⚡ POWER CARDS
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Usa una carta de poder
-   */
   usePowerCard(sessionId, playerId, cardType, targetPlayerId = null) {
     const session = this.sessions.get(sessionId);
 
@@ -463,9 +426,7 @@ class GameSessionService {
       return { success: false, error: 'Jugador no encontrado' };
     }
 
-    // Aquí iría la lógica de cada poder
-    // Por ahora solo log
-    console.log(`⚡ ${player.name} usa poder: ${cardType}`);
+    console.log(`⚡ ${player.name} usa: ${cardType}`);
 
     return {
       success: true,
@@ -473,9 +434,9 @@ class GameSessionService {
     };
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // 🔧 UTILIDADES PRIVADAS
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // 🔧 UTILS
+  // ═══════════════════════════════════════════════════════════════
 
   _generateSessionId() {
     return 'game_' + Math.random().toString(36).substring(2, 9);
@@ -485,18 +446,6 @@ class GameSessionService {
     if (!arr || arr.length === 0) return 'ANY';
     if (arr.includes('ANY')) return 'ANY';
     return arr[Math.floor(Math.random() * arr.length)];
-  }
-
-  _calculateMultiplier(tokens) {
-    const multipliers = {
-      0: 1,
-      1: 1.5,
-      2: 2,
-      3: 2.5,
-      4: 3,
-      5: 4 // ALL IN
-    };
-    return multipliers[tokens] || 1;
   }
 
   _checkWinner(session) {
@@ -516,33 +465,25 @@ class GameSessionService {
   }
 
   _sanitizeSession(session) {
-    // Quita información sensible (respuestas) antes de enviar al cliente
     const sanitized = { ...session };
 
     if (sanitized.currentRound) {
       sanitized.currentRound = { ...sanitized.currentRound };
-      delete sanitized.currentRound._answer; // No enviar respuesta
+      delete sanitized.currentRound._answer;
     }
 
     return sanitized;
   }
 
-  // ═══════════════════════════════════════════════════════════
-  // 🧹 LIMPIEZA
-  // ═══════════════════════════════════════════════════════════
+  // ═══════════════════════════════════════════════════════════════
+  // 🧹 CLEANUP
+  // ═══════════════════════════════════════════════════════════════
 
-  /**
-   * Elimina una sesión
-   */
   deleteSession(sessionId) {
     const deleted = this.sessions.delete(sessionId);
-    console.log(`🗑️ Sesión ${sessionId} ${deleted ? 'eliminada' : 'no encontrada'}`);
     return { success: deleted };
   }
 
-  /**
-   * Limpia sesiones antiguas (más de 2 horas)
-   */
   cleanupOldSessions() {
     const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
     let cleaned = 0;
@@ -555,7 +496,6 @@ class GameSessionService {
       }
     });
 
-    console.log(`🧹 Limpiadas ${cleaned} sesiones antiguas`);
     return { cleaned };
   }
 }
