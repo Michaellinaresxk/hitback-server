@@ -19,6 +19,10 @@ const audioRoutes = require('./routes/audio');
 const gameRoutes = require('./routes/game');
 const healthRoutes = require('./routes/health');
 
+// 🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)
+// ✅ CORREGIDO: Importar desde routes/
+const gameSessionRoutes = require('./routes/gameSession');
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || '0.0.0.0';
@@ -135,6 +139,9 @@ app.use('/api/audio', audioRoutes);
 app.use('/api/game', gameRoutes);
 app.use('/api/health', healthRoutes);
 
+// 🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)
+app.use('/api/v2/game', gameSessionRoutes);
+
 // ========================================
 // RUTA DE BIENVENIDA
 // ========================================
@@ -151,11 +158,23 @@ app.get('/', (req, res) => {
       accessUrls: networkIPs.map(ip => `http://${ip}:${PORT}`)
     },
     endpoints: {
-      scanQR: '/api/qr/scan/:qrCode',  // ✅ Esto es lo que usa tu app
-      tracks: '/api/tracks',
-      audio: '/api/audio/list',
-      health: '/api/health',
-      expoHealth: '/api/expo/health'
+      // 🎮 NUEVO API v2 (SIN QR)
+      v2: {
+        createSession: 'POST /api/v2/game/session',
+        startGame: 'POST /api/v2/game/session/:id/start',
+        nextRound: 'POST /api/v2/game/session/:id/round',
+        placeBet: 'POST /api/v2/game/session/:id/bet',
+        revealAnswer: 'POST /api/v2/game/session/:id/reveal',
+        getStatus: 'GET /api/v2/game/session/:id',
+        health: 'GET /api/v2/game/health'
+      },
+      // Legacy (con QR)
+      legacy: {
+        scanQR: '/api/qr/scan/:qrCode',
+        tracks: '/api/tracks',
+        audio: '/api/audio/list',
+        health: '/api/health'
+      }
     },
     expo: {
       testConnection: networkIPs.map(ip => `http://${ip}:${PORT}/api/expo/health`),
@@ -190,7 +209,7 @@ app.get('/api/test/tracks', (req, res) => {
 // TEST ENDPOINT - Deezer
 app.get('/api/test/deezer', async (req, res) => {
   try {
-    const deezerService = require('../services/DeezerService');
+    const deezerService = require('./services/DeezerService');
     const healthCheck = await deezerService.healthCheck();
 
     res.json({
@@ -213,7 +232,7 @@ app.get('/api/test/deezer', async (req, res) => {
 // TEST ENDPOINT - Deezer Fallback
 app.post('/api/test/deezer-fallback', async (req, res) => {
   try {
-    const DeezerService = require('../services/DeezerService');
+    const DeezerService = require('./services/DeezerService');
 
     // Simular un track sin audio local
     const testTrack = {
@@ -286,10 +305,19 @@ const server = app.listen(PORT, HOST, () => {
   if (networkIPs.length > 0) {
     logger.info(`📱 Network Access URLs for Expo:`);
     networkIPs.forEach(ip => {
-      logger.info(`   📍 http://${ip}:${PORT}`);
+      logger.info(`   🔗 http://${ip}:${PORT}`);
     });
     logger.info(`🧪 Test Expo connection: http://${networkIPs[0]}:${PORT}/api/expo/health`);
-    logger.info(`🎯 QR Scan endpoint (COMPLETE): http://${networkIPs[0]}:${PORT}/api/qr/scan/HITBACK_001_SONG_EASY`);
+
+    // 🎮 NUEVAS RUTAS
+    logger.info(`\n🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)`);
+    logger.info(`   POST /api/v2/game/session        - Crear sesión`);
+    logger.info(`   POST /api/v2/game/session/:id/start  - Iniciar juego`);
+    logger.info(`   POST /api/v2/game/session/:id/round  - Siguiente ronda`);
+    logger.info(`   POST /api/v2/game/session/:id/bet    - Registrar apuesta`);
+    logger.info(`   POST /api/v2/game/session/:id/reveal - Revelar respuesta`);
+    logger.info(`   GET  /api/v2/game/session/:id        - Estado sesión`);
+    logger.info(`   GET  /api/v2/game/health             - Health check`);
   }
 
   logger.info(`🎵 Audio files: /audio/tracks/`);
