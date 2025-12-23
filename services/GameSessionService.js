@@ -208,14 +208,15 @@ class GameSessionService {
       round: {
         number: session.round,
         track: session.currentRound.track,
-        question: session.currentRound.question
+        question: session.currentRound.question,
+        gameMasterAnswer: {
+          correct: session.currentRound._answer?.correct,
+          trackTitle: session.currentRound._answer?.trackTitle,
+          trackArtist: session.currentRound._answer?.trackArtist,
+          acceptableAnswers: session.currentRound._answer?.acceptableAnswers || []
+        }
       },
-      gameMasterData: {
-        correctAnswer: question.answer,
-        trackTitle: track.title,
-        trackArtist: track.artist,
-        acceptableAnswers: question.acceptableAnswers
-      }
+
     };
   }
 
