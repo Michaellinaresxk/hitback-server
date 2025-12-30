@@ -1,17 +1,21 @@
 /**
- * 🎮 Game Session Service - HITBACK Backend
+ * 🎮 GAME SESSION SERVICE - UPDATED
  * 
- * ✅ FIX: Sistema de tokens ÚNICOS
- * - Cada jugador tiene 3 tokens: [1, 2, 3] (valores +1, +2, +3)
- * - Al apostar: el token se REMUEVE del array (disabled)
- * - Si acierta: puntos = base + valor del token
- * - Si falla: 0 puntos, token ya usado
- * - Tokens NO se recuperan
+ * ✅ INTEGRACIÓN CON POWER CARDS
+ * - Detecta combos automáticamente
+ * - Aplica efectos de cartas a puntos
+ * - Registra uso de power cards
+ * 
+ * CAMBIOS:
+ * - revealAnswer(): Integración con PowerCardService y ComboTracker
+ * - Nuevos métodos: processCombos(), applyPowerCardBonus()
  */
 
 const trackService = require('./TrackService');
 const QuestionService = require('./QuestionService');
 const DeezerService = require('./DeezerService');
+const PowerCardService = require('./PowerCardService');
+const ComboTracker = require('./ComboTracker');
 
 class GameSessionService {
   constructor() {
@@ -41,12 +45,15 @@ class GameSessionService {
       id: `player_${index + 1}`,
       name: name || `Jugador ${index + 1}`,
       score: 0,
-      availableTokens: [1, 2, 3], // ✅ 3 tokens ÚNICOS
+      availableTokens: [1, 2, 3],
       powerCards: [],
       stats: {
         correctAnswers: 0,
         wrongAnswers: 0,
-        tokensUsed: []
+        tokensUsed: [],
+        combosCompleted: 0,              // ✅ NUEVA STAT
+        powerCardsUsed: 0,               // ✅ NUEVA STAT
+        totalComboStreak: 0              // ✅ NUEVA STAT
       }
     }));
 
@@ -78,6 +85,7 @@ class GameSessionService {
     console.log(`🎮 Sesión creada: ${sessionId}`);
     console.log(`   Jugadores: ${playerList.length}`);
     console.log(`   Tokens por jugador: [1, 2, 3]`);
+    console.log(`   ✅ Power Cards System ACTIVO`);
 
     return {
       success: true,
@@ -86,7 +94,249 @@ class GameSessionService {
   }
 
   // ═══════════════════════════════════════════════════════════════
-  // ▶️ INICIAR JUEGO
+  // ✅ REVELAR RESPUESTA CON INTEGRACIÓN DE POWER CARDS
+  // ═══════════════════════════════════════════════════════════════
+
+  revealAnswer(sessionId, winnerId = null) {
+    const session = this.sessions.get(sessionId);
+
+    if (!session || !session.currentRound) {
+      return { success: false, error: 'No hay ronda activa' };
+    }
+
+    const round = session.currentRound;
+    const answer = round._answer;
+
+    const results = {
+      correctAnswer: answer.correct,
+      trackInfo: {
+        title: answer.trackTitle,
+        artist: answer.trackArtist
+      },
+      winner: null,
+      pointsAwarded: 0,
+      basePoints: round.question.points,
+      tokenBonus: 0,
+      powerCardEffect: null,            // ✅ NUEVA PROP
+      comboStatus: null                 // ✅ NUEVA PROP
+    };
+
+    console.log(`\n═══ REVEAL ANSWER ═══`);
+    console.log(`Winner: ${winnerId || 'none'}`);
+    console.log(`Base points: ${round.question.points}`);
+
+    // ═══════════════════════════════════════════════════════════════
+    // PROCESAR GANADOR
+    // ═══════════════════════════════════════════════════════════════
+
+    if (winnerId) {
+      const winner = session.players.find(p => p.id === winnerId);
+
+      if (winner) {
+        const basePoints = round.question.points;
+        const bet = round.bets[winnerId];
+        const tokenBonus = bet ? bet.tokenValue : 0;
+
+        // Paso 1: Calcular puntos base con token
+        let totalPoints = basePoints + tokenBonus;
+
+        console.log(`✅ ${winner.name} ACIERTA:`);
+        console.log(`   Base: ${basePoints} pts`);
+        console.log(`   Token: +${tokenBonus} pts`);
+
+        // ═══════════════════════════════════════════════════════════
+        // Paso 2: APLICAR EFECTO DE POWER CARD
+        // ═══════════════════════════════════════════════════════════
+
+        const powerCardEffect = PowerCardService.applyActiveCardEffect(
+          winnerId,
+          totalPoints
+        );
+
+        if (powerCardEffect.cardUsed) {
+          totalPoints = powerCardEffect.finalPoints;
+          winner.stats.powerCardsUsed++;
+
+          results.powerCardEffect = {
+            cardId: powerCardEffect.cardUsed.id,
+            cardName: powerCardEffect.cardUsed.name,
+            emoji: powerCardEffect.cardUsed.emoji,
+            multiplier: powerCardEffect.multiplier,
+            basePointsBeforeCard: totalPoints / powerCardEffect.multiplier,
+            finalPointsAfterCard: totalPoints
+          };
+
+          console.log(`   💥 Power Card ${powerCardEffect.cardUsed.name}: x${powerCardEffect.multiplier}`);
+          console.log(`   → ${totalPoints} pts (con poder)`);
+        } else {
+          console.log(`   Total: ${totalPoints} pts`);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // Paso 3: REGISTRAR RESPUESTA Y DETECTAR COMBOS
+        // ═══════════════════════════════════════════════════════════
+
+        const comboResult = PowerCardService.processPlayerAnswer(
+          winnerId,
+          true,  // Es correcta
+          { gameSessionId: sessionId, roundNumber: round.roundNumber }
+        );
+
+        // Actualizar stats de combo
+        if (comboResult.comboDetected) {
+          winner.stats.combosCompleted++;
+
+          results.comboStatus = {
+            type: comboResult.comboType,
+            message: comboResult.comboMessage,
+            cardAwarded: comboResult.cardAwarded
+          };
+
+          console.log(`   🔥 COMBO: ${comboResult.comboMessage}`);
+        }
+
+        // Actualizar streak en stats
+        winner.stats.totalComboStreak = comboResult.currentStreak;
+
+        // Sumar puntos finales
+        winner.score += totalPoints;
+        winner.stats.correctAnswers++;
+
+        // Limpiar cartas activas
+        PowerCardService.clearActiveCards(winnerId);
+
+        results.winner = {
+          id: winner.id,
+          name: winner.name,
+          newScore: winner.score
+        };
+        results.pointsAwarded = totalPoints;
+        results.tokenBonus = tokenBonus;
+      }
+    } else {
+      // ═══════════════════════════════════════════════════════════
+      // NADIE ACERTÓ - Registrar respuestas incorrectas para todos
+      // ═══════════════════════════════════════════════════════════
+
+      console.log(`😅 Nadie acertó`);
+
+      session.players.forEach(player => {
+        PowerCardService.processPlayerAnswer(
+          player.id,
+          false,  // Incorrecto
+          { gameSessionId: sessionId, roundNumber: round.roundNumber }
+        );
+      });
+    }
+
+    // Log estado de jugadores
+    console.log(`\n📊 Estado:`);
+    session.players.forEach(p => {
+      const bet = round.bets[p.id];
+      const tokenUsed = bet ? `(usó +${bet.tokenValue})` : '';
+      const combos = p.stats.combosCompleted > 0 ? ` | ${p.stats.combosCompleted} combos` : '';
+      console.log(`   ${p.name}: ${p.score} pts, tokens: [${p.availableTokens.join(', ')}] ${tokenUsed}${combos}`);
+    });
+
+    // Historial
+    session.history.push({
+      round: round.roundNumber,
+      trackId: round.trackId,
+      questionType: round.question.type,
+      winner: winnerId,
+      pointsAwarded: results.pointsAwarded,
+      comboDetected: results.comboStatus ? results.comboStatus.type : null,
+      powerCardUsed: results.powerCardEffect ? results.powerCardEffect.cardName : null,
+      timestamp: new Date().toISOString()
+    });
+
+    session.currentRound = null;
+
+    // Verificar ganador del juego
+    const gameWinner = this._checkWinner(session);
+    if (gameWinner) {
+      session.status = 'finished';
+      results.gameOver = true;
+      results.gameWinner = gameWinner;
+      console.log(`🏆 GAME OVER - ${gameWinner.name}`);
+    }
+
+    console.log(`═══════════════════════\n`);
+
+    return {
+      success: true,
+      results,
+      players: session.players.map(p => ({
+        id: p.id,
+        name: p.name,
+        score: p.score,
+        availableTokens: p.availableTokens,
+        tokens: p.availableTokens.length,
+        stats: p.stats                    // ✅ INCLUIR STATS
+      }))
+    };
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // ⚡ MÉTODOS HELPER PARA POWER CARDS
+  // ═══════════════════════════════════════════════════════════════
+
+  /**
+   * Obtener estado de combo de un jugador en sesión
+   */
+  getPlayerComboStatus(sessionId, playerId) {
+    const session = this.sessions.get(sessionId);
+
+    if (!session) {
+      return { success: false, error: 'Sesión no encontrada' };
+    }
+
+    const comboStatus = PowerCardService.getComboStatus(playerId);
+    const player = session.players.find(p => p.id === playerId);
+
+    return {
+      success: true,
+      comboStatus,
+      playerStats: player ? {
+        name: player.name,
+        score: player.score,
+        combosCompleted: player.stats.combosCompleted,
+        powerCardsUsed: player.stats.powerCardsUsed
+      } : null
+    };
+  }
+
+  /**
+   * Obtener inventario de cartas del jugador
+   */
+  getPlayerPowerCards(playerId) {
+    const inventory = PowerCardService.getPlayerInventory(playerId);
+
+    return {
+      success: true,
+      playerId,
+      inventory,
+      totalCards: Object.values(inventory).reduce((a, b) => a + b, 0)
+    };
+  }
+
+  /**
+   * Activar power card (llamado desde frontend)
+   */
+  activatePlayerPowerCard(sessionId, playerId, cardId) {
+    const session = this.sessions.get(sessionId);
+
+    if (!session || session.status !== 'playing') {
+      return { success: false, error: 'Sesión no activa' };
+    }
+
+    const result = PowerCardService.activatePowerCard(playerId, cardId, sessionId);
+
+    return result;
+  }
+
+  // ═══════════════════════════════════════════════════════════════
+  // MÉTODOS ORIGINALES (sin cambios)
   // ═══════════════════════════════════════════════════════════════
 
   startGame(sessionId) {
@@ -110,10 +360,6 @@ class GameSessionService {
       session: this._sanitizeSession(session)
     };
   }
-
-  // ═══════════════════════════════════════════════════════════════
-  // 🎵 SIGUIENTE RONDA
-  // ═══════════════════════════════════════════════════════════════
 
   async nextRound(sessionId, forcedQuestionType = null) {
     const session = this.sessions.get(sessionId);
@@ -215,21 +461,10 @@ class GameSessionService {
           trackArtist: session.currentRound._answer?.trackArtist,
           acceptableAnswers: session.currentRound._answer?.acceptableAnswers || []
         }
-      },
-
+      }
     };
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // 🎰 USAR TOKEN (APOSTAR)
-  // ═══════════════════════════════════════════════════════════════
-
-  /**
-   * ✅ FIX: Usar un token ÚNICO
-   * - Verifica que el token específico esté disponible
-   * - Lo REMUEVE del array (disabled)
-   * - Guarda el valor para calcular puntos
-   */
   placeBet(sessionId, playerId, tokenValue) {
     const session = this.sessions.get(sessionId);
 
@@ -242,7 +477,6 @@ class GameSessionService {
       return { success: false, error: 'Jugador no encontrado' };
     }
 
-    // ✅ Verificar que el token ESPECÍFICO está disponible
     if (!player.availableTokens.includes(tokenValue)) {
       console.log(`❌ Token +${tokenValue} no disponible para ${player.name}`);
       console.log(`   Tokens disponibles: [${player.availableTokens.join(', ')}]`);
@@ -256,13 +490,11 @@ class GameSessionService {
     console.log(`🪙 ${player.name} usa token +${tokenValue}`);
     console.log(`   Tokens antes: [${player.availableTokens.join(', ')}]`);
 
-    // ✅ REMOVER el token del array (disabled)
     player.availableTokens = player.availableTokens.filter(t => t !== tokenValue);
     player.stats.tokensUsed.push(tokenValue);
 
     console.log(`   Tokens después: [${player.availableTokens.join(', ')}]`);
 
-    // Registrar la apuesta
     session.currentRound.bets[playerId] = {
       tokenValue: tokenValue,
       usedAt: new Date().toISOString()
@@ -272,123 +504,31 @@ class GameSessionService {
       success: true,
       bet: {
         tokenValue: tokenValue,
-        multiplier: tokenValue // Compatibilidad
+        multiplier: tokenValue
       },
-      availableTokens: player.availableTokens // ✅ Retornar tokens restantes
+      availableTokens: player.availableTokens
     };
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ✅ REVELAR RESPUESTA
-  // ═══════════════════════════════════════════════════════════════
-
-  revealAnswer(sessionId, winnerId = null) {
+  usePowerCard(sessionId, playerId, cardType, targetPlayerId = null) {
     const session = this.sessions.get(sessionId);
 
-    if (!session || !session.currentRound) {
-      return { success: false, error: 'No hay ronda activa' };
+    if (!session) {
+      return { success: false, error: 'Sesión no encontrada' };
     }
 
-    const round = session.currentRound;
-    const answer = round._answer;
-
-    const results = {
-      correctAnswer: answer.correct,
-      trackInfo: {
-        title: answer.trackTitle,
-        artist: answer.trackArtist
-      },
-      winner: null,
-      pointsAwarded: 0,
-      basePoints: round.question.points,
-      tokenBonus: 0
-    };
-
-    console.log(`\n═══ REVEAL ANSWER ═══`);
-    console.log(`Winner: ${winnerId || 'none'}`);
-    console.log(`Base points: ${round.question.points}`);
-
-    // PROCESAR GANADOR
-    if (winnerId) {
-      const winner = session.players.find(p => p.id === winnerId);
-
-      if (winner) {
-        const basePoints = round.question.points;
-        const bet = round.bets[winnerId];
-        const tokenBonus = bet ? bet.tokenValue : 0;
-
-        // ✅ Total = base + token bonus
-        const totalPoints = basePoints + tokenBonus;
-
-        winner.score += totalPoints;
-        winner.stats.correctAnswers++;
-
-        results.winner = {
-          id: winner.id,
-          name: winner.name,
-          newScore: winner.score
-        };
-        results.pointsAwarded = totalPoints;
-        results.tokenBonus = tokenBonus;
-
-        console.log(`✅ ${winner.name} GANA:`);
-        console.log(`   Base: ${basePoints} pts`);
-        console.log(`   Token: +${tokenBonus} pts`);
-        console.log(`   Total: ${totalPoints} pts`);
-      }
-    } else {
-      console.log(`😅 Nadie acertó`);
-      // Los tokens ya fueron removidos en placeBet - no se recuperan
+    const player = session.players.find(p => p.id === playerId);
+    if (!player) {
+      return { success: false, error: 'Jugador no encontrado' };
     }
 
-    // Log estado de jugadores
-    console.log(`\n📊 Estado:`);
-    session.players.forEach(p => {
-      const bet = round.bets[p.id];
-      const tokenUsed = bet ? `(usó +${bet.tokenValue})` : '';
-      console.log(`   ${p.name}: ${p.score} pts, tokens: [${p.availableTokens.join(', ')}] ${tokenUsed}`);
-    });
-
-    // Historial
-    session.history.push({
-      round: round.roundNumber,
-      trackId: round.trackId,
-      questionType: round.question.type,
-      winner: winnerId,
-      pointsAwarded: results.pointsAwarded,
-      timestamp: new Date().toISOString()
-    });
-
-    session.currentRound = null;
-
-    // Verificar ganador del juego
-    const gameWinner = this._checkWinner(session);
-    if (gameWinner) {
-      session.status = 'finished';
-      results.gameOver = true;
-      results.gameWinner = gameWinner;
-      console.log(`🏆 GAME OVER - ${gameWinner.name}`);
-    }
-
-    console.log(`═══════════════════════\n`);
+    console.log(`⚡ ${player.name} usa: ${cardType}`);
 
     return {
       success: true,
-      results,
-      // ✅ Retornar availableTokens en lugar de tokens (número)
-      players: session.players.map(p => ({
-        id: p.id,
-        name: p.name,
-        score: p.score,
-        availableTokens: p.availableTokens,
-        tokens: p.availableTokens.length // Compatibilidad
-      }))
+      message: `Poder ${cardType} activado`
     };
   }
-
-  // ═══════════════════════════════════════════════════════════════
-  // 📊 ESTADO
-  // ═══════════════════════════════════════════════════════════════
 
   getStatus(sessionId) {
     const session = this.sessions.get(sessionId);
@@ -417,33 +557,25 @@ class GameSessionService {
     return sessions;
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // ⚡ POWER CARDS
-  // ═══════════════════════════════════════════════════════════════
-
-  usePowerCard(sessionId, playerId, cardType, targetPlayerId = null) {
-    const session = this.sessions.get(sessionId);
-
-    if (!session) {
-      return { success: false, error: 'Sesión no encontrada' };
-    }
-
-    const player = session.players.find(p => p.id === playerId);
-    if (!player) {
-      return { success: false, error: 'Jugador no encontrado' };
-    }
-
-    console.log(`⚡ ${player.name} usa: ${cardType}`);
-
-    return {
-      success: true,
-      message: `Poder ${cardType} activado`
-    };
+  deleteSession(sessionId) {
+    const deleted = this.sessions.delete(sessionId);
+    return { success: deleted };
   }
 
-  // ═══════════════════════════════════════════════════════════════
-  // 🔧 UTILS
-  // ═══════════════════════════════════════════════════════════════
+  cleanupOldSessions() {
+    const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+    let cleaned = 0;
+
+    this.sessions.forEach((session, id) => {
+      const createdAt = new Date(session.createdAt).getTime();
+      if (createdAt < twoHoursAgo) {
+        this.sessions.delete(id);
+        cleaned++;
+      }
+    });
+
+    return { cleaned };
+  }
 
   _generateSessionId() {
     return 'game_' + Math.random().toString(36).substring(2, 9);
@@ -463,7 +595,8 @@ class GameSessionService {
         return {
           id: player.id,
           name: player.name,
-          score: player.score
+          score: player.score,
+          stats: player.stats  // ✅ Incluir stats
         };
       }
     }
@@ -480,30 +613,6 @@ class GameSessionService {
     }
 
     return sanitized;
-  }
-
-  // ═══════════════════════════════════════════════════════════════
-  // 🧹 CLEANUP
-  // ═══════════════════════════════════════════════════════════════
-
-  deleteSession(sessionId) {
-    const deleted = this.sessions.delete(sessionId);
-    return { success: deleted };
-  }
-
-  cleanupOldSessions() {
-    const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
-    let cleaned = 0;
-
-    this.sessions.forEach((session, id) => {
-      const createdAt = new Date(session.createdAt).getTime();
-      if (createdAt < twoHoursAgo) {
-        this.sessions.delete(id);
-        cleaned++;
-      }
-    });
-
-    return { cleaned };
   }
 }
 
