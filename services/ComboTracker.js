@@ -38,15 +38,28 @@ class ComboTracker {
     // Obtener o inicializar racha del jugador
     const playerData = this._getOrCreatePlayerData(playerId);
 
+    console.log(`\n🔍 COMBO TRACKER DEBUG - recordAnswer():`);
+    console.log(`   PlayerId: ${playerId}`);
+    console.log(`   Is Correct: ${isCorrect}`);
+    console.log(`   Streak ANTES: ${playerData.streak}`);
+    console.log(`   Threshold HOT_STREAK: ${this.comboThresholds.HOT_STREAK}`);
+
     // Si acertó, incrementar racha
     if (isCorrect) {
       playerData.streak += 1;
       playerData.lastCorrect = true;
 
       console.log(`🔥 ${playerId}: +1 CORRECTA (racha: ${playerData.streak})`);
+      console.log(`   Streak DESPUÉS: ${playerData.streak}`);
 
       // Detectar combos completados
       const comboDetected = this._detectCombo(playerId, playerData.streak);
+
+      console.log(`   Combo Detected: ${!!comboDetected}`);
+      if (comboDetected) {
+        console.log(`   Combo Type: ${comboDetected.type}`);
+        console.log(`   ⚠️ COMBO SE ACTIVÓ con streak = ${playerData.streak}`);
+      }
 
       const result = {
         success: true,
@@ -210,8 +223,15 @@ class ComboTracker {
    * @private
    */
   _detectCombo(playerId, streak) {
+    console.log(`\n🔍 _detectCombo() called:`);
+    console.log(`   PlayerId: ${playerId}`);
+    console.log(`   Streak: ${streak}`);
+    console.log(`   HOT_STREAK threshold: ${this.comboThresholds.HOT_STREAK}`);
+    console.log(`   Checking: ${streak} === ${this.comboThresholds.HOT_STREAK} ? ${streak === this.comboThresholds.HOT_STREAK}`);
+
     // Detectar Hot Streak (3 correctas consecutivas)
     if (streak === this.comboThresholds.HOT_STREAK) {
+      console.log(`   ✅ HOT_STREAK COMBO DETECTED!`);
       return {
         type: 'HOT_STREAK',
         message: '🔥 ¡HIT MASTER! 3 respuestas correctas consecutivas',
