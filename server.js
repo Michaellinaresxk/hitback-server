@@ -12,16 +12,17 @@ const { responseMiddleware } = require('./utils/responses');
 const { errorHandler } = require('./utils/errors');
 const logger = require('./utils/logger');
 
-// ✅ IMPORTAR RUTAS COMPLETAS (NO LAS BÁSICAS)
-const qrRoutes = require('./routes/qr');
+// ✅ IMPORTAR RUTAS (Sistema nuevo sin QR físicos)
 const tracksRoutes = require('./routes/tracks');
 const audioRoutes = require('./routes/audio');
-const gameRoutes = require('./routes/game');
 const healthRoutes = require('./routes/health');
 
 // 🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)
 // ✅ CORREGIDO: Importar desde routes/
 const gameSessionRoutes = require('./routes/gameSession');
+
+// ⚡ POWER CARDS ROUTES
+const powerCardRoutes = require('./routes/powerCard');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -131,16 +132,19 @@ app.get('/api/expo/health', (req, res) => {
 });
 
 // ========================================
-// ✅ USAR RUTAS COMPLETAS (NO LAS BÁSICAS)
+// 🎮 API ROUTES (Sistema nuevo sin QR físicos)
 // ========================================
-app.use('/api/qr', qrRoutes);
+
+// Recursos base
 app.use('/api/tracks', tracksRoutes);
 app.use('/api/audio', audioRoutes);
-app.use('/api/game', gameRoutes);
 app.use('/api/health', healthRoutes);
 
-// 🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)
+// Game Session API v2 (sin QR)
 app.use('/api/v2/game', gameSessionRoutes);
+
+// Power Cards & Combos
+app.use('/api/cards', powerCardRoutes);
 
 // ========================================
 // RUTA DE BIENVENIDA
@@ -149,7 +153,7 @@ app.get('/', (req, res) => {
   const networkIPs = getLocalNetworkIPs();
 
   res.sendSuccess({
-    message: 'HITBACK Backend API v2.0 - COMPLETE ROUTES ACTIVE',
+    message: 'HITBACK Backend API v2.0 - Sistema sin QR físicos',
     status: 'operational',
     server: {
       host: HOST,
@@ -158,8 +162,8 @@ app.get('/', (req, res) => {
       accessUrls: networkIPs.map(ip => `http://${ip}:${PORT}`)
     },
     endpoints: {
-      // 🎮 NUEVO API v2 (SIN QR)
-      v2: {
+      // 🎮 Game Session API v2 (sin QR)
+      game: {
         createSession: 'POST /api/v2/game/session',
         startGame: 'POST /api/v2/game/session/:id/start',
         nextRound: 'POST /api/v2/game/session/:id/round',
@@ -168,19 +172,25 @@ app.get('/', (req, res) => {
         getStatus: 'GET /api/v2/game/session/:id',
         health: 'GET /api/v2/game/health'
       },
-      // Legacy (con QR)
-      legacy: {
-        scanQR: '/api/qr/scan/:qrCode',
-        tracks: '/api/tracks',
-        audio: '/api/audio/list',
-        health: '/api/health'
+      // ⚡ Power Cards & Combos
+      powerCards: {
+        scanQR: 'POST /api/cards/scan-qr',
+        getAllCards: 'GET /api/cards/',
+        getComboStatus: 'GET /api/cards/combos/:playerId',
+        getInventory: 'GET /api/cards/inventories/:playerId'
+      },
+      // 📦 Recursos
+      resources: {
+        tracks: 'GET /api/tracks',
+        audio: 'GET /api/audio/list',
+        health: 'GET /api/health'
       }
     },
     expo: {
       testConnection: networkIPs.map(ip => `http://${ip}:${PORT}/api/expo/health`),
       audioTest: networkIPs.map(ip => `http://${ip}:${PORT}/audio/tracks/`)
     }
-  }, 'HITBACK API is running with COMPLETE ROUTES');
+  }, 'HITBACK API is running - Sistema nuevo sin QR de canciones');
 });
 
 app.get('/api/test/tracks', (req, res) => {
@@ -298,7 +308,7 @@ app.use(errorHandler);
 const server = app.listen(PORT, HOST, () => {
   const networkIPs = getLocalNetworkIPs();
 
-  logger.info(`🎵 HITBACK Backend started with COMPLETE ROUTES!`);
+  logger.info(`🎵 HITBACK Backend v2.0 - Sistema sin QR físicos`);
   logger.info(`📡 Host: ${HOST}:${PORT}`);
   logger.info(`🏠 Local: http://localhost:${PORT}`);
 
@@ -307,21 +317,25 @@ const server = app.listen(PORT, HOST, () => {
     networkIPs.forEach(ip => {
       logger.info(`   🔗 http://${ip}:${PORT}`);
     });
-    logger.info(`🧪 Test Expo connection: http://${networkIPs[0]}:${PORT}/api/expo/health`);
+    logger.info(`🧪 Test connection: http://${networkIPs[0]}:${PORT}/api/expo/health`);
 
-    // 🎮 NUEVAS RUTAS
-    logger.info(`\n🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)`);
-    logger.info(`   POST /api/v2/game/session        - Crear sesión`);
-    logger.info(`   POST /api/v2/game/session/:id/start  - Iniciar juego`);
-    logger.info(`   POST /api/v2/game/session/:id/round  - Siguiente ronda`);
-    logger.info(`   POST /api/v2/game/session/:id/bet    - Registrar apuesta`);
-    logger.info(`   POST /api/v2/game/session/:id/reveal - Revelar respuesta`);
-    logger.info(`   GET  /api/v2/game/session/:id        - Estado sesión`);
-    logger.info(`   GET  /api/v2/game/health             - Health check`);
+    // 🎮 Game Session API
+    logger.info(`\n🎮 GAME SESSION API (sin QR de canciones)`);
+    logger.info(`   POST /api/v2/game/session             - Crear sesión`);
+    logger.info(`   POST /api/v2/game/session/:id/start   - Iniciar juego`);
+    logger.info(`   POST /api/v2/game/session/:id/round   - Siguiente ronda`);
+    logger.info(`   POST /api/v2/game/session/:id/bet     - Registrar apuesta`);
+    logger.info(`   POST /api/v2/game/session/:id/reveal  - Revelar respuesta`);
+    logger.info(`   GET  /api/v2/game/session/:id         - Estado sesión`);
+
+    // ⚡ Power Cards
+    logger.info(`\n⚡ POWER CARDS & COMBOS`);
+    logger.info(`   POST /api/cards/scan-qr                - Escanear power card`);
+    logger.info(`   GET  /api/cards/combos/:playerId       - Estado de combo`);
+    logger.info(`   GET  /api/cards/inventories/:playerId  - Inventario`);
   }
 
-  logger.info(`🎵 Audio files: /audio/tracks/`);
-  logger.info(`✅ USING COMPLETE ROUTES - NOT BASIC ONES`);
+  logger.info(`\n✅ Sistema nuevo activo - QR solo para power cards`);
 });
 
 process.on('SIGTERM', () => {

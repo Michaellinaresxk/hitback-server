@@ -1,13 +1,15 @@
 /**
  * ⚡ POWER CARD ROUTES
- * 
+ *
  * Mapeo de rutas para operaciones con power cards
- * 
+ *
  * ✅ CLEAN CODE: Rutas organizadas, middleware aplicado correctamente
  */
 
 const express = require('express');
 const router = express.Router();
+const powerCardController = require('../controllers/powerCardController');
+const powerCardMiddleware = require('../middleware/PowercardMiddleware');
 
 // ═══════════════════════════════════════════════════════════════
 // 📤 GET - OBTENER POWER CARDS
