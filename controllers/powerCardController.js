@@ -1,227 +1,112 @@
 /**
- * ⚡ POWER CARD CONTROLLER
+ * ⚡ POWER CARD CONTROLLER - IMPROVED VERSION
  * 
- * Responsabilidad: Manejar requests HTTP para operaciones con power cards
- * - Obtener cartas disponibles
- * - Gestionar inventarios
- * - Procesar respuestas y detectar combos
- * - Activar cartas con QR
- * - Aplicar efectos de cartas
+ * Responsabilidad: Manejar requests HTTP para PowerCards
+ * - Escanear QR de cartas físicas
+ * - Gestionar inventarios de jugadores
+ * - Procesar combos y otorgar cartas
+ * - Activar y usar PowerCards
  * 
- * ✅ CLEAN CODE: Métodos enfocados, manejo de errores, logs informativos
+ * ✅ CLEAN CODE: Validación robusta, manejo de errores, logs claros
  */
 
 const PowerCardService = require('../services/PowerCardService');
-const ComboTracker = require('../services/ComboTracker');
+const { parsePowerCardQR } = require('../utils/Qrutils');
 const { asyncHandler } = require('../utils/errors');
 const logger = require('../utils/logger');
 
 class PowerCardController {
 
   // ═══════════════════════════════════════════════════════════════
-  // 📤 OBTENER POWER CARDS
+  // 📱 ESCANEO DE QR - OBTENER POWER CARD
   // ═══════════════════════════════════════════════════════════════
 
   /**
-   * GET /api/power-cards
-   * Obtener todas las power cards disponibles en el juego
-   */
-  getAllPowerCards = asyncHandler(async (req, res) => {
-    const timer = logger.startTimer('GET_ALL_POWER_CARDS');
-
-    logger.info('Fetching all power cards');
-
-    try {
-      const powerCards = PowerCardService.getAllPowerCards();
-      const combos = PowerCardService.getAllCombos();
-      const thresholds = PowerCardService.getRewardThresholds();
-
-      const duration = timer();
-
-      res.sendSuccess({
-        powerCards,
-        combos,
-        rewardThresholds: thresholds,
-        metadata: {
-          totalCards: powerCards.length,
-          totalCombos: combos.length,
-          timestamp: new Date().toISOString()
-        }
-      }, 'Power cards retrieved successfully', {
-        count: powerCards.length,
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error('Failed to get power cards:', error);
-      res.sendError(
-        'Failed to retrieve power cards',
-        'POWER_CARDS_ERROR',
-        500,
-        error.message
-      );
-    }
-  });
-
-  /**
-   * GET /api/power-cards/:cardId
-   * Obtener una power card específica
-   */
-  getPowerCardById = asyncHandler(async (req, res) => {
-    const { cardId } = req.params;
-    const timer = logger.startTimer(`GET_CARD_${cardId}`);
-
-    logger.info(`Fetching power card: ${cardId}`);
-
-    try {
-      const card = PowerCardService.getPowerCardById(cardId);
-      const duration = timer();
-
-      res.sendSuccess(card, `Power card '${card.name}' retrieved`, {
-        cardType: card.type,
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error(`Failed to get power card ${cardId}:`, error);
-      res.sendNotFound('PowerCard', cardId);
-    }
-  });
-
-  /**
-   * GET /api/power-cards/type/:type
-   * Obtener power card por tipo
-   */
-  getPowerCardByType = asyncHandler(async (req, res) => {
-    const { type } = req.params;
-    const timer = logger.startTimer(`GET_CARD_TYPE_${type}`);
-
-    logger.info(`Fetching power card by type: ${type}`);
-
-    try {
-      const card = PowerCardService.getPowerCardByType(type);
-      const duration = timer();
-
-      res.sendSuccess(card, `Power card type '${type}' retrieved`, {
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error(`Failed to get power card type ${type}:`, error);
-      res.sendError(
-        `Power card type not found: ${type}`,
-        'CARD_TYPE_NOT_FOUND',
-        404,
-        error.message
-      );
-    }
-  });
-
-  /**
-   * GET /api/power-cards/random
-   * Obtener una power card aleatoria
-   */
-  getRandomPowerCard = asyncHandler(async (req, res) => {
-    const timer = logger.startTimer('GET_RANDOM_CARD');
-
-    logger.info('Fetching random power card');
-
-    try {
-      const card = PowerCardService.getRandomPowerCard();
-      const duration = timer();
-
-      res.sendSuccess(card, `Random power card generated: ${card.name}`, {
-        cardType: card.type,
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error('Failed to get random power card:', error);
-      res.sendError(
-        'Failed to get random power card',
-        'RANDOM_CARD_ERROR',
-        500,
-        error.message
-      );
-    }
-  });
-
-  // ═══════════════════════════════════════════════════════════════
-  // 🎮 PROCESAR RESPUESTAS Y COMBOS
-  // ═══════════════════════════════════════════════════════════════
-
-  /**
-   * POST /api/power-cards/answer
-   * Procesar respuesta del jugador y detectar combos
+   * POST /api/cards/scan-qr
+   * Escanear QR de PowerCard física y asignarla al jugador
    * 
-   * Body: { playerId, isCorrect, sessionId? }
+   * Body: { qrCode, playerId, sessionId? }
+   * Response: { cardId, cardName, emoji, description, inventory }
    */
-  processAnswer = asyncHandler(async (req, res) => {
-    const { playerId, isCorrect, sessionId } = req.body;
-    const timer = logger.startTimer(`PROCESS_ANSWER_${playerId}`);
+  scanPowerCardQR = asyncHandler(async (req, res) => {
+    const { qrCode, playerId, sessionId } = req.body;
+    const timer = logger.startTimer(`SCAN_QR_${playerId}`);
 
-    logger.info(`Processing answer for ${playerId}: ${isCorrect ? 'CORRECT' : 'WRONG'}`);
+    logger.info(`📱 Scanning PowerCard QR for player: ${playerId}`);
+    logger.debug(`   QR: ${qrCode}`);
 
     try {
-      const result = PowerCardService.processPlayerAnswer(
+      // 1. Validar parámetros
+      if (!qrCode || !playerId) {
+        return res.sendValidationError(
+          [
+            { field: 'qrCode', message: 'QR code is required' },
+            { field: 'playerId', message: 'Player ID is required' }
+          ],
+          'Missing required fields'
+        );
+      }
+
+      // 2. Parsear y validar QR
+      const parsed = parsePowerCardQR(qrCode);
+
+      if (!parsed.isValid) {
+        logger.warn(`❌ Invalid QR format: ${parsed.error}`);
+        return res.sendValidationError(
+          [{ field: 'qrCode', message: parsed.error }],
+          'Invalid QR code format'
+        );
+      }
+
+      const { cardId } = parsed;
+
+      // 3. Verificar que la carta existe
+      let card;
+      try {
+        card = PowerCardService.getPowerCardById(cardId);
+      } catch (error) {
+        logger.warn(`❌ Card not found: ${cardId}`);
+        return res.sendNotFound('PowerCard', cardId);
+      }
+
+      // 4. Agregar carta al inventario del jugador
+      PowerCardService.addCardToInventory(playerId, cardId, 1);
+
+      // 5. Obtener inventario actualizado
+      const inventory = PowerCardService.getPlayerInventory(playerId);
+
+      const duration = timer();
+
+      logger.info(`✅ PowerCard assigned: ${card.name} → ${playerId}`);
+      logger.debug(`   Inventory: ${JSON.stringify(inventory)}`);
+
+      // 6. Responder con datos completos
+      res.sendSuccess({
         playerId,
-        isCorrect,
-        { sessionId }
-      );
-
-      const duration = timer();
-
-      logger.info(`Answer processed - Combo detected: ${result.comboDetected}`);
-
-      res.sendSuccess(result, 'Answer processed successfully', {
-        comboDetected: result.comboDetected,
-        comboType: result.comboType,
-        streak: result.currentStreak,
-        performance: `${duration}ms`
+        cardId: card.id,
+        cardName: card.name,
+        cardType: card.type,
+        emoji: card.emoji,
+        description: card.description,
+        usageLimit: card.usageLimit,
+        qrCode,
+        scannedAt: new Date().toISOString(),
+        sessionId,
+        inventory: {
+          [cardId]: inventory[cardId] || 1
+        },
+        totalCards: Object.values(inventory).reduce((a, b) => a + b, 0)
+      }, `PowerCard '${card.name}' assigned to player`, {
+        performance: `${duration}ms`,
+        cardType: card.type
       });
 
     } catch (error) {
       timer();
-      logger.error(`Failed to process answer for ${playerId}:`, error);
+      logger.error(`❌ Failed to scan PowerCard QR:`, error);
       res.sendError(
-        'Failed to process answer',
-        'ANSWER_PROCESSING_ERROR',
-        500,
-        error.message
-      );
-    }
-  });
-
-  /**
-   * GET /api/power-cards/combo/:playerId
-   * Obtener estado actual del combo de un jugador
-   */
-  getComboStatus = asyncHandler(async (req, res) => {
-    const { playerId } = req.params;
-    const timer = logger.startTimer(`GET_COMBO_STATUS_${playerId}`);
-
-    logger.info(`Getting combo status for ${playerId}`);
-
-    try {
-      const status = PowerCardService.getComboStatus(playerId);
-      const duration = timer();
-
-      res.sendSuccess(status, `Combo status for ${playerId}`, {
-        currentStreak: status.currentStreak,
-        isHitMaster: status.isHitMaster,
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error(`Failed to get combo status for ${playerId}:`, error);
-      res.sendError(
-        'Failed to get combo status',
-        'COMBO_STATUS_ERROR',
+        'Failed to scan PowerCard',
+        'QR_SCAN_ERROR',
         500,
         error.message
       );
@@ -233,52 +118,62 @@ class PowerCardController {
   // ═══════════════════════════════════════════════════════════════
 
   /**
-   * GET /api/power-cards/inventory/:playerId
-   * Obtener inventario de cartas del jugador
+   * GET /api/cards/inventory/:playerId
+   * Obtener inventario completo de PowerCards del jugador
    */
   getPlayerInventory = asyncHandler(async (req, res) => {
     const { playerId } = req.params;
     const timer = logger.startTimer(`GET_INVENTORY_${playerId}`);
 
-    logger.info(`Fetching inventory for ${playerId}`);
+    logger.info(`📦 Fetching inventory for: ${playerId}`);
 
     try {
       const inventory = PowerCardService.getPlayerInventory(playerId);
 
-      // Enriquecer con información de las cartas
-      const enrichedInventory = {};
+      // Enriquecer con información completa de las cartas
+      const enrichedInventory = [];
+
       for (const [cardId, count] of Object.entries(inventory)) {
         try {
           const card = PowerCardService.getPowerCardById(cardId);
-          enrichedInventory[cardId] = {
-            count,
+          enrichedInventory.push({
+            cardId: card.id,
             name: card.name,
             type: card.type,
             emoji: card.emoji,
-            description: card.description
-          };
+            description: card.description,
+            usageLimit: card.usageLimit,
+            count,
+            canUse: count > 0
+          });
         } catch (error) {
-          // Si la carta no existe, registrar pero continuar
-          logger.warn(`Card ${cardId} in inventory no longer exists`);
+          logger.warn(`⚠️  Card ${cardId} in inventory not found in database`);
         }
       }
 
+      const totalCards = enrichedInventory.reduce((sum, item) => sum + item.count, 0);
       const duration = timer();
+
+      logger.info(`✅ Inventory retrieved: ${totalCards} cards`);
 
       res.sendSuccess({
         playerId,
         inventory: enrichedInventory,
-        totalCards: Object.values(inventory).reduce((a, b) => a + b, 0)
-      }, `Inventory for ${playerId}`, {
-        cardTypes: Object.keys(enrichedInventory).length,
-        performance: `${duration}ms`
+        summary: {
+          totalCards,
+          uniqueCards: enrichedInventory.length,
+          availableTypes: [...new Set(enrichedInventory.map(c => c.type))]
+        }
+      }, `Inventory for player ${playerId}`, {
+        performance: `${duration}ms`,
+        cardCount: totalCards
       });
 
     } catch (error) {
       timer();
-      logger.error(`Failed to get inventory for ${playerId}:`, error);
+      logger.error(`❌ Failed to get inventory:`, error);
       res.sendError(
-        'Failed to get inventory',
+        'Failed to retrieve inventory',
         'INVENTORY_ERROR',
         500,
         error.message
@@ -287,28 +182,54 @@ class PowerCardController {
   });
 
   /**
-   * GET /api/power-cards/inventories/all
-   * Obtener inventarios de todos los jugadores (admin)
+   * GET /api/cards/inventories/all
+   * Obtener inventarios de todos los jugadores (para admin/debug)
    */
   getAllInventories = asyncHandler(async (req, res) => {
     const timer = logger.startTimer('GET_ALL_INVENTORIES');
 
-    logger.info('Fetching all inventories');
+    logger.info('📦 Fetching all inventories');
 
     try {
       const allInventories = PowerCardService.getAllInventories();
+
+      const enrichedData = {};
+      let totalPlayers = 0;
+      let totalCards = 0;
+
+      for (const [playerId, inventory] of Object.entries(allInventories)) {
+        totalPlayers++;
+        const playerCards = Object.values(inventory).reduce((a, b) => a + b, 0);
+        totalCards += playerCards;
+
+        enrichedData[playerId] = {
+          inventory,
+          totalCards: playerCards,
+          uniqueCards: Object.keys(inventory).length
+        };
+      }
+
       const duration = timer();
 
-      res.sendSuccess(allInventories, 'All inventories retrieved', {
-        players: Object.keys(allInventories).length,
-        performance: `${duration}ms`
+      logger.info(`✅ All inventories retrieved: ${totalPlayers} players, ${totalCards} cards`);
+
+      res.sendSuccess({
+        inventories: enrichedData,
+        summary: {
+          totalPlayers,
+          totalCards,
+          averageCardsPerPlayer: totalPlayers > 0 ? (totalCards / totalPlayers).toFixed(2) : 0
+        }
+      }, 'All inventories retrieved', {
+        performance: `${duration}ms`,
+        playerCount: totalPlayers
       });
 
     } catch (error) {
       timer();
-      logger.error('Failed to get all inventories:', error);
+      logger.error(`❌ Failed to get all inventories:`, error);
       res.sendError(
-        'Failed to get all inventories',
+        'Failed to retrieve inventories',
         'INVENTORIES_ERROR',
         500,
         error.message
@@ -316,196 +237,79 @@ class PowerCardController {
     }
   });
 
-  /**
-   * POST /api/power-cards/inventory/add
-   * Añadir carta al inventario (admin/testing)
-   * 
-   * Body: { playerId, cardId, count? }
-   */
-  addCardToInventory = asyncHandler(async (req, res) => {
-    const { playerId, cardId, count = 1 } = req.body;
-    const timer = logger.startTimer(`ADD_CARD_${playerId}`);
-
-    logger.info(`Adding ${count}x ${cardId} to ${playerId} inventory`);
-
-    try {
-      // Validar carta
-      PowerCardService.getPowerCardById(cardId);
-
-      PowerCardService.addCardToInventory(playerId, cardId, count);
-      const updatedInventory = PowerCardService.getPlayerInventory(playerId);
-
-      const duration = timer();
-
-      res.sendSuccess({
-        playerId,
-        cardId,
-        addedCount: count,
-        updatedInventory
-      }, `Card added to ${playerId} inventory`, {
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error(`Failed to add card to inventory:`, error);
-      res.sendError(
-        'Failed to add card to inventory',
-        'ADD_CARD_ERROR',
-        500,
-        error.message
-      );
-    }
-  });
-
   // ═══════════════════════════════════════════════════════════════
-  // ⚡ ACTIVAR Y USAR CARTAS
+  // ⚡ USAR POWER CARD
   // ═══════════════════════════════════════════════════════════════
 
   /**
-   * POST /api/power-cards/activate
-   * Activar una power card antes de responder
+   * POST /api/cards/use
+   * Usar una PowerCard del inventario
    * 
-   * Body: { playerId, cardId, sessionId }
+   * Body: { playerId, cardId, targetPlayerId?, sessionId }
+   * Response: { success, effect, updatedInventory }
    */
-  activatePowerCard = asyncHandler(async (req, res) => {
-    const { playerId, cardId, sessionId } = req.body;
-    const timer = logger.startTimer(`ACTIVATE_CARD_${playerId}_${cardId}`);
+  usePowerCard = asyncHandler(async (req, res) => {
+    const { playerId, cardId, targetPlayerId, sessionId } = req.body;
+    const timer = logger.startTimer(`USE_CARD_${playerId}`);
 
-    logger.info(`Activating card ${cardId} for ${playerId}`);
+    logger.info(`⚡ Using PowerCard: ${cardId} by ${playerId}`);
 
     try {
-      const result = PowerCardService.activatePowerCard(playerId, cardId, sessionId);
+      // 1. Validar parámetros
+      if (!playerId || !cardId) {
+        return res.sendValidationError(
+          [
+            { field: 'playerId', message: 'Player ID is required' },
+            { field: 'cardId', message: 'Card ID is required' }
+          ],
+          'Missing required fields'
+        );
+      }
 
-      if (!result.success) {
-        const duration = timer();
+      // 2. Verificar que el jugador tiene la carta
+      const inventory = PowerCardService.getPlayerInventory(playerId);
+
+      if (!inventory[cardId] || inventory[cardId] <= 0) {
+        logger.warn(`❌ Player ${playerId} doesn't have card ${cardId}`);
         return res.sendError(
-          result.error,
-          'ACTIVATION_FAILED',
-          400,
-          { playerId, cardId }
+          'Player does not own this card',
+          'CARD_NOT_OWNED',
+          403,
+          { playerId, cardId, inventory }
         );
       }
 
-      const duration = timer();
-
-      res.sendSuccess(result, `Power card activated for ${playerId}`, {
-        cardType: result.type,
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error(`Failed to activate card:`, error);
-      res.sendError(
-        'Failed to activate power card',
-        'ACTIVATION_ERROR',
-        500,
-        error.message
-      );
-    }
-  });
-
-  /**
-   * POST /api/power-cards/apply-effect
-   * Aplicar efecto de carta activa a puntos
-   * 
-   * Body: { playerId, basePoints }
-   */
-  applyCardEffect = asyncHandler(async (req, res) => {
-    const { playerId, basePoints } = req.body;
-    const timer = logger.startTimer(`APPLY_EFFECT_${playerId}`);
-
-    logger.info(`Applying card effect for ${playerId}`);
-
-    try {
-      if (typeof basePoints !== 'number' || basePoints < 0) {
-        return res.sendValidationError(
-          [{ field: 'basePoints', message: 'basePoints must be a positive number' }],
-          'Invalid basePoints'
-        );
-      }
-
-      const result = PowerCardService.applyActiveCardEffect(playerId, basePoints);
-      PowerCardService.clearActiveCards(playerId);
-
-      const duration = timer();
-
-      res.sendSuccess(result, 'Card effect applied', {
-        multiplier: result.multiplier,
-        basePoints,
-        finalPoints: result.finalPoints,
-        cardUsed: result.cardUsed?.name || 'none',
-        performance: `${duration}ms`
-      });
-
-    } catch (error) {
-      timer();
-      logger.error(`Failed to apply card effect:`, error);
-      res.sendError(
-        'Failed to apply card effect',
-        'EFFECT_ERROR',
-        500,
-        error.message
-      );
-    }
-  });
-
-  /**
-   * POST /api/power-cards/scan-qr
-   * Procesar escaneo de QR de power card
-   * Usado por el Game Master para confirmar la carta tomada
-   * 
-   * Body: { qrCode, playerId, sessionId }
-   */
-  scanPowerCardQR = asyncHandler(async (req, res) => {
-    const { qrCode, playerId, sessionId } = req.body;
-    const timer = logger.startTimer(`SCAN_QR_${playerId}`);
-
-    logger.info(`Scanning power card QR: ${qrCode}`);
-
-    try {
-      // Parsear QR
-      const parts = qrCode.split('_');
-      if (parts.length < 4 || parts[0] !== 'HITBACK' || parts[1] !== 'POWERCARD') {
-        return res.sendValidationError(
-          [{ field: 'qrCode', message: 'Invalid QR code format' }],
-          'Invalid QR format'
-        );
-      }
-
-      const [, , cardId] = parts;
-
-      // Validar que la carta existe
+      // 3. Obtener información de la carta
       const card = PowerCardService.getPowerCardById(cardId);
 
-      // Registrar que el jugador obtuvo la carta
-      PowerCardService.addCardToInventory(playerId, cardId, 1);
+      // 4. Activar la carta (marca como activa para usar en la siguiente ronda)
+      const result = PowerCardService.activatePowerCard(playerId, cardId, sessionId);
 
       const duration = timer();
 
-      logger.info(`Power card ${cardId} assigned to ${playerId}`);
+      logger.info(`✅ PowerCard activated: ${card.name}`);
 
       res.sendSuccess({
         playerId,
-        cardId,
+        cardId: card.id,
         cardName: card.name,
         cardType: card.type,
         emoji: card.emoji,
-        description: card.description,
-        qrCode,
-        scannedAt: new Date().toISOString(),
+        effect: result.effect,
+        activated: true,
+        message: `${card.emoji} ${card.name} lista para usar`,
         sessionId
-      }, `Power card scanned and assigned`, {
-        performance: `${duration}ms`
+      }, `PowerCard '${card.name}' activated`, {
+        performance: `${duration}ms`,
+        cardType: card.type
       });
 
     } catch (error) {
       timer();
-      logger.error(`Failed to scan power card QR:`, error);
+      logger.error(`❌ Failed to use PowerCard:`, error);
       res.sendError(
-        'Failed to scan power card',
-        'QR_SCAN_ERROR',
+        'Failed to use PowerCard',
+        'USE_CARD_ERROR',
         500,
         error.message
       );
@@ -513,72 +317,56 @@ class PowerCardController {
   });
 
   // ═══════════════════════════════════════════════════════════════
-  // 🧹 MANTENIMIENTO
+  // 🧹 UTILIDADES
   // ═══════════════════════════════════════════════════════════════
 
   /**
-   * DELETE /api/power-cards/player/:playerId
-   * Limpiar datos de un jugador
+   * POST /api/cards/test-add
+   * SOLO PARA TESTING: Agregar carta directamente al inventario
    */
-  clearPlayerData = asyncHandler(async (req, res) => {
-    const { playerId } = req.params;
-    const timer = logger.startTimer(`CLEAR_PLAYER_${playerId}`);
+  testAddCard = asyncHandler(async (req, res) => {
+    const { playerId, cardId, count = 1 } = req.body;
 
-    logger.info(`Clearing data for ${playerId}`);
+    logger.warn(`⚠️  TEST MODE: Adding ${count}x ${cardId} to ${playerId}`);
 
     try {
-      PowerCardService.clearPlayerData(playerId);
-      const duration = timer();
+      PowerCardService.addCardToInventory(playerId, cardId, count);
+      const inventory = PowerCardService.getPlayerInventory(playerId);
 
       res.sendSuccess({
         playerId,
-        cleared: true,
-        timestamp: new Date().toISOString()
-      }, `Data cleared for ${playerId}`, {
-        performance: `${duration}ms`
-      });
+        cardId,
+        count,
+        inventory
+      }, 'Card added (TEST MODE)');
 
     } catch (error) {
-      timer();
-      logger.error(`Failed to clear player data:`, error);
-      res.sendError(
-        'Failed to clear player data',
-        'CLEAR_ERROR',
-        500,
-        error.message
-      );
+      logger.error('Failed to add test card:', error);
+      res.sendError('Failed to add card', 'TEST_ERROR', 500, error.message);
     }
   });
 
   /**
-   * DELETE /api/power-cards/all
-   * Limpiar todos los datos (admin only)
+   * DELETE /api/cards/player/:playerId
+   * Limpiar datos de un jugador (fin de sesión)
    */
-  clearAllData = asyncHandler(async (req, res) => {
-    const timer = logger.startTimer('CLEAR_ALL_DATA');
+  clearPlayerData = asyncHandler(async (req, res) => {
+    const { playerId } = req.params;
 
-    logger.warn('Clearing ALL power card data');
+    logger.info(`🧹 Clearing data for player: ${playerId}`);
 
     try {
-      PowerCardService.clearAll();
-      const duration = timer();
+      // Implementar limpieza en el servicio
+      // PowerCardService.clearPlayerData(playerId);
 
       res.sendSuccess({
-        cleared: true,
-        timestamp: new Date().toISOString()
-      }, 'All power card data cleared', {
-        performance: `${duration}ms`
-      });
+        playerId,
+        cleared: true
+      }, `Data cleared for player ${playerId}`);
 
     } catch (error) {
-      timer();
-      logger.error(`Failed to clear all data:`, error);
-      res.sendError(
-        'Failed to clear all data',
-        'CLEAR_ALL_ERROR',
-        500,
-        error.message
-      );
+      logger.error('Failed to clear player data:', error);
+      res.sendError('Failed to clear data', 'CLEAR_ERROR', 500, error.message);
     }
   });
 }

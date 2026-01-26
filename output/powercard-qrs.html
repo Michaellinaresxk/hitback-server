@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HITBACK PowerCards - QR Codes</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 10px;
+      font-size: 3rem;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: rgba(255,255,255,0.9);
+      margin-bottom: 30px;
+      font-size: 1.2rem;
+    }
+
+    .instructions {
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 15px;
+      margin-bottom: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+    }
+
+    .instructions h2 {
+      color: #667eea;
+      margin-bottom: 15px;
+      font-size: 1.5rem;
+    }
+
+    .instructions ul {
+      margin-left: 20px;
+      line-height: 1.8;
+    }
+
+    .instructions li {
+      margin: 8px 0;
+      color: #333;
+    }
+
+    .instructions strong {
+      color: #667eea;
+      font-weight: bold;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+
+    .power-card {
+      background: white;
+      border-radius: 20px;
+      padding: 25px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      page-break-inside: avoid;
+      border: 3px solid #667eea;
+    }
+
+    .power-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.25);
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .card-emoji {
+      font-size: 4rem;
+    }
+
+    .card-type {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .card-name {
+      font-size: 2rem;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .card-qr {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      margin: 20px 0;
+      text-align: center;
+    }
+
+    .card-qr img {
+      width: 200px;
+      height: 200px;
+      display: block;
+      margin: 0 auto 15px;
+    }
+
+    .qr-text {
+      font-size: 0.7rem;
+      color: #666;
+      word-break: break-all;
+      font-family: 'Courier New', monospace;
+      background: white;
+      padding: 8px;
+      border-radius: 5px;
+    }
+
+    .card-description {
+      background: rgba(102, 126, 234, 0.1);
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      margin: 15px 0;
+      color: #333;
+      line-height: 1.6;
+      min-height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 2px solid #e9ecef;
+      padding-top: 15px;
+      margin-top: 15px;
+    }
+
+    .card-uses {
+      font-weight: bold;
+      color: #667eea;
+      font-size: 0.95rem;
+    }
+
+    .card-id {
+      font-size: 0.8rem;
+      color: #999;
+      font-family: 'Courier New', monospace;
+    }
+
+    .print-button {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 18px 35px;
+      border-radius: 50px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      cursor: pointer;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+      transition: transform 0.2s, box-shadow 0.2s;
+      z-index: 1000;
+    }
+
+    .print-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.4);
+    }
+
+    .print-button:active {
+      transform: scale(0.98);
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 10px;
+      }
+
+      .instructions,
+      .print-button,
+      .subtitle {
+        display: none;
+      }
+
+      h1 {
+        color: #333;
+        text-shadow: none;
+        font-size: 2rem;
+        margin-bottom: 20px;
+      }
+
+      .power-card {
+        border: 2px solid #667eea;
+        box-shadow: none;
+        break-inside: avoid;
+      }
+
+      .cards-grid {
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .cards-grid {
+        grid-template-columns: 1fr;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .print-button {
+        bottom: 20px;
+        right: 20px;
+        padding: 15px 25px;
+        font-size: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎴 HITBACK PowerCards</h1>
+    <p class="subtitle">QR Codes Generados - Listos para Imprimir</p>
+
+    <div class="instructions">
+      <h2>📋 Instrucciones de Uso</h2>
+      <ul>
+        <li>✅ Los <strong>QR codes</strong> ya están generados para cada PowerCard</li>
+        <li>🖨️ Presiona <strong>Ctrl+P</strong> (Cmd+P en Mac) o el botón "IMPRIMIR" para imprimir</li>
+        <li>✂️ Recorta cada carta siguiendo los bordes</li>
+        <li>📱 Escanéalas con tu app cuando logres un <strong>Hot Streak</strong> (3 respuestas correctas consecutivas)</li>
+        <li>🎮 Cada carta tiene un <strong>ID único</strong> que el backend reconoce automáticamente</li>
+        <li>⚡ Total de PowerCards: <strong>5</strong></li>
+      </ul>
+    </div>
+
+    <div class="cards-grid">
+      
+    <div class="power-card">
+      <div class="card-header">
+        <div class="card-emoji">🥷</div>
+        <div class="card-type">HIT_STEAL</div>
+      </div>
+      
+      <div class="card-name">Hit Steal</div>
+      
+      <div class="card-qr">
+        <img src="data:image/png;base64,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" alt="Hit Steal QR Code" />
+        <div class="qr-text">HITBACK_PC_power_robo_001_1769377055427</div>
+      </div>
+      
+      <div class="card-description">
+        Roba 1 power card de otro jugador
+      </div>
+      
+      <div class="card-footer">
+        <div class="card-uses">Usos: 1</div>
+        <div class="card-id">power_robo_001</div>
+      </div>
+    </div>
+    
+
+    <div class="power-card">
+      <div class="card-header">
+        <div class="card-emoji">🛡️</div>
+        <div class="card-type">STOP</div>
+      </div>
+      
+      <div class="card-name">STOP</div>
+      
+      <div class="card-qr">
+        <img src="data:image/png;base64,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" alt="STOP QR Code" />
+        <div class="qr-text">HITBACK_PC_power_stop_001_1769377055446</div>
+      </div>
+      
+      <div class="card-description">
+        Inmune a robos
+      </div>
+      
+      <div class="card-footer">
+        <div class="card-uses">Usos: 1</div>
+        <div class="card-id">power_stop_001</div>
+      </div>
+    </div>
+    
+
+    <div class="power-card">
+      <div class="card-header">
+        <div class="card-emoji">⚡</div>
+        <div class="card-type">REPLAY</div>
+      </div>
+      
+      <div class="card-name">REPLAY</div>
+      
+      <div class="card-qr">
+        <img src="data:image/png;base64,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" alt="REPLAY QR Code" />
+        <div class="qr-text">HITBACK_PC_power_replay_001_1769377055454</div>
+      </div>
+      
+      <div class="card-description">
+        Tu próxima respuesta vale doble puntos
+      </div>
+      
+      <div class="card-footer">
+        <div class="card-uses">Usos: 1</div>
+        <div class="card-id">power_replay_001</div>
+      </div>
+    </div>
+    
+
+    <div class="power-card">
+      <div class="card-header">
+        <div class="card-emoji">🔄</div>
+        <div class="card-type">STOP_BLAST</div>
+      </div>
+      
+      <div class="card-name">STOP-BLAST</div>
+      
+      <div class="card-qr">
+        <img src="data:image/png;base64,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" alt="STOP-BLAST QR Code" />
+        <div class="qr-text">HITBACK_PC_power_stop_blast_001_1769377055458</div>
+      </div>
+      
+      <div class="card-description">
+        Inmune a robos y le quitas la carta Hit Steal al que te intento robar.
+      </div>
+      
+      <div class="card-footer">
+        <div class="card-uses">Usos: 1</div>
+        <div class="card-id">power_stop_blast_001</div>
+      </div>
+    </div>
+    
+
+    <div class="power-card">
+      <div class="card-header">
+        <div class="card-emoji">🎯</div>
+        <div class="card-type">PRECISION</div>
+      </div>
+      
+      <div class="card-name">Precisión Total</div>
+      
+      <div class="card-qr">
+        <img src="data:image/png;base64,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" alt="Precisión Total QR Code" />
+        <div class="qr-text">HITBACK_PC_power_precision_001_1769377055462</div>
+      </div>
+      
+      <div class="card-description">
+        Si aciertas año exacto, +2 puntos extra
+      </div>
+      
+      <div class="card-footer">
+        <div class="card-uses">Usos: 2</div>
+        <div class="card-id">power_precision_001</div>
+      </div>
+    </div>
+    
+    </div>
+  </div>
+
+  <button class="print-button" onclick="window.print()">
+    🖨️ IMPRIMIR CARTAS
+  </button>
+</body>
+</html>
+  

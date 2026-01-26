@@ -1,184 +1,117 @@
 /**
- * ⚡ POWER CARD ROUTES
+ * ⚡ POWER CARD ROUTES - IMPROVED VERSION
  *
- * Mapeo de rutas para operaciones con power cards
+ * Rutas organizadas para operaciones con PowerCards:
+ * - Escaneo de QR
+ * - Gestión de inventario
+ * - Uso de cartas
+ * - Combos y recompensas
  *
- * ✅ CLEAN CODE: Rutas organizadas, middleware aplicado correctamente
+ * ✅ CLEAN CODE: Rutas RESTful, middleware apropiado
  */
 
 const express = require('express');
 const router = express.Router();
-const powerCardController = require('../controllers/powerCardController');
-const powerCardMiddleware = require('../middleware/PowercardMiddleware');
+const powerCardController = require('../controllers/PowerCardController');
 
 // ═══════════════════════════════════════════════════════════════
-// 📤 GET - OBTENER POWER CARDS
-// ═══════════════════════════════════════════════════════════════
-
-/**
- * GET /api/power-cards
- * Obtener todas las power cards, combos y configuración
- */
-router.get('/', powerCardController.getAllPowerCards);
-
-/**
- * GET /api/power-cards/:cardId
- * Obtener una power card específica
- */
-router.get(
-  '/:cardId',
-  powerCardMiddleware.validatePowerCardExists,
-  powerCardController.getPowerCardById
-);
-
-/**
- * GET /api/power-cards/type/:type
- * Obtener power card por tipo (replay, stop, hit_steal, etc.)
- */
-router.get('/type/:type', powerCardController.getPowerCardByType);
-
-/**
- * GET /api/power-cards/random
- * Obtener una power card aleatoria
- */
-router.get('/random', powerCardController.getRandomPowerCard);
-
-// ═══════════════════════════════════════════════════════════════
-// 🎮 COMBOS Y RESPUESTAS
+// 📱 ESCANEO DE QR
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * POST /api/combos/answer
- * Procesar respuesta del jugador y detectar combos
+ * POST /api/cards/scan-qr
+ * Escanear QR de PowerCard física
  * 
- * Body: { playerId, isCorrect, sessionId? }
- * Response: { comboDetected, comboType, cardAwarded, playerInventory, progressToNextCombo }
- */
-router.post(
-  '/combos/answer',
-  powerCardMiddleware.validateAnswerPayload,
-  powerCardMiddleware.enrichSessionContext,
-  powerCardController.processAnswer
-);
-
-/**
- * GET /api/combos/:playerId
- * Obtener estado del combo de un jugador
+ * Body: { qrCode, playerId, sessionId? }
+ * Response: { cardId, cardName, emoji, inventory }
  * 
- * Response: { currentStreak, isHitMaster, nextComboIn, message, canDrawCard }
+ * Este es el endpoint PRINCIPAL que el frontend usa cuando:
+ * 1. Detecta combo (Hot Streak)
+ * 2. Muestra modal de QR scanner
+ * 3. Usuario escanea carta física
+ * 4. Backend valida, parsea y asigna la carta
  */
-router.get(
-  '/combos/:playerId',
-  powerCardController.getComboStatus
-);
+router.post('/scan-qr', powerCardController.scanPowerCardQR);
 
 // ═══════════════════════════════════════════════════════════════
 // 🎒 INVENTARIO
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * GET /api/inventories/:playerId
- * Obtener inventario de cartas del jugador
- */
-router.get(
-  '/inventories/:playerId',
-  powerCardController.getPlayerInventory
-);
-
-/**
- * GET /api/inventories/all
- * Obtener inventarios de todos los jugadores (admin)
- */
-router.get(
-  '/inventories/all',
-  powerCardController.getAllInventories
-);
-
-/**
- * POST /api/inventories/add
- * Añadir carta al inventario (testing/admin)
+ * GET /api/cards/inventory/:playerId
+ * Obtener inventario de PowerCards de un jugador
  * 
- * Body: { playerId, cardId, count? }
+ * Response: { 
+ *   inventory: [{ cardId, name, emoji, count, canUse }],
+ *   summary: { totalCards, uniqueCards, availableTypes }
+ * }
  */
-router.post(
-  '/inventories/add',
-  powerCardMiddleware.validateActivateCardPayload,
-  powerCardController.addCardToInventory
-);
+router.get('/inventory/:playerId', powerCardController.getPlayerInventory);
+
+/**
+ * GET /api/cards/inventories/all
+ * Obtener todos los inventarios (admin/debug)
+ */
+router.get('/inventories/all', powerCardController.getAllInventories);
 
 // ═══════════════════════════════════════════════════════════════
-// ⚡ ACTIVAR Y USAR CARTAS
+// ⚡ USAR POWER CARDS
 // ═══════════════════════════════════════════════════════════════
 
 /**
- * POST /api/cards/activate
- * Activar una power card antes de responder
- * El Game Master escanea el QR y confirma que el jugador la activará
+ * POST /api/cards/use
+ * Usar una PowerCard del inventario
  * 
- * Body: { playerId, cardId, sessionId }
- * Response: { activated, cardId, type, name, effect, message }
- */
-router.post(
-  '/cards/activate',
-  powerCardMiddleware.validateActivateCardPayload,
-  powerCardMiddleware.validatePlayerHasCard,
-  powerCardController.activatePowerCard
-);
-
-/**
- * POST /api/cards/apply-effect
- * Aplicar efecto de carta activa a los puntos ganados
- * Usado cuando el jugador acertó la respuesta con carta activa
+ * Body: { playerId, cardId, targetPlayerId?, sessionId }
+ * Response: { activated, effect, message }
  * 
- * Body: { playerId, basePoints }
- * Response: { finalPoints, multiplier, cardUsed }
+ * Flujo:
+ * 1. Jugador tiene carta en inventario
+ * 2. Decide usarla (antes de responder)
+ * 3. Backend activa la carta
+ * 4. Cuando responde correctamente, se aplica el efecto
  */
-router.post(
-  '/cards/apply-effect',
-  powerCardController.applyCardEffect
-);
+router.post('/use', powerCardController.usePowerCard);
+
+// ═══════════════════════════════════════════════════════════════
+// 🧪 TESTING & DEBUG
+// ═══════════════════════════════════════════════════════════════
 
 /**
- * POST /api/cards/scan-qr
- * Procesar escaneo del QR de power card física
- * El Game Master escanea la carta del mazo y confirma que la toma el jugador
+ * POST /api/cards/test-add
+ * SOLO TESTING: Agregar carta directamente
  * 
- * Body: { qrCode, playerId, sessionId }
- * Response: { playerId, cardId, cardName, emoji, scannedAt }
+ * Body: { playerId, cardId, count }
  */
-router.post(
-  '/cards/scan-qr',
-  powerCardMiddleware.validatePowerCardQR,
-  powerCardController.scanPowerCardQR
-);
-
-// ═══════════════════════════════════════════════════════════════
-// 🧹 MANTENIMIENTO
-// ═══════════════════════════════════════════════════════════════
+router.post('/test-add', powerCardController.testAddCard);
 
 /**
- * DELETE /api/power-cards/player/:playerId
- * Limpiar datos de un jugador (fin de sesión)
+ * DELETE /api/cards/player/:playerId
+ * Limpiar datos de jugador
  */
-router.delete(
-  '/player/:playerId',
-  powerCardController.clearPlayerData
-);
-
-/**
- * DELETE /api/power-cards/all
- * Limpiar todos los datos del sistema (admin only)
- */
-router.delete(
-  '/all',
-  powerCardController.clearAllData
-);
+router.delete('/player/:playerId', powerCardController.clearPlayerData);
 
 // ═══════════════════════════════════════════════════════════════
-// ❌ ERROR HANDLER
+// ❌ ERROR HANDLING
 // ═══════════════════════════════════════════════════════════════
 
-// Aplicar error handler al final
-router.use(powerCardMiddleware.powerCardErrorHandler);
+// Global error handler para rutas de PowerCards
+router.use((err, req, res, next) => {
+  console.error('PowerCard Route Error:', err);
+
+  if (res.sendError) {
+    res.sendError(
+      'PowerCard operation failed',
+      'POWER_CARD_ERROR',
+      500,
+      err.message
+    );
+  } else {
+    res.status(500).json({
+      success: false,
+      error: err.message || 'Internal server error'
+    });
+  }
+});
 
 module.exports = router;

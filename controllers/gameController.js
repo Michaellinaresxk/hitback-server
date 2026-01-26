@@ -170,6 +170,8 @@ class GameController {
         validation: this.trackService.validateTrackData(track)
       };
 
+
+
       const duration = timer();
       logger.info(`Retrieved track ${track.title} in ${duration}ms`);
 
