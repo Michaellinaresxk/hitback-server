@@ -176,11 +176,21 @@ class GameSessionService {
         // Paso 3: REGISTRAR RESPUESTA Y DETECTAR COMBOS
         // ═══════════════════════════════════════════════════════════
 
+        console.log(`\n🔍 DEBUG COMBO - Antes de procesar:`);
+        console.log(`   Player: ${winnerId}`);
+        console.log(`   Round: ${round.roundNumber}`);
+        console.log(`   Correct answers antes: ${winner.stats.correctAnswers}`);
+
         const comboResult = PowerCardService.processPlayerAnswer(
           winnerId,
           true,  // Es correcta
           { gameSessionId: sessionId, roundNumber: round.roundNumber }
         );
+
+        console.log(`🔍 DEBUG COMBO - Resultado:`);
+        console.log(`   Current Streak: ${comboResult.currentStreak}`);
+        console.log(`   Combo Detected: ${comboResult.comboDetected}`);
+        console.log(`   Combo Type: ${comboResult.comboType}`);
 
         // Actualizar stats de combo
         if (comboResult.comboDetected) {
@@ -192,7 +202,8 @@ class GameSessionService {
             cardAwarded: comboResult.cardAwarded
           };
 
-          console.log(`   🔥 COMBO: ${comboResult.comboMessage}`);
+          console.log(`   🔥 COMBO ACTIVADO: ${comboResult.comboMessage}`);
+          console.log(`   🔥 Correct answers TOTAL: ${winner.stats.correctAnswers + 1}`);
         }
 
         // Actualizar streak en stats
@@ -212,6 +223,21 @@ class GameSessionService {
         };
         results.pointsAwarded = totalPoints;
         results.tokenBonus = tokenBonus;
+
+        // ═══════════════════════════════════════════════════════════
+        // ⚠️ IMPORTANTE: Resetear streak de los jugadores que NO ganaron
+        // ═══════════════════════════════════════════════════════════
+        console.log(`\n🔄 Reseteando streak de jugadores que NO ganaron:`);
+        session.players.forEach(player => {
+          if (player.id !== winnerId) {
+            console.log(`   ❌ ${player.name} (${player.id}) no ganó esta ronda - reseteando streak`);
+            PowerCardService.processPlayerAnswer(
+              player.id,
+              false,  // Incorrecto
+              { gameSessionId: sessionId, roundNumber: round.roundNumber }
+            );
+          }
+        });
       }
     } else {
       // ═══════════════════════════════════════════════════════════
