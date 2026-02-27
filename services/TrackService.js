@@ -7,6 +7,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const DeezerServiceV2 = require('./DeezerServiceV2');
 
 class TrackService {
   constructor() {
@@ -16,6 +17,10 @@ class TrackService {
 
     // ✅ NUEVO: Set para tracks usados en la partida actual
     this.usedTrackIds = new Set();
+
+    // 🔄 NUEVO: Sistema híbrido con Deezer
+    this.deezerService = DeezerServiceV2;
+    this.deezerTracksAdded = 0; // Contador de tracks agregados desde Deezer
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -45,6 +50,64 @@ class TrackService {
     const previousCount = this.usedTrackIds.size;
     this.usedTrackIds.clear();
     console.log(`🔄 Tracks usados reseteados (${previousCount} → 0)`);
+  }
+
+  /**
+   * 🔄 NUEVO: Buscar más tracks en Deezer y agregarlos al pool
+   */
+  async fetchMoreTracksFromDeezer(genre = null, decade = null) {
+    try {
+      console.log(`📡 Buscando tracks en Deezer (género: ${genre}, década: ${decade})...`);
+
+      const deezerTracks = await this.deezerService.searchTracks({
+        genre: genre || null,
+        decade: decade || null,
+        limit: 25
+      });
+
+      if (deezerTracks.length === 0) {
+        console.log(`⚠️ Deezer no retornó tracks`);
+        return;
+      }
+
+      // Convertir tracks de Deezer al formato interno
+      const newTracks = deezerTracks.map(dt => ({
+        id: dt.id,
+        title: dt.title,
+        artist: dt.artist,
+        album: dt.album,
+        year: dt.year,
+        genre: dt.genre || genre || 'POP',
+        decade: dt.decade || decade || this.calculateDecade(dt.year),
+        difficulty: dt.difficulty || 'MEDIUM',
+        audioSource: 'deezer',
+        hasAudio: true,
+        hasQuestions: true,
+        availableCardTypes: ['song', 'artist', 'decade', 'year'],
+        // 🔥 IMPORTANTE: Guardar el previewUrl para usarlo directamente
+        previewUrl: dt.previewUrl,
+        cover: dt.cover
+      }));
+
+      // Agregar al pool de tracks
+      this.tracks.push(...newTracks);
+      this.deezerTracksAdded += newTracks.length;
+
+      console.log(`✅ ${newTracks.length} tracks agregados desde Deezer`);
+      console.log(`📊 Total tracks en pool: ${this.tracks.length} (${this.deezerTracksAdded} desde Deezer)`);
+
+    } catch (error) {
+      console.error(`❌ Error buscando en Deezer:`, error.message);
+    }
+  }
+
+  /**
+   * 📅 Calcular década a partir del año
+   */
+  calculateDecade(year) {
+    if (!year) return null;
+    const decadeStart = Math.floor(year / 10) * 10;
+    return `${decadeStart}s`;
   }
 
   /**
@@ -137,9 +200,10 @@ class TrackService {
   /**
    * 🎲 OBTENER TRACK ALEATORIO CON FILTROS (MÉTODO PRINCIPAL)
    * ✅ MODIFICADO: Ahora excluye tracks ya usados
+   * 🔄 NUEVO: Busca en Deezer cuando se queda sin tracks
    * @param {Object} filters - { difficulty, genre, decade }
    */
-  getRandomTrack(filters = {}) {
+  async getRandomTrack(filters = {}) {
     console.log(`\n🎲 Buscando track con filtros:`, filters);
 
     let pool = [...this.tracks];
@@ -149,11 +213,21 @@ class TrackService {
     pool = pool.filter(t => !this.usedTrackIds.has(t.id));
     console.log(`   ├─ Excluyendo usados: ${pool.length}/${originalSize} disponibles`);
 
-    // Si ya usamos todos los tracks, resetear automáticamente
+    // 🔄 NUEVO: Si ya usamos todos los tracks, buscar más en Deezer
     if (pool.length === 0) {
-      console.log(`⚠️ Todos los tracks usados. Reseteando automáticamente...`);
-      this.resetUsedTracks();
+      console.log(`⚠️ Todos los tracks usados. Buscando más en Deezer...`);
+      await this.fetchMoreTracksFromDeezer(filters.genre, filters.decade);
+      // Después de agregar de Deezer, volver a construir pool
       pool = [...this.tracks];
+      pool = pool.filter(t => !this.usedTrackIds.has(t.id));
+      console.log(`   ✅ Tracks nuevos disponibles: ${pool.length}`);
+
+      // Si aún así no hay tracks, resetear
+      if (pool.length === 0) {
+        console.log(`⚠️ Sin tracks disponibles incluso desde Deezer. Reseteando...`);
+        this.resetUsedTracks();
+        pool = [...this.tracks];
+      }
     }
 
     // Filtro 1: Dificultad
