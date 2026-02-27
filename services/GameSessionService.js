@@ -50,10 +50,12 @@ class GameSessionService {
       stats: {
         correctAnswers: 0,
         wrongAnswers: 0,
+        tokensWon: 0,                    // ✅ CORREGIDO: agregado para frontend
+        tokensLost: 0,                   // ✅ CORREGIDO: agregado para frontend
         tokensUsed: [],
-        combosCompleted: 0,              // ✅ NUEVA STAT
-        powerCardsUsed: 0,               // ✅ NUEVA STAT
-        totalComboStreak: 0              // ✅ NUEVA STAT
+        combosCompleted: 0,
+        powerCardsUsed: 0,
+        totalComboStreak: 0
       }
     }));
 
@@ -143,6 +145,11 @@ class GameSessionService {
         console.log(`✅ ${winner.name} ACIERTA:`);
         console.log(`   Base: ${basePoints} pts`);
         console.log(`   Token: +${tokenBonus} pts`);
+
+        // ✅ CORREGIDO: Registrar token ganado
+        if (tokenBonus > 0) {
+          winner.stats.tokensWon += tokenBonus;
+        }
 
         // ═══════════════════════════════════════════════════════════
         // Paso 2: APLICAR EFECTO DE POWER CARD
@@ -236,6 +243,12 @@ class GameSessionService {
               false,  // Incorrecto
               { gameSessionId: sessionId, roundNumber: round.roundNumber }
             );
+
+            // ✅ CORREGIDO: Registrar tokens perdidos
+            const playerBet = round.bets[player.id];
+            if (playerBet && playerBet.tokenValue > 0) {
+              player.stats.tokensLost += playerBet.tokenValue;
+            }
           }
         });
       }
@@ -252,6 +265,12 @@ class GameSessionService {
           false,  // Incorrecto
           { gameSessionId: sessionId, roundNumber: round.roundNumber }
         );
+
+        // ✅ CORREGIDO: Registrar tokens perdidos cuando nadie acierta
+        const playerBet = round.bets[player.id];
+        if (playerBet && playerBet.tokenValue > 0) {
+          player.stats.tokensLost += playerBet.tokenValue;
+        }
       });
     }
 
@@ -296,9 +315,18 @@ class GameSessionService {
         id: p.id,
         name: p.name,
         score: p.score,
-        availableTokens: p.availableTokens,
         tokens: p.availableTokens.length,
-        stats: p.stats                    // ✅ INCLUIR STATS
+        powerCards: p.powerCards || [],   // ✅ CORREGIDO: incluir powerCards
+        stats: {
+          correctAnswers: p.stats.correctAnswers || 0,
+          wrongAnswers: p.stats.wrongAnswers || 0,
+          tokensWon: p.stats.tokensWon || 0,        // ✅ CORREGIDO: incluir campo
+          tokensLost: p.stats.tokensLost || 0,      // ✅ CORREGIDO: incluir campo
+          tokensUsed: p.stats.tokensUsed || [],
+          combosCompleted: p.stats.combosCompleted || 0,
+          powerCardsUsed: p.stats.powerCardsUsed || 0,
+          totalComboStreak: p.stats.totalComboStreak || 0
+        }
       }))
     };
   }
@@ -417,27 +445,33 @@ class GameSessionService {
       difficulty: session.config.difficulty
     };
 
-    const track = this.trackService.getRandomTrack(filters);
+    // 🔄 NUEVO: getRandomTrack ahora es async y busca en Deezer cuando se queda sin tracks
+    const track = await this.trackService.getRandomTrack(filters);
 
     if (!track) {
       return { success: false, error: 'No hay tracks disponibles' };
     }
 
-    let audioUrl = null;
-    let audioSource = 'none';
+    // 🔥 IMPORTANTE: Si el track tiene previewUrl (de Deezer), usarlo directamente
+    let audioUrl = track.previewUrl || null;
+    let audioSource = track.audioSource || 'deezer';
 
-    try {
-      console.log(`🎵 Buscando: "${track.title}" - ${track.artist}`);
-      const deezerResult = await DeezerService.searchTrack(track.title, track.artist);
-
-      if (deezerResult && deezerResult.previewUrl) {
-        audioUrl = deezerResult.previewUrl;
-        audioSource = 'deezer';
-        console.log(`✅ Audio encontrado`);
+    // Si no tiene previewUrl, buscar en Deezer (tracks viejos de tracks.json)
+    if (!audioUrl) {
+      try {
+        console.log(`🎵 Buscando audio: "${track.title}" - ${track.artist}`);
+        const deezerResult = await DeezerService.searchTrack(track.title, track.artist);
+        if (deezerResult && deezerResult.previewUrl) {
+          audioUrl = deezerResult.previewUrl;
+          audioSource = 'deezer';
+          console.log(`✅ Audio encontrado`);
+        }
+      } catch (error) {
+        console.error(`❌ Error Deezer:`, error.message);
       }
-    } catch (error) {
-      console.error(`❌ Error Deezer:`, error.message);
     }
+
+    console.log(`🎵 Track: "${track.title}" - ${track.artist} (${audioSource})`);
 
     const question = this.questionService.generateQuestion(track, forcedQuestionType);
 
@@ -529,10 +563,10 @@ class GameSessionService {
     return {
       success: true,
       bet: {
-        tokenValue: tokenValue,
+        tokens: tokenValue,           // ✅ CORREGIDO: nombre correcto para frontend
         multiplier: tokenValue
       },
-      availableTokens: player.availableTokens
+      playerTokens: player.availableTokens.length  // ✅ CORREGIDO: devolver número, no array
     };
   }
 

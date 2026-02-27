@@ -14,6 +14,7 @@ const logger = require('./utils/logger');
 
 // ✅ IMPORTAR RUTAS (Sistema nuevo sin QR físicos)
 const tracksRoutes = require('./routes/tracks');
+const tracksV2Routes = require('./routes/tracksV2'); // 🔄 NUEVO: Sistema híbrido Deezer + PostgreSQL
 const audioRoutes = require('./routes/audio');
 const healthRoutes = require('./routes/health');
 
@@ -137,6 +138,7 @@ app.get('/api/expo/health', (req, res) => {
 
 // Recursos base
 app.use('/api/tracks', tracksRoutes);
+app.use('/api/v2/tracks', tracksV2Routes); // 🔄 NUEVO: Endpoints V2 con Deezer + PostgreSQL
 app.use('/api/audio', audioRoutes);
 app.use('/api/health', healthRoutes);
 
