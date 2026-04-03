@@ -18,8 +18,8 @@ const tracksV2Routes = require('./routes/tracksV2'); // 🔄 NUEVO: Sistema híb
 const audioRoutes = require('./routes/audio');
 const healthRoutes = require('./routes/health');
 
-// 🎮 NUEVAS RUTAS - GAME SESSION (SIN QR)
-// ✅ CORREGIDO: Importar desde routes/
+// GAME SESSION (SIN QR)
+// Importar desde routes/
 const gameSessionRoutes = require('./routes/gameSession');
 
 // ⚡ POWER CARDS ROUTES

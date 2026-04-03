@@ -15,7 +15,6 @@ const trackService = require('./TrackService');
 const QuestionService = require('./QuestionService');
 const DeezerService = require('./DeezerService');
 const PowerCardService = require('./PowerCardService');
-const ComboTracker = require('./ComboTracker');
 
 class GameSessionService {
   constructor() {
@@ -50,8 +49,8 @@ class GameSessionService {
       stats: {
         correctAnswers: 0,
         wrongAnswers: 0,
-        tokensWon: 0,                    // ✅ CORREGIDO: agregado para frontend
-        tokensLost: 0,                   // ✅ CORREGIDO: agregado para frontend
+        tokensWon: 0,
+        tokensLost: 0,
         tokensUsed: [],
         combosCompleted: 0,
         powerCardsUsed: 0,
@@ -316,12 +315,12 @@ class GameSessionService {
         name: p.name,
         score: p.score,
         tokens: p.availableTokens.length,
-        powerCards: p.powerCards || [],   // ✅ CORREGIDO: incluir powerCards
+        powerCards: p.powerCards || [],
         stats: {
           correctAnswers: p.stats.correctAnswers || 0,
           wrongAnswers: p.stats.wrongAnswers || 0,
-          tokensWon: p.stats.tokensWon || 0,        // ✅ CORREGIDO: incluir campo
-          tokensLost: p.stats.tokensLost || 0,      // ✅ CORREGIDO: incluir campo
+          tokensWon: p.stats.tokensWon || 0,
+          tokensLost: p.stats.tokensLost || 0,
           tokensUsed: p.stats.tokensUsed || [],
           combosCompleted: p.stats.combosCompleted || 0,
           powerCardsUsed: p.stats.powerCardsUsed || 0,
@@ -330,6 +329,53 @@ class GameSessionService {
       }))
     };
   }
+
+  /**
+ * Aplica un delta de puntos a un jugador en la sesión.
+ * Usado por Reaction Cards (frontend-only) para mantener el backend sincronizado.
+ *
+ * @param {string} sessionId
+ * @param {string} playerId  - ID del backend (player_1, player_2, etc.)
+ * @param {number} delta     - positivo o negativo
+ * @param {string} reason    - para logging (MANAGEMENT_FEE, BAD_REVIEW, etc.)
+ */
+  applyScoreDelta(sessionId, playerId, delta, reason = 'REACTION_CARD') {
+    const session = this.sessions.get(sessionId);
+
+    if (!session) {
+      return { success: false, error: 'Sesión no encontrada' };
+    }
+
+    const player = session.players.find(p => p.id === playerId);
+
+    if (!player) {
+      return { success: false, error: 'Jugador no encontrado' };
+    }
+
+    const previousScore = player.score;
+    player.score = Math.max(0, player.score + delta);
+
+    console.log(`🎴 ${reason}: ${player.name} ${delta > 0 ? '+' : ''}${delta} (${previousScore} → ${player.score})`);
+
+    return {
+      success: true,
+      player: {
+        id: player.id,
+        name: player.name,
+        previousScore,
+        newScore: player.score,
+        delta,
+        reason,
+      },
+      players: session.players.map(p => ({
+        id: p.id,
+        name: p.name,
+        score: p.score,
+        availableTokens: p.availableTokens,
+      })),
+    };
+  }
+
 
   // ═══════════════════════════════════════════════════════════════
   // ⚡ MÉTODOS HELPER PARA POWER CARDS
@@ -445,33 +491,57 @@ class GameSessionService {
       difficulty: session.config.difficulty
     };
 
-    // 🔄 NUEVO: getRandomTrack ahora es async y busca en Deezer cuando se queda sin tracks
-    const track = await this.trackService.getRandomTrack(filters);
+    // 🔄 Intentar hasta MAX_AUDIO_RETRIES veces para encontrar un track con audio
+    const MAX_AUDIO_RETRIES = 3;
+    let track = null;
+    let audioUrl = null;
+    let audioSource = 'deezer';
+
+    for (let attempt = 1; attempt <= MAX_AUDIO_RETRIES; attempt++) {
+      const candidate = await this.trackService.getRandomTrack(filters);
+
+      if (!candidate) {
+        break; // No quedan tracks
+      }
+
+      let candidateAudioUrl = candidate.previewUrl || null;
+      let candidateAudioSource = candidate.audioSource || 'deezer';
+
+      if (!candidateAudioUrl) {
+        try {
+          console.log(`🎵 [${attempt}/${MAX_AUDIO_RETRIES}] Buscando audio: "${candidate.title}" - ${candidate.artist}`);
+          const deezerResult = await DeezerService.searchTrack(candidate.title, candidate.artist);
+          if (deezerResult && deezerResult.previewUrl) {
+            candidateAudioUrl = deezerResult.previewUrl;
+            candidateAudioSource = 'deezer';
+            console.log(`✅ Audio encontrado en intento ${attempt}`);
+          }
+        } catch (error) {
+          console.error(`❌ Error Deezer (intento ${attempt}):`, error.message);
+        }
+      }
+
+      track = candidate;
+      audioUrl = candidateAudioUrl;
+      audioSource = candidateAudioSource;
+
+      if (audioUrl) {
+        // ✅ Track con audio encontrado
+        break;
+      }
+
+      console.warn(`⚠️ Intento ${attempt}: sin audio para "${candidate.title}", probando otro track...`);
+    }
 
     if (!track) {
       return { success: false, error: 'No hay tracks disponibles' };
     }
 
-    // 🔥 IMPORTANTE: Si el track tiene previewUrl (de Deezer), usarlo directamente
-    let audioUrl = track.previewUrl || null;
-    let audioSource = track.audioSource || 'deezer';
-
-    // Si no tiene previewUrl, buscar en Deezer (tracks viejos de tracks.json)
     if (!audioUrl) {
-      try {
-        console.log(`🎵 Buscando audio: "${track.title}" - ${track.artist}`);
-        const deezerResult = await DeezerService.searchTrack(track.title, track.artist);
-        if (deezerResult && deezerResult.previewUrl) {
-          audioUrl = deezerResult.previewUrl;
-          audioSource = 'deezer';
-          console.log(`✅ Audio encontrado`);
-        }
-      } catch (error) {
-        console.error(`❌ Error Deezer:`, error.message);
-      }
+      console.warn(`⚠️ No se encontró audio después de ${MAX_AUDIO_RETRIES} intentos — continuando sin audio`);
     }
 
-    console.log(`🎵 Track: "${track.title}" - ${track.artist} (${audioSource})`);
+    console.log(`🎵 Track: "${track.title}" - ${track.artist} (${audioUrl ? audioSource : 'sin audio'})`);
 
     const question = this.questionService.generateQuestion(track, forcedQuestionType);
 
@@ -584,9 +654,23 @@ class GameSessionService {
 
     console.log(`⚡ ${player.name} usa: ${cardType}`);
 
+    // ─── FESTIVAL ─────────────────────────────────────────────────
+    // Efecto inmediato: +1 a todos los jugadores de la sesión.
+    if (cardType === 'power_festival_001' || cardType === 'festival') {
+      session.players.forEach(p => { p.score += 1; });
+      const affected = session.players.map(p => ({ id: p.id, name: p.name, score: p.score }));
+      console.log(`🎪 FESTIVAL: +1 a todos (${session.players.length} jugadores)`);
+      return {
+        success: true,
+        message: `🎪 ¡Festival! Todos los jugadores +1 pt`,
+        effect: 'festival',
+        affected,
+      };
+    }
+
     return {
       success: true,
-      message: `Poder ${cardType} activado`
+      message: `Poder ${cardType} activado`,
     };
   }
 

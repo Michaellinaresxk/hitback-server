@@ -1,24 +1,6 @@
 {
   "powerCards": [
     {
-      "id": "power_robo_001",
-      "type": "hit_steal",
-      "name": "Hit Steal",
-      "description": "Roba 1 power card de otro jugador",
-      "emoji": "🥷",
-      "usageLimit": 1,
-      "currentUses": 0
-    },
-    {
-      "id": "power_stop_001",
-      "type": "stop",
-      "name": "STOP",
-      "description": "Inmune a robos",
-      "emoji": "🛡️",
-      "usageLimit": 1,
-      "currentUses": 0
-    },
-    {
       "id": "power_replay_001",
       "type": "replay",
       "name": "REPLAY",
@@ -28,22 +10,32 @@
       "currentUses": 0
     },
     {
-      "id": "power_stop_blast_001",
-      "type": "stop_blast",
-      "name": "STOP-BLAST",
-      "description": "Inmune a robos y le quitas la carta Hit Steal al que te intento robar.",
-      "emoji": "🔄",
+      "id": "power_festival_001",
+      "type": "festival",
+      "name": "FESTIVAL",
+      "description": "Todos los jugadores ganan +1 pt — celebración colectiva",
+      "emoji": "🎪",
       "usageLimit": 1,
       "currentUses": 0
     },
     {
-      "id": "power_precision_001",
-      "type": "precision",
-      "name": "Precisión Total",
-      "description": "Si aciertas año exacto, +2 puntos extra",
-      "emoji": "🎯",
-      "usageLimit": 2,
+      "id": "power_double_platinum_001",
+      "type": "double_platinum",
+      "name": "DOUBLE PLATINUM",
+      "description": "La próxima ronda, quien responda correctamente gana el doble de puntos",
+      "emoji": "💿",
+      "usageLimit": 1,
       "currentUses": 0
+    },
+    {
+      "id": "power_label_fee_001",
+      "type": "label_fee",
+      "name": "LABEL FEE",
+      "description": "Al tomar esta carta pierdes 1 punto inmediatamente",
+      "emoji": "💸",
+      "usageLimit": 1,
+      "currentUses": 0,
+      "effectOnDraw": { "scoreChange": -1 }
     }
   ],
   "combos": [
