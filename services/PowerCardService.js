@@ -350,7 +350,7 @@ class PowerCardService {
         let multiplier = 1;
 
         // Aplicar efecto según tipo de carta
-        if (card.type === 'replay') {
+        if (card.type === 'replay' || card.type === 'double_platinum') {
           multiplier = 2;
           finalPoints = basePoints * 2;
         }
@@ -490,10 +490,9 @@ class PowerCardService {
   _getCardEffect(cardType) {
     const effects = {
       replay: { multiplier: 2, description: 'Próxima respuesta vale 2x' },
-      stop: { protection: true, description: 'Protección contra robos' },
-      hit_steal: { steal: true, description: 'Robar carta de otro' },
-      stop_blast: { protection: true, steal: true, description: 'Protección + contraataque' },
-      precision: { bonus: 2, description: '+2 puntos si aciertas año exacto' }
+      festival: { allPlayersBonus: 1, description: 'Todos los jugadores +1 pt' },
+      double_platinum: { multiplier: 2, description: 'Próxima ronda vale 2x para quien responda' },
+      label_fee: { scoreChange: -1, description: 'Pierdes 1 punto al tomar esta carta' },
     };
 
     return effects[cardType] || { description: 'Efecto desconocido' };

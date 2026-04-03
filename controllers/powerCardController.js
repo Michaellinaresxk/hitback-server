@@ -11,7 +11,7 @@
  */
 
 const PowerCardService = require('../services/PowerCardService');
-const { parsePowerCardQR } = require('../utils/Qrutils');
+const { parsePowerCardQR, generateQRsForAllCards } = require('../utils/Qrutils');
 const { asyncHandler } = require('../utils/errors');
 const logger = require('../utils/logger');
 
@@ -70,7 +70,11 @@ class PowerCardController {
       }
 
       // 4. Agregar carta al inventario del jugador
-      PowerCardService.addCardToInventory(playerId, cardId, 1);
+      // Las cartas con effectOnDraw se consumen al tomar — no van al inventario
+      const hasImmediateEffect = !!card.effectOnDraw;
+      if (!hasImmediateEffect) {
+        PowerCardService.addCardToInventory(playerId, cardId, 1);
+      }
 
       // 5. Obtener inventario actualizado
       const inventory = PowerCardService.getPlayerInventory(playerId);
@@ -89,12 +93,11 @@ class PowerCardController {
         emoji: card.emoji,
         description: card.description,
         usageLimit: card.usageLimit,
+        effectOnDraw: card.effectOnDraw || null,
         qrCode,
         scannedAt: new Date().toISOString(),
         sessionId,
-        inventory: {
-          [cardId]: inventory[cardId] || 1
-        },
+        inventory: hasImmediateEffect ? inventory : { [cardId]: inventory[cardId] || 1 },
         totalCards: Object.values(inventory).reduce((a, b) => a + b, 0)
       }, `PowerCard '${card.name}' assigned to player`, {
         performance: `${duration}ms`,
@@ -343,6 +346,29 @@ class PowerCardController {
     } catch (error) {
       logger.error('Failed to add test card:', error);
       res.sendError('Failed to add card', 'TEST_ERROR', 500, error.message);
+    }
+  });
+
+  /**
+   * GET /api/cards/printable-qrs
+   * Obtener los QR codes estáticos de todas las PowerCards para imprimir el mazo físico
+   *
+   * Response: { cards: [{ cardId, cardName, cardType, emoji, qrCode, description }] }
+   */
+  getPrintableQRs = asyncHandler(async (req, res) => {
+    logger.info('🖨️ Generating printable QR codes for physical deck');
+
+    try {
+      const allCards = PowerCardService.getAllPowerCards();
+      const printableQRs = generateQRsForAllCards(allCards);
+
+      res.sendSuccess(
+        { cards: printableQRs, total: printableQRs.length },
+        'Printable QR codes generated',
+      );
+    } catch (error) {
+      logger.error('❌ Failed to generate printable QRs:', error);
+      res.sendError('Failed to generate QR codes', 'QR_GENERATE_ERROR', 500, error.message);
     }
   });
 

@@ -317,6 +317,58 @@ router.post('/session/:id/power', (req, res) => {
   }
 });
 
+
+// ═══════════════════════════════════════════════════════════
+// 🎴 REACTION CARD — APLICAR DELTA DE PUNTOS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * PATCH /api/v2/game/session/:id/players/:playerId/score
+ * Aplica un delta de puntos a un jugador (Reaction Cards frontend-only).
+ *
+ * Body:
+ * {
+ *   delta: -1,               // positivo o negativo
+ *   reason: "MANAGEMENT_FEE" // para logging
+ * }
+ *
+ * Response:
+ * {
+ *   success: true,
+ *   player: { id, name, previousScore, newScore, delta, reason },
+ *   players: [{ id, name, score, availableTokens }]
+ * }
+ */
+router.patch('/session/:id/players/:playerId/score', (req, res) => {
+  try {
+    const { id, playerId } = req.params;
+    const { delta, reason } = req.body;
+
+    if (delta === undefined || typeof delta !== 'number') {
+      return res.status(400).json({
+        success: false,
+        error: 'delta es requerido y debe ser un número',
+      });
+    }
+
+    console.log(`🎴 Score delta: sesión ${id}, jugador ${playerId}, delta ${delta > 0 ? '+' : ''}${delta} (${reason})`);
+
+    const result = gameService.applyScoreDelta(id, playerId, delta, reason);
+
+    if (!result.success) {
+      return res.status(404).json(result);
+    }
+
+    res.json(result);
+  } catch (error) {
+    console.error('❌ Error aplicando score delta:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
 // ═══════════════════════════════════════════════════════════
 // 🩺 HEALTH CHECK
 // ═══════════════════════════════════════════════════════════

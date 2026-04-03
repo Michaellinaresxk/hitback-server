@@ -54,6 +54,13 @@ router.get('/inventory/:playerId', powerCardController.getPlayerInventory);
  */
 router.get('/inventories/all', powerCardController.getAllInventories);
 
+/**
+ * GET /api/cards/printable-qrs
+ * Obtener QR codes estáticos para imprimir el mazo físico
+ * Cada carta retorna su qrCode listo para generar un PNG/SVG imprimible
+ */
+router.get('/printable-qrs', powerCardController.getPrintableQRs);
+
 // ═══════════════════════════════════════════════════════════════
 // ⚡ USAR POWER CARDS
 // ═══════════════════════════════════════════════════════════════
