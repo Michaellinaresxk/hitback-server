@@ -1,11 +1,11 @@
 /**
  * 🎮 GAME SESSION SERVICE - UPDATED
- * 
+ *
  * ✅ INTEGRACIÓN CON POWER CARDS
  * - Detecta combos automáticamente
  * - Aplica efectos de cartas a puntos
  * - Registra uso de power cards
- * 
+ *
  * CAMBIOS:
  * - revealAnswer(): Integración con PowerCardService y ComboTracker
  * - Nuevos métodos: processCombos(), applyPowerCardBonus()
@@ -35,7 +35,7 @@ class GameSessionService {
       difficulty = 'ANY',
       targetScore = 15,
       timeLimit = 1200,
-      powerCardsPerPlayer = 3
+      powerCardsPerPlayer = 3,
     } = config;
 
     const sessionId = this._generateSessionId();
@@ -54,8 +54,8 @@ class GameSessionService {
         tokensUsed: [],
         combosCompleted: 0,
         powerCardsUsed: 0,
-        totalComboStreak: 0
-      }
+        totalComboStreak: 0,
+      },
     }));
 
     const session = {
@@ -68,7 +68,7 @@ class GameSessionService {
         difficulty,
         targetScore,
         timeLimit,
-        powerCardsPerPlayer
+        powerCardsPerPlayer,
       },
       players: playerList,
       currentPlayerIndex: 0,
@@ -77,7 +77,7 @@ class GameSessionService {
       currentRound: null,
       timeRemaining: timeLimit,
       startedAt: null,
-      history: []
+      history: [],
     };
 
     this.sessions.set(sessionId, session);
@@ -90,7 +90,7 @@ class GameSessionService {
 
     return {
       success: true,
-      session: this._sanitizeSession(session)
+      session: this._sanitizeSession(session),
     };
   }
 
@@ -112,14 +112,14 @@ class GameSessionService {
       correctAnswer: answer.correct,
       trackInfo: {
         title: answer.trackTitle,
-        artist: answer.trackArtist
+        artist: answer.trackArtist,
       },
       winner: null,
       pointsAwarded: 0,
       basePoints: round.question.points,
       tokenBonus: 0,
-      powerCardEffect: null,            // ✅ NUEVA PROP
-      comboStatus: null                 // ✅ NUEVA PROP
+      powerCardEffect: null, // ✅ NUEVA PROP
+      comboStatus: null, // ✅ NUEVA PROP
     };
 
     console.log(`\n═══ REVEAL ANSWER ═══`);
@@ -131,7 +131,7 @@ class GameSessionService {
     // ═══════════════════════════════════════════════════════════════
 
     if (winnerId) {
-      const winner = session.players.find(p => p.id === winnerId);
+      const winner = session.players.find((p) => p.id === winnerId);
 
       if (winner) {
         const basePoints = round.question.points;
@@ -154,10 +154,7 @@ class GameSessionService {
         // Paso 2: APLICAR EFECTO DE POWER CARD
         // ═══════════════════════════════════════════════════════════
 
-        const powerCardEffect = PowerCardService.applyActiveCardEffect(
-          winnerId,
-          totalPoints
-        );
+        const powerCardEffect = PowerCardService.applyActiveCardEffect(winnerId, totalPoints);
 
         if (powerCardEffect.cardUsed) {
           totalPoints = powerCardEffect.finalPoints;
@@ -169,13 +166,38 @@ class GameSessionService {
             emoji: powerCardEffect.cardUsed.emoji,
             multiplier: powerCardEffect.multiplier,
             basePointsBeforeCard: totalPoints / powerCardEffect.multiplier,
-            finalPointsAfterCard: totalPoints
+            finalPointsAfterCard: totalPoints,
           };
 
-          console.log(`   💥 Power Card ${powerCardEffect.cardUsed.name}: x${powerCardEffect.multiplier}`);
+          console.log(
+            `   💥 Power Card ${powerCardEffect.cardUsed.name}: x${powerCardEffect.multiplier}`
+          );
           console.log(`   → ${totalPoints} pts (con poder)`);
         } else {
           console.log(`   Total: ${totalPoints} pts`);
+        }
+
+        // ═══════════════════════════════════════════════════════════
+        // Paso 2b: DOUBLE PLATINUM (flag de ronda, aplica a cualquiera)
+        // ═══════════════════════════════════════════════════════════
+
+        if (session.doublePlatinumActive) {
+          const beforeDP = totalPoints;
+          totalPoints = totalPoints * 2;
+          session.doublePlatinumActive = false;
+          console.log(`   💿 DOUBLE PLATINUM: ${beforeDP} → ${totalPoints} pts`);
+
+          // Si no hubo power card personal, reportar DP como el efecto
+          if (!results.powerCardEffect) {
+            results.powerCardEffect = {
+              cardId: 'power_double_platinum_001',
+              cardName: 'DOUBLE PLATINUM',
+              emoji: '💿',
+              multiplier: 2,
+              basePointsBeforeCard: beforeDP,
+              finalPointsAfterCard: totalPoints,
+            };
+          }
         }
 
         // ═══════════════════════════════════════════════════════════
@@ -189,7 +211,7 @@ class GameSessionService {
 
         const comboResult = PowerCardService.processPlayerAnswer(
           winnerId,
-          true,  // Es correcta
+          true, // Es correcta
           { gameSessionId: sessionId, roundNumber: round.roundNumber }
         );
 
@@ -205,7 +227,7 @@ class GameSessionService {
           results.comboStatus = {
             type: comboResult.comboType,
             message: comboResult.comboMessage,
-            cardAwarded: comboResult.cardAwarded
+            cardAwarded: comboResult.cardAwarded,
           };
 
           console.log(`   🔥 COMBO ACTIVADO: ${comboResult.comboMessage}`);
@@ -225,7 +247,7 @@ class GameSessionService {
         results.winner = {
           id: winner.id,
           name: winner.name,
-          newScore: winner.score
+          newScore: winner.score,
         };
         results.pointsAwarded = totalPoints;
         results.tokenBonus = tokenBonus;
@@ -234,12 +256,14 @@ class GameSessionService {
         // ⚠️ IMPORTANTE: Resetear streak de los jugadores que NO ganaron
         // ═══════════════════════════════════════════════════════════
         console.log(`\n🔄 Reseteando streak de jugadores que NO ganaron:`);
-        session.players.forEach(player => {
+        session.players.forEach((player) => {
           if (player.id !== winnerId) {
-            console.log(`   ❌ ${player.name} (${player.id}) no ganó esta ronda - reseteando streak`);
+            console.log(
+              `   ❌ ${player.name} (${player.id}) no ganó esta ronda - reseteando streak`
+            );
             PowerCardService.processPlayerAnswer(
               player.id,
-              false,  // Incorrecto
+              false, // Incorrecto
               { gameSessionId: sessionId, roundNumber: round.roundNumber }
             );
 
@@ -258,10 +282,10 @@ class GameSessionService {
 
       console.log(`😅 Nadie acertó`);
 
-      session.players.forEach(player => {
+      session.players.forEach((player) => {
         PowerCardService.processPlayerAnswer(
           player.id,
-          false,  // Incorrecto
+          false, // Incorrecto
           { gameSessionId: sessionId, roundNumber: round.roundNumber }
         );
 
@@ -275,11 +299,13 @@ class GameSessionService {
 
     // Log estado de jugadores
     console.log(`\n📊 Estado:`);
-    session.players.forEach(p => {
+    session.players.forEach((p) => {
       const bet = round.bets[p.id];
       const tokenUsed = bet ? `(usó +${bet.tokenValue})` : '';
       const combos = p.stats.combosCompleted > 0 ? ` | ${p.stats.combosCompleted} combos` : '';
-      console.log(`   ${p.name}: ${p.score} pts, tokens: [${p.availableTokens.join(', ')}] ${tokenUsed}${combos}`);
+      console.log(
+        `   ${p.name}: ${p.score} pts, tokens: [${p.availableTokens.join(', ')}] ${tokenUsed}${combos}`
+      );
     });
 
     // Historial
@@ -291,7 +317,7 @@ class GameSessionService {
       pointsAwarded: results.pointsAwarded,
       comboDetected: results.comboStatus ? results.comboStatus.type : null,
       powerCardUsed: results.powerCardEffect ? results.powerCardEffect.cardName : null,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     session.currentRound = null;
@@ -310,7 +336,7 @@ class GameSessionService {
     return {
       success: true,
       results,
-      players: session.players.map(p => ({
+      players: session.players.map((p) => ({
         id: p.id,
         name: p.name,
         score: p.score,
@@ -324,21 +350,21 @@ class GameSessionService {
           tokensUsed: p.stats.tokensUsed || [],
           combosCompleted: p.stats.combosCompleted || 0,
           powerCardsUsed: p.stats.powerCardsUsed || 0,
-          totalComboStreak: p.stats.totalComboStreak || 0
-        }
-      }))
+          totalComboStreak: p.stats.totalComboStreak || 0,
+        },
+      })),
     };
   }
 
   /**
- * Aplica un delta de puntos a un jugador en la sesión.
- * Usado por Reaction Cards (frontend-only) para mantener el backend sincronizado.
- *
- * @param {string} sessionId
- * @param {string} playerId  - ID del backend (player_1, player_2, etc.)
- * @param {number} delta     - positivo o negativo
- * @param {string} reason    - para logging (MANAGEMENT_FEE, BAD_REVIEW, etc.)
- */
+   * Aplica un delta de puntos a un jugador en la sesión.
+   * Usado por Reaction Cards (frontend-only) para mantener el backend sincronizado.
+   *
+   * @param {string} sessionId
+   * @param {string} playerId  - ID del backend (player_1, player_2, etc.)
+   * @param {number} delta     - positivo o negativo
+   * @param {string} reason    - para logging (MANAGEMENT_FEE, BAD_REVIEW, etc.)
+   */
   applyScoreDelta(sessionId, playerId, delta, reason = 'REACTION_CARD') {
     const session = this.sessions.get(sessionId);
 
@@ -346,7 +372,7 @@ class GameSessionService {
       return { success: false, error: 'Sesión no encontrada' };
     }
 
-    const player = session.players.find(p => p.id === playerId);
+    const player = session.players.find((p) => p.id === playerId);
 
     if (!player) {
       return { success: false, error: 'Jugador no encontrado' };
@@ -355,7 +381,9 @@ class GameSessionService {
     const previousScore = player.score;
     player.score = Math.max(0, player.score + delta);
 
-    console.log(`🎴 ${reason}: ${player.name} ${delta > 0 ? '+' : ''}${delta} (${previousScore} → ${player.score})`);
+    console.log(
+      `🎴 ${reason}: ${player.name} ${delta > 0 ? '+' : ''}${delta} (${previousScore} → ${player.score})`
+    );
 
     return {
       success: true,
@@ -367,7 +395,7 @@ class GameSessionService {
         delta,
         reason,
       },
-      players: session.players.map(p => ({
+      players: session.players.map((p) => ({
         id: p.id,
         name: p.name,
         score: p.score,
@@ -375,7 +403,6 @@ class GameSessionService {
       })),
     };
   }
-
 
   // ═══════════════════════════════════════════════════════════════
   // ⚡ MÉTODOS HELPER PARA POWER CARDS
@@ -392,17 +419,19 @@ class GameSessionService {
     }
 
     const comboStatus = PowerCardService.getComboStatus(playerId);
-    const player = session.players.find(p => p.id === playerId);
+    const player = session.players.find((p) => p.id === playerId);
 
     return {
       success: true,
       comboStatus,
-      playerStats: player ? {
-        name: player.name,
-        score: player.score,
-        combosCompleted: player.stats.combosCompleted,
-        powerCardsUsed: player.stats.powerCardsUsed
-      } : null
+      playerStats: player
+        ? {
+            name: player.name,
+            score: player.score,
+            combosCompleted: player.stats.combosCompleted,
+            powerCardsUsed: player.stats.powerCardsUsed,
+          }
+        : null,
     };
   }
 
@@ -416,7 +445,7 @@ class GameSessionService {
       success: true,
       playerId,
       inventory,
-      totalCards: Object.values(inventory).reduce((a, b) => a + b, 0)
+      totalCards: Object.values(inventory).reduce((a, b) => a + b, 0),
     };
   }
 
@@ -457,7 +486,7 @@ class GameSessionService {
 
     return {
       success: true,
-      session: this._sanitizeSession(session)
+      session: this._sanitizeSession(session),
     };
   }
 
@@ -479,7 +508,7 @@ class GameSessionService {
         success: true,
         gameOver: true,
         winner,
-        session: this._sanitizeSession(session)
+        session: this._sanitizeSession(session),
       };
     }
 
@@ -488,7 +517,7 @@ class GameSessionService {
     const filters = {
       genre: this._getRandomFromArray(session.config.genres),
       decade: this._getRandomFromArray(session.config.decades),
-      difficulty: session.config.difficulty
+      difficulty: session.config.difficulty,
     };
 
     // 🔄 Intentar hasta MAX_AUDIO_RETRIES veces para encontrar un track con audio
@@ -509,7 +538,9 @@ class GameSessionService {
 
       if (!candidateAudioUrl) {
         try {
-          console.log(`🎵 [${attempt}/${MAX_AUDIO_RETRIES}] Buscando audio: "${candidate.title}" - ${candidate.artist}`);
+          console.log(
+            `🎵 [${attempt}/${MAX_AUDIO_RETRIES}] Buscando audio: "${candidate.title}" - ${candidate.artist}`
+          );
           const deezerResult = await DeezerService.searchTrack(candidate.title, candidate.artist);
           if (deezerResult && deezerResult.previewUrl) {
             candidateAudioUrl = deezerResult.previewUrl;
@@ -530,7 +561,9 @@ class GameSessionService {
         break;
       }
 
-      console.warn(`⚠️ Intento ${attempt}: sin audio para "${candidate.title}", probando otro track...`);
+      console.warn(
+        `⚠️ Intento ${attempt}: sin audio para "${candidate.title}", probando otro track...`
+      );
     }
 
     if (!track) {
@@ -538,10 +571,14 @@ class GameSessionService {
     }
 
     if (!audioUrl) {
-      console.warn(`⚠️ No se encontró audio después de ${MAX_AUDIO_RETRIES} intentos — continuando sin audio`);
+      console.warn(
+        `⚠️ No se encontró audio después de ${MAX_AUDIO_RETRIES} intentos — continuando sin audio`
+      );
     }
 
-    console.log(`🎵 Track: "${track.title}" - ${track.artist} (${audioUrl ? audioSource : 'sin audio'})`);
+    console.log(
+      `🎵 Track: "${track.title}" - ${track.artist} (${audioUrl ? audioSource : 'sin audio'})`
+    );
 
     const question = this.questionService.generateQuestion(track, forcedQuestionType);
 
@@ -553,7 +590,7 @@ class GameSessionService {
         genre: track.genre,
         decade: track.decade,
         audioUrl: audioUrl,
-        audioSource: audioSource
+        audioSource: audioSource,
       },
       question: {
         type: question.type,
@@ -561,17 +598,17 @@ class GameSessionService {
         icon: question.icon,
         points: question.points,
         hints: question.hints,
-        isChallenge: question.isChallenge || false
+        isChallenge: question.isChallenge || false,
       },
       _answer: {
         correct: question.answer,
         acceptableAnswers: question.acceptableAnswers,
         trackTitle: track.title,
-        trackArtist: track.artist
+        trackArtist: track.artist,
       },
       bets: {},
       startedAt: new Date().toISOString(),
-      status: 'playing'
+      status: 'playing',
     };
 
     session.usedTrackIds.push(track.id);
@@ -589,9 +626,9 @@ class GameSessionService {
           correct: session.currentRound._answer?.correct,
           trackTitle: session.currentRound._answer?.trackTitle,
           trackArtist: session.currentRound._answer?.trackArtist,
-          acceptableAnswers: session.currentRound._answer?.acceptableAnswers || []
-        }
-      }
+          acceptableAnswers: session.currentRound._answer?.acceptableAnswers || [],
+        },
+      },
     };
   }
 
@@ -602,7 +639,7 @@ class GameSessionService {
       return { success: false, error: 'No hay ronda activa' };
     }
 
-    const player = session.players.find(p => p.id === playerId);
+    const player = session.players.find((p) => p.id === playerId);
     if (!player) {
       return { success: false, error: 'Jugador no encontrado' };
     }
@@ -613,30 +650,30 @@ class GameSessionService {
       return {
         success: false,
         error: `Token +${tokenValue} ya fue usado`,
-        availableTokens: player.availableTokens
+        availableTokens: player.availableTokens,
       };
     }
 
     console.log(`🪙 ${player.name} usa token +${tokenValue}`);
     console.log(`   Tokens antes: [${player.availableTokens.join(', ')}]`);
 
-    player.availableTokens = player.availableTokens.filter(t => t !== tokenValue);
+    player.availableTokens = player.availableTokens.filter((t) => t !== tokenValue);
     player.stats.tokensUsed.push(tokenValue);
 
     console.log(`   Tokens después: [${player.availableTokens.join(', ')}]`);
 
     session.currentRound.bets[playerId] = {
       tokenValue: tokenValue,
-      usedAt: new Date().toISOString()
+      usedAt: new Date().toISOString(),
     };
 
     return {
       success: true,
       bet: {
-        tokens: tokenValue,           // ✅ CORREGIDO: nombre correcto para frontend
-        multiplier: tokenValue
+        tokens: tokenValue, // ✅ CORREGIDO: nombre correcto para frontend
+        multiplier: tokenValue,
       },
-      playerTokens: player.availableTokens.length  // ✅ CORREGIDO: devolver número, no array
+      playerTokens: player.availableTokens.length, // ✅ CORREGIDO: devolver número, no array
     };
   }
 
@@ -647,7 +684,7 @@ class GameSessionService {
       return { success: false, error: 'Sesión no encontrada' };
     }
 
-    const player = session.players.find(p => p.id === playerId);
+    const player = session.players.find((p) => p.id === playerId);
     if (!player) {
       return { success: false, error: 'Jugador no encontrado' };
     }
@@ -657,14 +694,49 @@ class GameSessionService {
     // ─── FESTIVAL ─────────────────────────────────────────────────
     // Efecto inmediato: +1 a todos los jugadores de la sesión.
     if (cardType === 'power_festival_001' || cardType === 'festival') {
-      session.players.forEach(p => { p.score += 1; });
-      const affected = session.players.map(p => ({ id: p.id, name: p.name, score: p.score }));
+      session.players.forEach((p) => {
+        p.score += 1;
+      });
+      const affected = session.players.map((p) => ({ id: p.id, name: p.name, score: p.score }));
       console.log(`🎪 FESTIVAL: +1 a todos (${session.players.length} jugadores)`);
       return {
         success: true,
         message: `🎪 ¡Festival! Todos los jugadores +1 pt`,
         effect: 'festival',
         affected,
+      };
+    }
+
+    // ─── REPLAY ───────────────────────────────────────────────────
+    // Efecto diferido: x2 a la próxima respuesta correcta del holder.
+    // Se activa en PowerCardService para que applyActiveCardEffect lo
+    // encuentre durante revealAnswer.
+    if (cardType === 'power_replay_001' || cardType === 'replay') {
+      const activation = PowerCardService.activatePowerCard(playerId, cardType, sessionId);
+      if (!activation.success) {
+        console.warn(`⚠️ REPLAY activation failed: ${activation.error}`);
+      } else {
+        console.log(`⚡ REPLAY activado para ${player.name} — próxima respuesta x2`);
+      }
+      return {
+        success: true,
+        message: `⚡ REPLAY activado — próxima respuesta x2`,
+        effect: 'replay',
+      };
+    }
+
+    // ─── DOUBLE PLATINUM ──────────────────────────────────────────
+    // Efecto de ronda: x2 a CUALQUIER jugador que responda correctamente
+    // en la próxima ronda. Flag a nivel sesión, no por jugador.
+    if (cardType === 'power_double_platinum_001' || cardType === 'double_platinum') {
+      session.doublePlatinumActive = true;
+      console.log(
+        `💿 DOUBLE PLATINUM activado por ${player.name} — próxima ronda vale x2 para todos`
+      );
+      return {
+        success: true,
+        message: `💿 DOUBLE PLATINUM — la próxima respuesta correcta vale x2`,
+        effect: 'double_platinum',
       };
     }
 
@@ -683,7 +755,7 @@ class GameSessionService {
 
     return {
       success: true,
-      session: this._sanitizeSession(session)
+      session: this._sanitizeSession(session),
     };
   }
 
@@ -695,7 +767,7 @@ class GameSessionService {
         status: session.status,
         players: session.players.length,
         round: session.round,
-        createdAt: session.createdAt
+        createdAt: session.createdAt,
       });
     });
     return sessions;
@@ -707,7 +779,7 @@ class GameSessionService {
   }
 
   cleanupOldSessions() {
-    const twoHoursAgo = Date.now() - (2 * 60 * 60 * 1000);
+    const twoHoursAgo = Date.now() - 2 * 60 * 60 * 1000;
     let cleaned = 0;
 
     this.sessions.forEach((session, id) => {
@@ -740,7 +812,7 @@ class GameSessionService {
           id: player.id,
           name: player.name,
           score: player.score,
-          stats: player.stats  // ✅ Incluir stats
+          stats: player.stats, // ✅ Incluir stats
         };
       }
     }
