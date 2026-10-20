@@ -73,11 +73,11 @@ class PowerCardController {
       // Las cartas con effectOnDraw se consumen al tomar — no van al inventario
       const hasImmediateEffect = !!card.effectOnDraw;
       if (!hasImmediateEffect) {
-        PowerCardService.addCardToInventory(playerId, cardId, 1);
+        PowerCardService.addCardToInventory(playerId, cardId, 1, sessionId);
       }
 
       // 5. Obtener inventario actualizado
-      const inventory = PowerCardService.getPlayerInventory(playerId);
+      const inventory = PowerCardService.getPlayerInventory(playerId, sessionId);
 
       const duration = timer();
 
@@ -131,7 +131,10 @@ class PowerCardController {
     logger.info(`📦 Fetching inventory for: ${playerId}`);
 
     try {
-      const inventory = PowerCardService.getPlayerInventory(playerId);
+      const inventory = PowerCardService.getPlayerInventory(
+        playerId,
+        req.query.sessionId || null,
+      );
 
       // Enriquecer con información completa de las cartas
       const enrichedInventory = [];
@@ -270,7 +273,7 @@ class PowerCardController {
       }
 
       // 2. Verificar que el jugador tiene la carta
-      const inventory = PowerCardService.getPlayerInventory(playerId);
+      const inventory = PowerCardService.getPlayerInventory(playerId, sessionId);
 
       if (!inventory[cardId] || inventory[cardId] <= 0) {
         logger.warn(`❌ Player ${playerId} doesn't have card ${cardId}`);
@@ -287,6 +290,10 @@ class PowerCardController {
 
       // 4. Activar la carta (marca como activa para usar en la siguiente ronda)
       const result = PowerCardService.activatePowerCard(playerId, cardId, sessionId);
+
+      if (!result.success) {
+        return res.sendError(result.error, 'POWER_CARD_ACTIVATION_FAILED', 400);
+      }
 
       const duration = timer();
 
@@ -333,8 +340,16 @@ class PowerCardController {
     logger.warn(`⚠️  TEST MODE: Adding ${count}x ${cardId} to ${playerId}`);
 
     try {
-      PowerCardService.addCardToInventory(playerId, cardId, count);
-      const inventory = PowerCardService.getPlayerInventory(playerId);
+      PowerCardService.addCardToInventory(
+        playerId,
+        cardId,
+        count,
+        req.body.sessionId || null,
+      );
+      const inventory = PowerCardService.getPlayerInventory(
+        playerId,
+        req.body.sessionId || null,
+      );
 
       res.sendSuccess({
         playerId,
@@ -382,8 +397,7 @@ class PowerCardController {
     logger.info(`🧹 Clearing data for player: ${playerId}`);
 
     try {
-      // Implementar limpieza en el servicio
-      // PowerCardService.clearPlayerData(playerId);
+      PowerCardService.clearPlayerData(playerId, req.query.sessionId || null);
 
       res.sendSuccess({
         playerId,

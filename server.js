@@ -307,7 +307,7 @@ app.use(errorHandler);
 // ========================================
 // INICIO DEL SERVIDOR
 // ========================================
-const server = app.listen(PORT, HOST, () => {
+const startServer = () => app.listen(PORT, HOST, () => {
   const networkIPs = getLocalNetworkIPs();
 
   logger.info(`🎵 HITBACK Backend v2.0 - Sistema sin QR físicos`);
@@ -340,12 +340,18 @@ const server = app.listen(PORT, HOST, () => {
   logger.info(`\n✅ Sistema nuevo activo - QR solo para power cards`);
 });
 
-process.on('SIGTERM', () => {
-  logger.info('SIGTERM received. Shutting down gracefully...');
-  server.close(() => {
-    logger.info('Server closed.');
-    process.exit(0);
+let server;
+if (require.main === module) {
+  server = startServer();
+
+  process.on('SIGTERM', () => {
+    logger.info('SIGTERM received. Shutting down gracefully...');
+    server.close(() => {
+      logger.info('Server closed.');
+      process.exit(0);
+    });
   });
-});
+}
 
 module.exports = app;
+module.exports.startServer = startServer;

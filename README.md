@@ -1,391 +1,116 @@
-# 🎵 HITBACK Backend v2.0
+# HITBACK Backend
 
-**Arquitectura moderna y escalable para el juego de música HITBACK**
+> Guía operativa cotejada con rutas, servicios y tests del servidor el 2026-10-20. La suite HTTP usa dependencias deterministas; Deezer, PostgreSQL, cámara y dispositivos no se verificaron con esta revisión.
 
-[![Node.js](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/express-4.21.2-blue.svg)](https://expressjs.com/)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+## Requisitos y arranque
 
-## 🚀 Quick Start
+- El `package.json` del servidor declara Node.js `>=14`; usar una versión de Node actualmente soportada por Expo y por las dependencias del workspace. El mínimo declarado no equivale a soporte operativo comprobado.
+- Desde esta carpeta:
 
 ```bash
-# 1. Clonar e instalar
-git clone <your-repo>
-cd hitback-backend
 npm install
-
-# 2. Configuración automática
-npm run setup
-
-# 3. Iniciar servidor
-npm start
-
-# 4. Probar API
-curl http://localhost:3000/api/health
-```
-
-## 📋 Características
-
-- 🎯 **Escaneo QR** - Códigos QR para cartas físicas del juego
-- 🎵 **Audio Local** - Reproducción de previews desde archivos locales
-- 🎮 **Gestión de Juego** - API completa para sesiones de juego
-- 📊 **Monitoreo** - Health checks y diagnósticos detallados
-- 🔒 **Seguridad** - Rate limiting y validación robusta
-- 📝 **Logging** - Sistema de logs estructurado
-- 🧪 **Testing** - Endpoints de testing y validación
-
-## 🏗️ Arquitectura
-
-### Estructura de Directorios
-
-```
-server/
-├── src/
-│   ├── controllers/     # Lógica de controladores
-│   ├── services/        # Lógica de negocio
-│   ├── routes/          # Definición de rutas
-│   ├── middleware/      # Middlewares personalizados
-│   ├── utils/           # Utilidades y helpers
-│   └── __tests__/       # Tests unitarios e integración
-├── data/                # Datos del juego (tracks.json)
-├── public/audio/        # Archivos de audio
-├── logs/                # Logs del sistema
-├── backups/             # Backups automáticos
-└── server.js            # Punto de entrada
-```
-
-### Servicios Principales
-
-- **QRService** - Validación, parsing y generación de códigos QR
-- **AudioService** - Gestión de archivos de audio local
-- **TrackService** - Manejo de datos de tracks y canciones
-- **GameController** - Orquestación del flujo del juego
-
-## 🎯 API Endpoints
-
-### 🔍 QR Codes
-```http
-POST /api/qr/scan/:qrCode          # Escanear código QR
-GET  /api/qr/generate              # Generar todos los QR codes
-GET  /api/qr/validate/:qrCode      # Validar formato QR
-GET  /api/qr/search                # Buscar QR codes
-```
-
-### 🎵 Tracks
-```http
-GET  /api/tracks                   # Listar todos los tracks
-GET  /api/tracks/:id               # Obtener track específico
-GET  /api/tracks/random            # Track aleatorio
-GET  /api/tracks/search            # Buscar tracks
-```
-
-### 🔊 Audio
-```http
-GET  /api/audio/list               # Listar archivos de audio
-GET  /api/audio/stream/:filename   # Stream de audio
-GET  /api/audio/diagnostics        # Diagnóstico de audio
-```
-
-### 🎮 Game
-```http
-POST /api/game/create              # Crear sesión de juego
-POST /api/game/scan/:qrCode        # Escanear en juego
-GET  /api/game/:gameId             # Estado del juego
-```
-
-### 🏥 Health & Monitoring
-```http
-GET  /api/health                   # Health check general
-GET  /api/health/services          # Estado de servicios
-GET  /api/health/detailed          # Health check detallado
-```
-
-## 🎯 Formato de Códigos QR
-
-```
-HITBACK_{TRACK_ID}_{CARD_TYPE}_{DIFFICULTY}
-```
-
-**Ejemplos:**
-- `HITBACK_001_SONG_EASY` → Pregunta de canción (1-2 puntos)
-- `HITBACK_002_ARTIST_MEDIUM` → Pregunta de artista (2-4 puntos)
-- `HITBACK_003_DECADE_HARD` → Pregunta de década (4-6 puntos)
-- `HITBACK_004_CHALLENGE_EXPERT` → Challenge card (8-15 puntos)
-
-**Card Types:**
-- `SONG` - ¿Cuál es la canción?
-- `ARTIST` - ¿Quién la canta?
-- `DECADE` - ¿De qué década es?
-- `LYRICS` - Completar letra
-- `CHALLENGE` - Desafío (cantar, bailar, imitar)
-
-## 🎵 Configuración de Audio
-
-### 1. Directorio de Audio
-```bash
-public/audio/tracks/
-├── 001_despacito.mp3
-├── 002_bohemian_rhapsody.mp3
-├── 003_shape_of_you.mp3
-└── ...
-```
-
-### 2. Formatos Soportados
-- **MP3** (recomendado)
-- **WAV**
-- **M4A**
-
-### 3. Especificaciones
-- **Duración**: ~30 segundos
-- **Calidad**: 128kbps mínimo
-- **Tamaño**: < 5MB por archivo
-
-## ⚙️ Configuración
-
-### Variables de Entorno
-
-```bash
-# Servidor
-PORT=3000
-NODE_ENV=development
-
-# Audio
-AUDIO_DIRECTORY=./public/audio/tracks
-MAX_AUDIO_SIZE=10485760
-
-# Rate Limiting
-RATE_LIMIT_MAX_REQUESTS=100
-QR_SCAN_RATE_LIMIT=30
-
-# Logging
-LOG_LEVEL=info
-LOG_FILE=./logs/hitback.log
-```
-
-Ver `.env.example` para configuración completa.
-
-## 🧪 Testing y Validación
-
-### Comandos de Testing
-```bash
-npm test                    # Ejecutar todos los tests
-npm run test:watch          # Tests en modo watch
-npm run test:unit           # Solo tests unitarios
-npm run health              # Health check rápido
-npm run validate            # Validar configuración
-```
-
-### Test de QR Codes
-```bash
-# Test individual
-curl -X POST http://localhost:3000/api/qr/scan/HITBACK_001_SONG_EASY
-
-# Batch test
-curl -X POST http://localhost:3000/api/qr/test/batch \
-  -H "Content-Type: application/json" \
-  -d '{"qrCodes": ["HITBACK_001_SONG_EASY", "HITBACK_002_ARTIST_MEDIUM"]}'
-```
-
-### Test de Audio
-```bash
-# Listar archivos
-curl http://localhost:3000/api/audio/list
-
-# Test específico
-curl http://localhost:3000/api/audio/test/001_despacito.mp3
-
-# Diagnóstico completo
-curl http://localhost:3000/api/audio/diagnostics
-```
-
-## 📱 Integración con Mobile App
-
-### React Native / Expo
-
-```typescript
-// audioService.ts
-const SERVER_URL = 'http://YOUR_IP:3000';
-
-export const scanQRCode = async (qrCode: string) => {
-  const response = await fetch(`${SERVER_URL}/api/qr/scan/${qrCode}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-  });
-  
-  const data = await response.json();
-  
-  if (data.success) {
-    // Reproducir audio
-    const audioUrl = data.data.audio.url;
-    if (audioUrl) {
-      // Usar tu reproductor de audio preferido
-      playAudio(audioUrl);
-    }
-    
-    // Mostrar pregunta
-    const question = data.data.question.text;
-    const points = data.data.scan.points;
-    
-    return { question, points, audioUrl };
-  }
-  
-  throw new Error(data.error?.message || 'Scan failed');
-};
-```
-
-### URLs de la API
-```typescript
-const API_ENDPOINTS = {
-  scanQR: `${SERVER_URL}/api/qr/scan`,
-  tracks: `${SERVER_URL}/api/tracks`,
-  health: `${SERVER_URL}/api/health`,
-  audio: `${SERVER_URL}/audio/tracks`,
-};
-```
-
-## 🔧 Scripts Útiles
-
-```bash
-# Desarrollo
-npm run dev                 # Servidor con nodemon
-npm run logs               # Ver logs en tiempo real
-
-# Configuración  
-npm run setup              # Setup automático
-npm run setup:audio       # Solo configuración de audio
-npm run validate           # Validar configuración
-
-# Mantenimiento
-npm run clean              # Limpiar logs y backups
-npm run backup             # Crear backup manual
-
-# Calidad de código
-npm run lint               # Verificar código
-npm run lint:fix           # Corregir automáticamente
-npm run format             # Formatear código
-```
-
-## 📊 Monitoreo y Logs
-
-### Health Checks
-- **General**: `/api/health` - Estado general del sistema
-- **Servicios**: `/api/health/services` - Estado individual de servicios
-- **Detallado**: `/api/health/detailed` - Métricas completas
-
-### Logs
-- **Archivo**: `logs/hitback.log`
-- **Rotación**: Automática cada 10MB
-- **Niveles**: error, warn, info, debug
-
-### Métricas
-- **Performance**: Tiempo de respuesta de endpoints
-- **Uso**: Estadísticas de QR codes y audio
-- **Errores**: Tracking de errores y fallos
-
-## 🚀 Deployment
-
-### Desarrollo Local
-```bash
 npm run dev
-# Servidor en http://localhost:3000
 ```
 
-### Producción
+`npm start` inicia `node server.js`; `npm run dev` inicia nodemon. El servidor escucha en `0.0.0.0:3000` por defecto. Expo lee primero `EXPO_PUBLIC_HITBACK_API_URL`; en desarrollo intenta detectar el host de Expo y usa `192.168.1.10` como fallback. Confirma conectividad desde el dispositivo; el endpoint `/api/expo/health` informa IPs detectadas, pero no verifica los flujos de juego.
+
+## Arquitectura actual
+
+`server.js` monta rutas desde `routes/` y servicios/controladores desde sus carpetas en la raíz. No existe un directorio `src/` como el que describían versiones anteriores de este README.
+
+| Área                                             | Código activo                                                                               |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Sesiones, rondas, apuestas, reveal y score delta | `routes/gameSession.js`, `services/GameSessionService.js`                                   |
+| Tracks estáticos / recurso legacy                | `routes/tracks.js`, `services/TrackService.js`, `data/tracks.json` si está presente         |
+| Búsqueda dinámica de tracks v2                   | `routes/tracksV2.js`, `services/TrackServiceV2.js`, `services/DeezerServiceV2.js`           |
+| Audio y streaming                                | `routes/audio.js`, `services/AudioService.js`, `public/audio/tracks/`                       |
+| Health                                           | `routes/health.js` y endpoint Expo `/api/expo/health`                                       |
+| Power Cards físicas e inventario                 | `routes/powerCard.js`, `controllers/PowerCardController.js`, `services/PowerCardService.js` |
+| Combos                                           | `services/ComboTracker.js`, llamado durante reveal                                          |
+
+Las rondas del juego de Expo usan `/api/v2/game/*`; `GameSessionService.nextRound()` usa `TrackService` y puede consultar Deezer, con tracks usados guardados en memoria por sessionId. `TrackServiceV2` con PostgreSQL está montado como recurso separado `/api/v2/tracks/*`; no es el servicio que crea las rondas de sesión. Si PostgreSQL no está disponible, TrackServiceV2 intenta fallback en memoria, sin persistencia. No prometas disponibilidad “ilimitada” ni recuperación durable.
+
+## API que consume la app
+
+### Sesiones `/api/v2/game`
+
+| Método   | Ruta                                   | Uso                                                                             |
+| -------- | -------------------------------------- | ------------------------------------------------------------------------------- |
+| `POST`   | `/session`                             | Crear sesión con nombres/configuración                                          |
+| `POST`   | `/session/:id/start`                   | Iniciar sesión                                                                  |
+| `POST`   | `/session/:id/round`                   | Obtener pista y pregunta                                                        |
+| `POST`   | `/session/:id/bet`                     | Registrar apuesta `{ playerId, tokens }`                                        |
+| `POST`   | `/session/:id/reveal`                  | Revelar con `{ winnerId }` o `null`                                             |
+| `GET`    | `/session/:id`                         | Consultar estado                                                                |
+| `GET`    | `/sessions`                            | Listar sesiones del proceso                                                     |
+| `DELETE` | `/session/:id`                         | Eliminar sesión                                                                 |
+| `POST`   | `/session/:id/power`                   | Activar carta por `playerId` + `cardId`; valida inventario asociado a la sesión |
+| `POST`   | `/session/:id/double-platinum`         | Activar el modificador de tile hasta el siguiente reveal                        |
+| `PATCH`  | `/session/:id/players/:playerId/score` | Aplicar delta de score                                                          |
+| `GET`    | `/health`                              | Health de sesiones                                                              |
+
+Las sesiones y el inventario del servicio se mantienen en memoria del proceso; reiniciar el backend no es un mecanismo de recuperación.
+
+### Power Cards `/api/cards`
+
+- `POST /scan-qr`: escanea QR `HITBACK_PC_{cardId}` (también admite sufijo timestamp); body `{ qrCode, playerId, sessionId? }`. El controlador agrega al inventario backend salvo cartas con `effectOnDraw`.
+- `GET /inventory/:playerId`: inventario; pasar `?sessionId=...` para recuperar inventario de una sesión. Sin el parámetro consulta el scope global legacy.
+- `GET /inventories/all`: diagnóstico de todos los inventarios.
+- `GET /printable-qrs`: QRs imprimibles.
+- `POST /use`: endpoint PowerCard independiente; el cliente Expo del flujo de partida activa cartas mediante `POST /api/v2/game/session/:id/power`.
+- `POST /test-add`: ruta de diagnóstico; no usar como flujo de juego.
+- `DELETE /player/:playerId`: limpiar datos de jugador.
+
+La app Expo no usa `POST /api/qr/scan/:qrCode` para iniciar una canción. No documentes ese endpoint heredado como paso de juego.
+
+### Recursos
+
+- Tracks: `/api/tracks` y `/api/v2/tracks` (incluye `/health`, `/random`, `/search`, `/stats`).
+- Audio: `/api/audio/list`, `/api/audio/check/:filename`, `/api/audio/stream/:filename`, `/api/audio/metadata/:filename`, `/api/audio/diagnostics`, `/api/audio/integrity`, `/api/audio/stats`, `/api/audio/test/:filename`.
+- Health general: `/api/health`, `/api/health/expo`, `/api/health/diagnostic`.
+- Audio estático: `/audio/tracks/*`.
+- `/api/expo/health` es un endpoint adicional definido directamente en `server.js`.
+
+## Configuración
+
+`PORT` y `HOST` tienen defaults `3000` y `0.0.0.0`. `TrackServiceV2` lee `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` (`Hitback` por defecto); estas variables son para `/api/v2/tracks/*`, no para elegir rondas de sesión. La integración actual de Deezer no declara una API key.
+
+No hay `.env.example` comprometido/verificado; `server/.env` es local y está ignorado. No compartas secretos ni copies credenciales a documentación. Revisa `server/.gitIgnore` antes de crear archivos de entorno.
+
+## Verificación
+
 ```bash
-# Configurar variables de entorno
-NODE_ENV=production
-PORT=3000
-
-# Iniciar servidor
-npm start
-```
-
-### Docker (Opcional)
-```dockerfile
-FROM node:16-alpine
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci --only=production
-COPY . .
-EXPOSE 3000
-CMD ["npm", "start"]
-```
-
-## 🎮 Flujo del Juego
-
-1. **Setup**: Game Master crea partida en la app
-2. **Players**: Se agregan jugadores manualmente
-3. **Scan**: Jugador escanea carta QR física
-4. **Audio**: Se reproduce preview (30 seg) en dispositivo GM
-5. **Question**: Aparece pregunta en pantalla del GM
-6. **Answer**: Todos compiten gritando la respuesta
-7. **Score**: GM selecciona ganador, puntos se suman automáticamente
-8. **Repeat**: El ganador se convierte en siguiente DJ
-
-## 🛠️ Troubleshooting
-
-### Problemas Comunes
-
-**Error de audio**
-```bash
-# Verificar archivos
+npm test
+npm run test:coverage
+npm run lint
+npm run health
 npm run validate
-curl http://localhost:3000/api/audio/diagnostics
 ```
 
-**QR codes no funcionan**
-```bash
-# Test individual
-curl -X POST http://localhost:3000/api/qr/scan/HITBACK_001_SONG_EASY
+Las pruebas Jest están bajo `__tests__/`. `npm test` ejecuta Jest serialmente; `npm run test:coverage` genera coverage sobre directorios del backend (no implica cobertura completa del comportamiento). `npm run test:integration` ejecuta los tests Jest de `__tests__/integration`; `npm run test:unit` busca una carpeta `unit`, pero las suites unitarias actuales están en `__tests__/services`, así que no usar ese script como prueba de unidad sin corregir/verificar su patrón.
 
-# Validar formato
-curl http://localhost:3000/api/qr/validate/HITBACK_001_SONG_EASY
-```
+`__tests__/integration/expoApi.test.js` usa Supertest y sustituye TrackService/QuestionService para no depender de Deezer o PostgreSQL. Cubre creación/inicio, scan QR, ronda, apuesta, activación REPLAY, reveal/score y el endpoint Double Platinum. No cubre una sesión E2E real con proveedor de tracks, los casos de `comboStatus` dentro de reveal, la sincronización Expo UI/World Tour, el delta de Reaction Card por HTTP ni dispositivos/cámara. En la revisión del 2026-10-20, las suites focalizadas pasaron (9 tests) y la suite Jest completa pasó (5 suites, 66 tests). Estos resultados no validan Deezer, PostgreSQL, cámara ni dispositivos.
 
-**Problemas de permisos**
-```bash
-# Verificar permisos de directorios
-ls -la public/audio/tracks/
-ls -la data/
-ls -la logs/
-```
+Hallazgo para una futura spec/issue: `ComboTracker` declara umbrales HOT_STREAK=3, DOUBLE_HIT=5 y TRIPLE_HIT=7, pero resetea el streak al detectar el combo de 3. En la ruta normal, los umbrales de 5 y 7 parecen inalcanzables. Hoy solo debe documentarse HOT_STREAK como comportamiento esperado hasta que se resuelva y se pruebe esa regla.
 
-### Debug Modo
+El target de victoria está alineado actualmente: Expo envía `SCORE_TO_WIN` (22) al crear la sesión; el backend usa 22 como default y conserva un `targetScore` explícito si otro cliente envía un override. El comentario de request y el script de flujo manual usan también 22. La regla de fin de partida del backend consulta el valor guardado en esa sesión.
+
+`node tests/test-deezer-integration.js` es un script manual separado de Jest: requiere Deezer y PostgreSQL accesibles. Sus fallos individuales se capturan y reportan en el resumen; por eso valida el resultado impreso y no solo el exit code del proceso.
+
+El script `npm run validate`/`scripts/validate-setup.js` conserva supuestos antiguos: busca rutas QR de canciones, exige datos/audio locales y tiene comprobaciones de CORS que no reflejan el wiring actual; puede fallar aunque las rutas consumidas por Expo funcionen. No es un check de integración válido por sí solo.
+
+Comprobaciones puntuales cuando el servidor corre:
 
 ```bash
-# Logs detallados
-LOG_LEVEL=debug npm run dev
-
-# Ver logs en tiempo real
-npm run logs
+curl http://localhost:3000/api/expo/health
+curl http://localhost:3000/api/v2/game/health
+curl http://localhost:3000/api/v2/tracks/health
+curl http://localhost:3000/api/audio/list
 ```
 
-## 📚 Documentación Adicional
+## Documentación relacionada
 
-- **API Docs**: http://localhost:3000/api/docs
-- **Quick Start**: Ver `QUICKSTART.md` generado tras setup
-- **Tests**: Documentación en `src/__tests__/`
-
-## 🤝 Contribuir
-
-1. Fork del repositorio
-2. Crear rama feature (`git checkout -b feature/amazing-feature`)
-3. Commit cambios (`git commit -m 'Add amazing feature'`)
-4. Push a la rama (`git push origin feature/amazing-feature`)
-5. Abrir Pull Request
-
-## 📄 Licencia
-
-MIT License - ver archivo `LICENSE` para detalles.
-
-## 🆘 Soporte
-
-- **Issues**: GitHub Issues
-- **Docs**: http://localhost:3000/api/docs
-- **Health**: http://localhost:3000/api/health
-
----
-
-**¡Listo para jugar! 🎵🎮**
+- Integración completa Expo/backend: [`../documentation/HITBACK_SYSTEM_DOCS.md`](../documentation/HITBACK_SYSTEM_DOCS.md).
+- [`README_DEEZER.md`](README_DEEZER.md): notas técnicas del subsistema TrackServiceV2; no representa el proveedor de rondas de sesión actual.
+- [`MIGRATION_GUIDE.md`](MIGRATION_GUIDE.md) y [`SYNC_REPORT.md`](SYNC_REPORT.md): documentos históricos, no instrucciones operativas actuales.
+- [`TRACKS.md`](TRACKS.md): comportamiento actual del catálogo y fuentes de audio.

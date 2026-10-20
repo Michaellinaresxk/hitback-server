@@ -35,9 +35,10 @@ class DeezerServiceV2 {
    * Reset del contador de rate limiting cada minuto
    */
   resetRateLimitCounter() {
-    setInterval(() => {
+    this.rateLimitInterval = setInterval(() => {
       this.requestCount = 0;
     }, this.requestWindow);
+    this.rateLimitInterval.unref?.();
   }
 
   /**

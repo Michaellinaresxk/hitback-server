@@ -196,6 +196,13 @@ class ComboTracker {
     console.log(`🧹 Tracker limpiado completamente`);
   }
 
+  clearSessionData(sessionId) {
+    const prefix = `${sessionId}::`;
+    for (const playerId of this.playerStreaks.keys()) {
+      if (playerId.startsWith(prefix)) this.playerStreaks.delete(playerId);
+    }
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // MÉTODOS PRIVADOS
   // ═══════════════════════════════════════════════════════════════

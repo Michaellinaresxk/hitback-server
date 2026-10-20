@@ -103,14 +103,16 @@ class PowerCardService {
    * @returns {object} { comboDetected, cardAwarded, playerData }
    */
   processPlayerAnswer(playerId, isCorrect, context = {}) {
+    const sessionId = context.gameSessionId || null;
+    const trackerPlayerId = this._getScopedPlayerId(playerId, sessionId);
     // 1. Registrar respuesta en ComboTracker
-    const comboResult = ComboTracker.recordAnswer(playerId, isCorrect);
+    const comboResult = ComboTracker.recordAnswer(trackerPlayerId, isCorrect);
 
     // 2. Si se detectó combo, otorgar power card
     let cardAwarded = null;
 
     if (comboResult.comboDetected) {
-      cardAwarded = this._awardCardForCombo(playerId, comboResult.comboType);
+      cardAwarded = this._awardCardForCombo(playerId, comboResult.comboType, sessionId);
       console.log(`⚡ Carta otorgada a ${playerId}: ${cardAwarded.name} (${cardAwarded.id})`);
     }
 
@@ -128,7 +130,7 @@ class PowerCardService {
         emoji: cardAwarded.emoji,
         qrCode: this._generateQRForCard(cardAwarded.id, playerId)
       } : null,
-      playerInventory: this.getPlayerInventory(playerId),
+      playerInventory: this.getPlayerInventory(playerId, sessionId),
       progressToNextCombo: comboResult.progressToNextCombo,
       context
     };
@@ -141,8 +143,10 @@ class PowerCardService {
    * @param {string} playerId
    * @returns {object} Estado del combo
    */
-  getComboStatus(playerId) {
-    const streak = ComboTracker.getPlayerStreak(playerId);
+  getComboStatus(playerId, sessionId = null) {
+    const streak = ComboTracker.getPlayerStreak(
+      this._getScopedPlayerId(playerId, sessionId),
+    );
 
     return {
       playerId,
@@ -150,7 +154,7 @@ class PowerCardService {
       isHitMaster: streak.streak >= 3,
       nextComboIn: streak.nextComboIn,
       message: this._generateComboMessage(streak.streak),
-      canDrawCard: streak.streak >= 3 && !this._hasRecentlyDrawnCard(playerId)
+      canDrawCard: streak.streak >= 3 && !this._hasRecentlyDrawnCard(playerId, sessionId)
     };
   }
 
@@ -159,7 +163,7 @@ class PowerCardService {
    * 
    * @private
    */
-  _awardCardForCombo(playerId, comboType) {
+  _awardCardForCombo(playerId, comboType, sessionId = null) {
     let cardToAward;
 
     switch (comboType) {
@@ -179,12 +183,8 @@ class PowerCardService {
         return null;
     }
 
-    // Añadir a inventario del jugador
-    this.addCardToInventory(playerId, cardToAward.id);
-
-    // Marcar última carta otorgada
-    this._recordCardAwarded(playerId, cardToAward.id);
-
+    // El combo habilita el sorteo de una carta física; el inventario se actualiza
+    // únicamente cuando PowerCardController valida el QR escaneado.
     return cardToAward;
   }
 
@@ -198,8 +198,8 @@ class PowerCardService {
    * @param {string} playerId
    * @returns {object} { cardId: count, ... }
    */
-  getPlayerInventory(playerId) {
-    return this.playerInventory.get(playerId) || {};
+  getPlayerInventory(playerId, sessionId = null) {
+    return this.playerInventory.get(this._getScopedPlayerId(playerId, sessionId)) || {};
   }
 
   /**
@@ -209,12 +209,13 @@ class PowerCardService {
    * @param {string} cardId
    * @param {number} count - Cuántas cartas (default 1)
    */
-  addCardToInventory(playerId, cardId, count = 1) {
-    if (!this.playerInventory.has(playerId)) {
-      this.playerInventory.set(playerId, {});
+  addCardToInventory(playerId, cardId, count = 1, sessionId = null) {
+    const scopedPlayerId = this._getScopedPlayerId(playerId, sessionId);
+    if (!this.playerInventory.has(scopedPlayerId)) {
+      this.playerInventory.set(scopedPlayerId, {});
     }
 
-    const inventory = this.playerInventory.get(playerId);
+    const inventory = this.playerInventory.get(scopedPlayerId);
     inventory[cardId] = (inventory[cardId] || 0) + count;
 
     console.log(`✅ ${playerId} obtuvo ${count}x ${cardId}`);
@@ -227,8 +228,8 @@ class PowerCardService {
    * @param {string} cardId
    * @returns {boolean} Si se removió exitosamente
    */
-  removeCardFromInventory(playerId, cardId) {
-    const inventory = this.playerInventory.get(playerId);
+  removeCardFromInventory(playerId, cardId, sessionId = null) {
+    const inventory = this.playerInventory.get(this._getScopedPlayerId(playerId, sessionId));
 
     if (!inventory || !inventory[cardId] || inventory[cardId] <= 0) {
       throw new Error(`Player ${playerId} doesn't have card ${cardId}`);
@@ -273,10 +274,10 @@ class PowerCardService {
    * @param {string} sessionId - ID de sesión de juego
    * @returns {object} { success, effect, multiplier }
    */
-  activatePowerCard(playerId, cardId, sessionId) {
+  activatePowerCard(playerId, cardId, sessionId = null) {
     try {
       // 1. Validar que el jugador tiene la carta
-      const inventory = this.getPlayerInventory(playerId);
+      const inventory = this.getPlayerInventory(playerId, sessionId);
       if (!inventory[cardId] || inventory[cardId] <= 0) {
         throw new Error(`Player ${playerId} doesn't have card ${cardId}`);
       }
@@ -285,11 +286,12 @@ class PowerCardService {
       const card = this.getPowerCardById(cardId);
 
       // 3. Crear activación
-      if (!this.activePowerCards.has(playerId)) {
-        this.activePowerCards.set(playerId, {});
+      const scopedPlayerId = this._getScopedPlayerId(playerId, sessionId);
+      if (!this.activePowerCards.has(scopedPlayerId)) {
+        this.activePowerCards.set(scopedPlayerId, {});
       }
 
-      this.activePowerCards.get(playerId)[cardId] = {
+      this.activePowerCards.get(scopedPlayerId)[cardId] = {
         status: 'active',
         activatedAt: new Date().toISOString(),
         sessionId,
@@ -329,8 +331,9 @@ class PowerCardService {
    * @param {number} basePoints - Puntos sin modificar
    * @returns {object} { finalPoints, multiplier, cardUsed }
    */
-  applyActiveCardEffect(playerId, basePoints) {
-    const activeCards = this.activePowerCards.get(playerId);
+  applyActiveCardEffect(playerId, basePoints, sessionId = null) {
+    const scopedPlayerId = this._getScopedPlayerId(playerId, sessionId);
+    const activeCards = this.activePowerCards.get(scopedPlayerId);
 
     if (!activeCards) {
       return {
@@ -357,10 +360,10 @@ class PowerCardService {
 
         // Marcar como usado y remover de inventario
         cardData.effectApplied = true;
-        this.removeCardFromInventory(playerId, cardId);
+        this.removeCardFromInventory(playerId, cardId, sessionId);
 
         // Registrar uso
-        this._recordCardUsage(playerId, cardId, { basePoints, finalPoints, multiplier });
+        this._recordCardUsage(scopedPlayerId, cardId, { basePoints, finalPoints, multiplier });
 
         console.log(`⚡ ${playerId}: Carta ${card.name} aplicada (${basePoints} → ${finalPoints})`);
 
@@ -390,8 +393,8 @@ class PowerCardService {
    * 
    * @param {string} playerId
    */
-  clearActiveCards(playerId) {
-    this.activePowerCards.delete(playerId);
+  clearActiveCards(playerId, sessionId = null) {
+    this.activePowerCards.delete(this._getScopedPlayerId(playerId, sessionId));
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -430,11 +433,12 @@ class PowerCardService {
    * 
    * @param {string} playerId
    */
-  clearPlayerData(playerId) {
-    this.playerInventory.delete(playerId);
-    this.usageHistory.delete(playerId);
-    this.activePowerCards.delete(playerId);
-    ComboTracker.clearPlayerData(playerId);
+  clearPlayerData(playerId, sessionId = null) {
+    const scopedPlayerId = this._getScopedPlayerId(playerId, sessionId);
+    this.playerInventory.delete(scopedPlayerId);
+    this.usageHistory.delete(scopedPlayerId);
+    this.activePowerCards.delete(scopedPlayerId);
+    ComboTracker.clearPlayerData(this._getScopedPlayerId(playerId, sessionId));
 
     console.log(`🧹 ${playerId}: Datos limpiados`);
   }
@@ -449,6 +453,16 @@ class PowerCardService {
     ComboTracker.clearAll();
 
     console.log(`🧹 Sistema de Power Cards completamente reseteado`);
+  }
+
+  clearSessionData(sessionId) {
+    const prefix = `${sessionId}::`;
+    for (const store of [this.playerInventory, this.usageHistory, this.activePowerCards]) {
+      for (const playerId of store.keys()) {
+        if (playerId.startsWith(prefix)) store.delete(playerId);
+      }
+    }
+    ComboTracker.clearSessionData(sessionId);
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -498,13 +512,17 @@ class PowerCardService {
     return effects[cardType] || { description: 'Efecto desconocido' };
   }
 
+  _getScopedPlayerId(playerId, sessionId = null) {
+    return sessionId ? `${sessionId}::${playerId}` : playerId;
+  }
+
   /**
    * Generar código QR para una carta
    * 
    * @private
    */
   _generateQRForCard(cardId, playerId) {
-    return `HITBACK_POWERCARD_${cardId}_${playerId}_${Date.now()}`;
+    return `HITBACK_PC_${cardId}`;
   }
 
   /**
@@ -529,13 +547,14 @@ class PowerCardService {
    * 
    * @private
    */
-  _recordCardAwarded(playerId, cardId) {
+  _recordCardAwarded(playerId, cardId, sessionId = null) {
+    const scopedPlayerId = this._getScopedPlayerId(playerId, sessionId);
     // Registrar en historial para evitar otorgar múltiples veces
-    if (!this.usageHistory.has(playerId)) {
-      this.usageHistory.set(playerId, []);
+    if (!this.usageHistory.has(scopedPlayerId)) {
+      this.usageHistory.set(scopedPlayerId, []);
     }
 
-    this.usageHistory.get(playerId).push({
+    this.usageHistory.get(scopedPlayerId).push({
       cardId,
       event: 'awarded',
       timestamp: new Date().toISOString()
@@ -566,8 +585,8 @@ class PowerCardService {
    * 
    * @private
    */
-  _hasRecentlyDrawnCard(playerId) {
-    const history = this.usageHistory.get(playerId);
+  _hasRecentlyDrawnCard(playerId, sessionId = null) {
+    const history = this.usageHistory.get(this._getScopedPlayerId(playerId, sessionId));
 
     if (!history) return false;
 

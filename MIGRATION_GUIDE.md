@@ -1,5 +1,9 @@
 # 🎵 HITBACK - Guía de Migración a Deezer API
 
+> Archivo histórico de migración. No sigas estos pasos como instalación actual: incluye rutas fuera del repo, comandos/servicios V2 y supuestos de datos que no representan el flujo de sesiones actual. Consulta [`README.md`](README.md) y [`TRACKS.md`](TRACKS.md).
+
+> Reconciliación 2026-10-20: el flujo de sesión sigue usando `TrackService`, no `TrackServiceV2`; no se debe ejecutar este procedimiento para poner en marcha la app actual. Sus cifras de catálogo, tablas, filtros y fragmentos de migración no se cotejaron uno por uno ni describen el contrato activo.
+
 Esta guía te ayudará a migrar de `tracks.json` estático a un sistema híbrido **Deezer API + PostgreSQL**.
 
 ---
@@ -18,7 +22,8 @@ Esta guía te ayudará a migrar de `tracks.json` estático a un sistema híbrido
 
 ## 🎯 ¿Por qué migrar?
 
-### Limitaciones actuales (tracks.json):
+### Limitaciones actuales (tracks.json)
+
 - ❌ Solo 217 canciones disponibles
 - ❌ Preguntas precargadas manualmente
 - ❌ Sin filtrado dinámico por región
@@ -26,6 +31,7 @@ Esta guía te ayudará a migrar de `tracks.json` estático a un sistema híbrido
 - ❌ Sin variedad de épocas/estilos
 
 ### Ventajas del nuevo sistema:
+
 - ✅ **Tracks ilimitados** desde Deezer API
 - ✅ **Filtrado dinámico** por género, década, región
 - ✅ **Preguntas auto-generadas** (song, artist, decade, year)
@@ -90,12 +96,14 @@ psql -h localhost -U postgres -d Hitback -c "SELECT NOW();"
 Si no tienes PostgreSQL instalado:
 
 **macOS:**
+
 ```bash
 brew install postgresql@13
 brew services start postgresql@13
 ```
 
 **Linux (Ubuntu/Debian):**
+
 ```bash
 sudo apt update
 sudo apt install postgresql postgresql-contrib
@@ -132,6 +140,7 @@ psql -U postgres -d Hitback -f migrations/001_create_tables.sql
 ```
 
 Deberías ver:
+
 ```
 CREATE TABLE
 CREATE INDEX
@@ -153,6 +162,7 @@ node scripts/migrate-tracks-to-db.js
 ```
 
 Verás algo como:
+
 ```
 ╔═══════════════════════════════════════════════════╗
 ║     MIGRACIÓN tracks.json → PostgreSQL            ║
@@ -219,14 +229,13 @@ const TrackServiceV2 = require('./services/TrackServiceV2'); // Nuevo
 // Usar V2 opcionalmente
 const USE_V2 = process.env.USE_TRACK_SERVICE_V2 === 'true';
 
-const trackService = USE_V2
-  ? new TrackServiceV2()
-  : new TrackService();
+const trackService = USE_V2 ? new TrackServiceV2() : new TrackService();
 
 module.exports = { trackService };
 ```
 
 En `.env`:
+
 ```bash
 USE_TRACK_SERVICE_V2=true  # Cambiar a true para probar
 ```
@@ -236,12 +245,14 @@ USE_TRACK_SERVICE_V2=true  # Cambiar a true para probar
 En `services/GameSessionService.js`:
 
 **ANTES:**
+
 ```javascript
 const TrackService = require('./TrackService');
 this.trackService = new TrackService();
 ```
 
 **DESPUÉS:**
+
 ```javascript
 const TrackServiceV2 = require('./TrackServiceV2');
 this.trackService = new TrackServiceV2();
@@ -333,6 +344,7 @@ service.healthCheck().then(health => {
 ```
 
 Debe retornar:
+
 ```json
 {
   "database": "healthy",
@@ -405,6 +417,7 @@ tail -f logs/app.log
 ```
 
 Deberías ver:
+
 ```
 ✅ PostgreSQL conectado correctamente
 ✅ Track obtenido de BD: "Bohemian Rhapsody" - Queen
@@ -448,7 +461,7 @@ const track = await trackService.getRandomTrack({
   sessionId: 'session_123',
   genre: 'LATIN',
   decade: '2010s',
-  region: 'AR' // Argentina, 'MX' = México, 'US' = USA
+  region: 'AR', // Argentina, 'MX' = México, 'US' = USA
 });
 ```
 
@@ -487,18 +500,23 @@ git checkout -- services/GameSessionService.js
 ## ❓ FAQ
 
 ### ¿Necesito API key de Deezer?
+
 No, la API pública de Deezer no requiere autenticación para búsquedas y previews.
 
 ### ¿Qué pasa si Deezer está caído?
+
 El sistema usa tracks cacheados en PostgreSQL. Si no hay en cache, retorna un track de fallback.
 
 ### ¿Puedo seguir usando tracks.json?
+
 Sí, puedes mantener ambos sistemas. Usa `USE_TRACK_SERVICE_V2=false`.
 
 ### ¿Se pierden las preguntas de lyrics/challenges?
+
 No, se migran a la tabla `custom_questions` en PostgreSQL.
 
 ### ¿Cómo agrego más tracks manualmente?
+
 Puedes insertar tracks directamente en PostgreSQL:
 
 ```sql
@@ -507,18 +525,44 @@ VALUES ('custom_001', 'Mi Canción', 'Mi Artista', 'ROCK', '2020s', 'EASY');
 ```
 
 ### ¿Cómo limpio el cache?
+
 ```sql
 DELETE FROM tracks WHERE deezer_id IS NOT NULL;
 ```
 
 ### ¿Cuántos tracks puede cachear?
+
 Ilimitados. PostgreSQL puede manejar millones de registros.
 
 ### ¿Qué pasa con los tracks usados en una sesión?
+
 Se registran en `session_tracks` y no se repetirán en esa sesión.
 
 ### ¿Puedo ver estadísticas de tracks?
+
 Sí:
+ERT INTO tracks (id, title, artist, genre, decade, difficulty)
+VALUES ('custom_001', 'Mi Canción', 'Mi Artista', 'ROCK', '2020s', 'EASY');
+```
+
+### ¿Cómo limpio el cache?
+
+```sql
+DELETE FROM tracks WHERE deezer_id IS NOT NULL;
+```
+
+### ¿Cuántos tracks puede cachear?
+
+Ilimitados. PostgreSQL puede manejar millones de registros.
+
+### ¿Qué pasa con los tracks usados en una sesión?
+
+Se registran en `session_tracks` y no se repetirán en esa sesión.
+
+### ¿Puedo ver estadísticas de tracks?
+
+Sí:
+
 ```bash
 curl http://localhost:3000/api/tracks/stats/overview
 ```

@@ -15,8 +15,7 @@ class TrackService {
     this.tracksPath = this.findTracksPath();
     this.loadTracks();
 
-    // ✅ NUEVO: Set para tracks usados en la partida actual
-    this.usedTrackIds = new Set();
+    this.usedTrackIdsBySession = new Map();
 
     // 🔄 NUEVO: Sistema híbrido con Deezer
     this.deezerService = DeezerServiceV2;
@@ -30,25 +29,26 @@ class TrackService {
   /**
    * 📌 Marcar track como usado
    */
-  markTrackAsUsed(trackId) {
-    this.usedTrackIds.add(trackId);
+  markTrackAsUsed(trackId, sessionId = 'default') {
+    const usedTrackIds = this._getUsedTrackIds(sessionId);
+    usedTrackIds.add(trackId);
     console.log(`📌 Track marcado como usado: ${trackId}`);
-    console.log(`   Usados: ${this.usedTrackIds.size}/${this.tracks.length}`);
+    console.log(`   Usados: ${usedTrackIds.size}/${this.tracks.length}`);
   }
 
   /**
    * ❓ Verificar si un track ya fue usado
    */
-  isTrackUsed(trackId) {
-    return this.usedTrackIds.has(trackId);
+  isTrackUsed(trackId, sessionId = 'default') {
+    return this._getUsedTrackIds(sessionId).has(trackId);
   }
 
   /**
    * 🔄 Reiniciar tracks usados (llamar al iniciar nueva partida)
    */
-  resetUsedTracks() {
-    const previousCount = this.usedTrackIds.size;
-    this.usedTrackIds.clear();
+  resetUsedTracks(sessionId = 'default') {
+    const previousCount = this._getUsedTrackIds(sessionId).size;
+    this.usedTrackIdsBySession.delete(sessionId);
     console.log(`🔄 Tracks usados reseteados (${previousCount} → 0)`);
   }
 
@@ -113,13 +113,21 @@ class TrackService {
   /**
    * 📊 Obtener estado de tracks usados
    */
-  getUsedTracksStatus() {
+  getUsedTracksStatus(sessionId = 'default') {
+    const usedTrackIds = this._getUsedTrackIds(sessionId);
     return {
       total: this.tracks.length,
-      used: this.usedTrackIds.size,
-      available: this.tracks.length - this.usedTrackIds.size,
-      usedIds: Array.from(this.usedTrackIds)
+      used: usedTrackIds.size,
+      available: this.tracks.length - usedTrackIds.size,
+      usedIds: Array.from(usedTrackIds)
     };
+  }
+
+  _getUsedTrackIds(sessionId = 'default') {
+    if (!this.usedTrackIdsBySession.has(sessionId)) {
+      this.usedTrackIdsBySession.set(sessionId, new Set());
+    }
+    return this.usedTrackIdsBySession.get(sessionId);
   }
 
   // ═══════════════════════════════════════════════════════════
@@ -204,13 +212,15 @@ class TrackService {
    * @param {Object} filters - { difficulty, genre, decade }
    */
   async getRandomTrack(filters = {}) {
+    const sessionId = filters.sessionId || 'default';
+    const usedTrackIds = this._getUsedTrackIds(sessionId);
     console.log(`\n🎲 Buscando track con filtros:`, filters);
 
     let pool = [...this.tracks];
     const originalSize = pool.length;
 
     // ✅ NUEVO: Filtro 0 - Excluir tracks ya usados
-    pool = pool.filter(t => !this.usedTrackIds.has(t.id));
+    pool = pool.filter(t => !usedTrackIds.has(t.id));
     console.log(`   ├─ Excluyendo usados: ${pool.length}/${originalSize} disponibles`);
 
     // 🔄 NUEVO: Si ya usamos todos los tracks, buscar más en Deezer
@@ -219,13 +229,13 @@ class TrackService {
       await this.fetchMoreTracksFromDeezer(filters.genre, filters.decade);
       // Después de agregar de Deezer, volver a construir pool
       pool = [...this.tracks];
-      pool = pool.filter(t => !this.usedTrackIds.has(t.id));
+      pool = pool.filter(t => !usedTrackIds.has(t.id));
       console.log(`   ✅ Tracks nuevos disponibles: ${pool.length}`);
 
       // Si aún así no hay tracks, resetear
       if (pool.length === 0) {
         console.log(`⚠️ Sin tracks disponibles incluso desde Deezer. Reseteando...`);
-        this.resetUsedTracks();
+        this.resetUsedTracks(sessionId);
         pool = [...this.tracks];
       }
     }
@@ -257,7 +267,7 @@ class TrackService {
     // Si no hay resultados después de filtros, usar fallback
     if (pool.length === 0) {
       console.log(`⚠️ Sin coincidencias exactas (0/${originalSize}), usando fallback...`);
-      return this.getFallbackTrack(filters);
+      return this.getFallbackTrack(filters, sessionId);
     }
 
     // Selección aleatoria
@@ -265,7 +275,7 @@ class TrackService {
     const selected = pool[randomIndex];
 
     // ✅ NUEVO: Marcar como usado ANTES de retornar
-    this.markTrackAsUsed(selected.id);
+    this.markTrackAsUsed(selected.id, sessionId);
 
     console.log(`✅ Seleccionado: "${selected.title}" - ${selected.artist}`);
     console.log(`   Pool: ${pool.length}/${originalSize} tracks\n`);
@@ -281,18 +291,19 @@ class TrackService {
    * 🔄 Fallback cuando no hay coincidencias exactas
    * ✅ MODIFICADO: También excluye tracks usados
    */
-  getFallbackTrack(filters) {
+  getFallbackTrack(filters, sessionId = filters.sessionId || 'default') {
+    const usedTrackIds = this._getUsedTrackIds(sessionId);
     // Intento 1: Solo dificultad (excluyendo usados)
     if (filters.difficulty && filters.difficulty !== 'ANY') {
       const pool = this.tracks.filter(t =>
         t.difficulty &&
         t.difficulty.toLowerCase() === filters.difficulty.toLowerCase() &&
-        !this.usedTrackIds.has(t.id)
+        !usedTrackIds.has(t.id)
       );
       if (pool.length > 0) {
         console.log(`   Fallback 1 (solo dificultad): ${pool.length} tracks`);
         const selected = pool[Math.floor(Math.random() * pool.length)];
-        this.markTrackAsUsed(selected.id);
+        this.markTrackAsUsed(selected.id, sessionId);
         return selected;
       }
     }
@@ -302,31 +313,31 @@ class TrackService {
       const pool = this.tracks.filter(t =>
         t.genre &&
         t.genre.toUpperCase() === filters.genre.toUpperCase() &&
-        !this.usedTrackIds.has(t.id)
+        !usedTrackIds.has(t.id)
       );
       if (pool.length > 0) {
         console.log(`   Fallback 2 (solo género): ${pool.length} tracks`);
         const selected = pool[Math.floor(Math.random() * pool.length)];
-        this.markTrackAsUsed(selected.id);
+        this.markTrackAsUsed(selected.id, sessionId);
         return selected;
       }
     }
 
     // Intento 3: Cualquier track NO usado
-    const availableTracks = this.tracks.filter(t => !this.usedTrackIds.has(t.id));
+    const availableTracks = this.tracks.filter(t => !usedTrackIds.has(t.id));
 
     if (availableTracks.length > 0) {
       console.log(`   Fallback 3: Track aleatorio de ${availableTracks.length} disponibles`);
       const selected = availableTracks[Math.floor(Math.random() * availableTracks.length)];
-      this.markTrackAsUsed(selected.id);
+      this.markTrackAsUsed(selected.id, sessionId);
       return selected;
     }
 
     // Último recurso: Resetear y usar cualquiera
     console.log(`⚠️ No quedan tracks disponibles. Reseteando...`);
-    this.resetUsedTracks();
+    this.resetUsedTracks(sessionId);
     const selected = this.tracks[Math.floor(Math.random() * this.tracks.length)];
-    this.markTrackAsUsed(selected.id);
+    this.markTrackAsUsed(selected.id, sessionId);
     return selected;
   }
 

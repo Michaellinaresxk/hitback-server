@@ -1,5 +1,7 @@
 # 🎵 Sistema Híbrido: Deezer API + PostgreSQL
 
+> Historical subsystem notes. `TrackServiceV2` remains mounted at `/api/v2/tracks`, but it is not the provider used by game-session rounds. Several migration/setup examples below are not current. See [`README.md`](README.md) and [`TRACKS.md`](TRACKS.md).
+
 ## Resumen Ejecutivo
 
 Has migrado exitosamente de un sistema estático (`tracks.json` con 217 canciones) a un **sistema híbrido escalable** que combina:

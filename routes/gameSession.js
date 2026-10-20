@@ -1,6 +1,6 @@
 /**
  * 🎮 Game Session Routes - API sin QR
- * 
+ *
  * Endpoints:
  * POST   /api/v2/game/session          - Crear nueva sesión
  * POST   /api/v2/game/session/:id/start - Iniciar juego
@@ -11,7 +11,7 @@
  * GET    /api/v2/game/sessions          - Listar sesiones
  * DELETE /api/v2/game/session/:id       - Eliminar sesión
  * GET    /api/v2/game/health            - Health check
- * 
+ *
  * ⚠️ NOTA: Este archivo va en /routes/gameSession.js
  * ⚠️ Los servicios están en /services/
  */
@@ -33,14 +33,14 @@ const gameService = new GameSessionService();
 /**
  * POST /api/v2/game/session
  * Crear nueva sesión de juego
- * 
+ *
  * Body:
  * {
  *   players: ["Ana", "Bob", "Cat"],
  *   genres: ["ROCK", "POP"],
  *   decades: ["1980s", "1990s"],
  *   difficulty: "MEDIUM",
- *   targetScore: 15,
+ *   targetScore: 22,
  *   timeLimit: 1200
  * }
  */
@@ -61,7 +61,7 @@ router.post('/session', (req, res) => {
     console.error('❌ Error creando sesión:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -82,12 +82,12 @@ router.post('/session/:id/start', (req, res) => {
 
     const result = gameService.startGame(id);
 
-    res.json(result);
+    res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
     console.error('❌ Error iniciando juego:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -99,7 +99,7 @@ router.post('/session/:id/start', (req, res) => {
 /**
  * POST /api/v2/game/session/:id/round
  * Obtener siguiente ronda (track + pregunta)
- * 
+ *
  * Body (opcional):
  * {
  *   forceQuestionType: "artist"  // Para carta SNIPER
@@ -119,7 +119,7 @@ router.post('/session/:id/round', async (req, res) => {
     console.error('❌ Error obteniendo ronda:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -131,7 +131,7 @@ router.post('/session/:id/round', async (req, res) => {
 /**
  * POST /api/v2/game/session/:id/bet
  * Registrar apuesta de un jugador
- * 
+ *
  * Body:
  * {
  *   playerId: "player_1",
@@ -146,7 +146,7 @@ router.post('/session/:id/bet', (req, res) => {
     if (!playerId || tokens === undefined) {
       return res.status(400).json({
         success: false,
-        error: 'playerId y tokens son requeridos'
+        error: 'playerId y tokens son requeridos',
       });
     }
 
@@ -154,12 +154,12 @@ router.post('/session/:id/bet', (req, res) => {
 
     const result = gameService.placeBet(id, playerId, tokens);
 
-    res.json(result);
+    res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
     console.error('❌ Error registrando apuesta:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -171,7 +171,7 @@ router.post('/session/:id/bet', (req, res) => {
 /**
  * POST /api/v2/game/session/:id/reveal
  * Revelar respuesta y asignar puntos
- * 
+ *
  * Body:
  * {
  *   winnerId: "player_2"  // null si nadie acertó
@@ -186,12 +186,12 @@ router.post('/session/:id/reveal', (req, res) => {
 
     const result = gameService.revealAnswer(id, winnerId);
 
-    res.json(result);
+    res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
     console.error('❌ Error revelando respuesta:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -219,7 +219,7 @@ router.get('/session/:id', (req, res) => {
     console.error('❌ Error obteniendo estado:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -239,13 +239,13 @@ router.get('/sessions', (req, res) => {
     res.json({
       success: true,
       count: sessions.length,
-      sessions
+      sessions,
     });
   } catch (error) {
     console.error('❌ Error listando sesiones:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -271,7 +271,7 @@ router.delete('/session/:id', (req, res) => {
     console.error('❌ Error eliminando sesión:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
@@ -283,7 +283,7 @@ router.delete('/session/:id', (req, res) => {
 /**
  * POST /api/v2/game/session/:id/power
  * Usar carta de poder
- * 
+ *
  * Body:
  * {
  *   playerId: "player_1",
@@ -294,29 +294,40 @@ router.delete('/session/:id', (req, res) => {
 router.post('/session/:id/power', (req, res) => {
   try {
     const { id } = req.params;
-    const { playerId, cardType, targetPlayerId } = req.body;
+    const { playerId, cardId, targetPlayerId } = req.body;
 
-    if (!playerId || !cardType) {
+    if (!playerId || !cardId) {
       return res.status(400).json({
         success: false,
-        error: 'playerId y cardType son requeridos'
+        error: 'playerId y cardId son requeridos',
       });
     }
 
-    console.log(`⚡ Poder: ${cardType} por ${playerId}`);
+    console.log(`⚡ Power Card: ${cardId} por ${playerId}`);
 
-    const result = gameService.usePowerCard(id, playerId, cardType, targetPlayerId);
+    const result = gameService.usePowerCard(id, playerId, cardId, targetPlayerId);
 
-    res.json(result);
+    res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
     console.error('❌ Error usando poder:', error);
     res.status(500).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 });
-
+/**
+ * POST /api/v2/game/session/:id/double-platinum
+ * Activar bonus de tile
+ */
+router.post('/session/:id/double-platinum', (req, res) => {
+  try {
+    const result = gameService.activateDoublePlatinum(req.params.id);
+    res.status(result.success ? 200 : 400).json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // ═══════════════════════════════════════════════════════════
 // 🎴 REACTION CARD — APLICAR DELTA DE PUNTOS
@@ -351,7 +362,9 @@ router.patch('/session/:id/players/:playerId/score', (req, res) => {
       });
     }
 
-    console.log(`🎴 Score delta: sesión ${id}, jugador ${playerId}, delta ${delta > 0 ? '+' : ''}${delta} (${reason})`);
+    console.log(
+      `🎴 Score delta: sesión ${id}, jugador ${playerId}, delta ${delta > 0 ? '+' : ''}${delta} (${reason})`
+    );
 
     const result = gameService.applyScoreDelta(id, playerId, delta, reason);
 
@@ -383,8 +396,9 @@ router.get('/health', (req, res) => {
     service: 'GameSessionService',
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    activeSessions: gameService.getAllSessions().length
+    activeSessions: gameService.getAllSessions().length,
   });
 });
 
 module.exports = router;
+module.exports.gameService = gameService;

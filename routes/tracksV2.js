@@ -11,7 +11,7 @@ const router = express.Router();
 const TrackServiceV2 = require('../services/TrackServiceV2');
 const logger = require('../utils/logger');
 
-// Inicializar servicio
+// El servicio puede inyectarse en tests para evitar conexiones externas.
 const trackService = new TrackServiceV2();
 
 /**
@@ -198,3 +198,4 @@ router.get('/session/:sessionId/used', async (req, res) => {
 });
 
 module.exports = router;
+module.exports.trackService = trackService;

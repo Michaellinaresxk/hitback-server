@@ -154,17 +154,17 @@ describe('PowerCardService', () => {
       const result = PowerCardService.processPlayerAnswer('player1', true);
 
       const qrCode = result.cardAwarded.qrCode;
-      expect(qrCode).toMatch(/^HITBACK_POWERCARD_/);
+      expect(qrCode).toMatch(/^HITBACK_PC_/);
     });
 
-    test('carta debe aparecer en inventario', () => {
+    test('combo habilita el escaneo sin duplicar una carta en inventario', () => {
       PowerCardService.processPlayerAnswer('player1', true);
       PowerCardService.processPlayerAnswer('player1', true);
       PowerCardService.processPlayerAnswer('player1', true);
 
       const inventory = PowerCardService.getPlayerInventory('player1');
 
-      expect(inventory['power_replay_001']).toBe(1);
+      expect(inventory['power_replay_001']).toBeUndefined();
     });
   });
 
@@ -181,23 +181,23 @@ describe('PowerCardService', () => {
     });
 
     test('addCardToInventory debe añadir carta', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
-      const inventory = PowerCardService.getPlayerInventory('player1');
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
+      const inventory = PowerCardService.getPlayerInventory('player1', 'session1');
 
       expect(inventory['power_replay_001']).toBe(1);
     });
 
     test('debe permitir múltiples cartas del mismo tipo', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
-      const inventory = PowerCardService.getPlayerInventory('player1');
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
+      const inventory = PowerCardService.getPlayerInventory('player1', 'session1');
 
       expect(inventory['power_replay_001']).toBe(2);
     });
 
     test('removeCardFromInventory debe remover carta', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
-      PowerCardService.removeCardFromInventory('player1', 'power_replay_001');
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
+      PowerCardService.removeCardFromInventory('player1', 'power_replay_001', 'session1');
       const inventory = PowerCardService.getPlayerInventory('player1');
 
       expect(inventory['power_replay_001']).toBeUndefined();
@@ -225,7 +225,7 @@ describe('PowerCardService', () => {
   describe('Activación de Cartas', () => {
 
     test('activatePowerCard debe marcar carta como activa', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
       const result = PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
 
       expect(result.activated).toBe(true);
@@ -233,7 +233,7 @@ describe('PowerCardService', () => {
     });
 
     test('debe retornar efecto correcto', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
       const result = PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
 
       expect(result.effect).toBeDefined();
@@ -251,21 +251,21 @@ describe('PowerCardService', () => {
   describe('Aplicar Efectos', () => {
 
     test('applyActiveCardEffect debe multiplicar puntos', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
       PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
 
-      const result = PowerCardService.applyActiveCardEffect('player1', 10);
+      const result = PowerCardService.applyActiveCardEffect('player1', 10, 'session1');
 
       expect(result.finalPoints).toBe(20);
       expect(result.multiplier).toBe(2);
     });
 
     test('debe remover carta después de aplicar efecto', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
       PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
-      PowerCardService.applyActiveCardEffect('player1', 10);
+      PowerCardService.applyActiveCardEffect('player1', 10, 'session1');
 
-      const inventory = PowerCardService.getPlayerInventory('player1');
+      const inventory = PowerCardService.getPlayerInventory('player1', 'session1');
       expect(Object.keys(inventory).length).toBe(0);
     });
 
@@ -278,10 +278,10 @@ describe('PowerCardService', () => {
 
       testCases.forEach(testCase => {
         PowerCardService.clearAll();
-        PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
+        PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
         PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
 
-        const result = PowerCardService.applyActiveCardEffect('player1', testCase.base);
+        const result = PowerCardService.applyActiveCardEffect('player1', testCase.base, 'session1');
         expect(result.finalPoints).toBe(testCase.expected);
       });
     });
@@ -295,52 +295,56 @@ describe('PowerCardService', () => {
 
     test('flujo completo: combo -> otorgamiento -> activación -> efecto', () => {
       // Paso 1: Detectar combo
-      const comboResult = PowerCardService.processPlayerAnswer('player1', true);
-      PowerCardService.processPlayerAnswer('player1', true);
-      const result3 = PowerCardService.processPlayerAnswer('player1', true);
+      const context = { gameSessionId: 'session1' };
+      const comboResult = PowerCardService.processPlayerAnswer('player1', true, context);
+      PowerCardService.processPlayerAnswer('player1', true, context);
+      const result3 = PowerCardService.processPlayerAnswer('player1', true, context);
 
       expect(result3.comboDetected).toBe(true);
       expect(result3.cardAwarded).toBeDefined();
 
-      // Paso 2: Verificar inventario
-      const inventory = PowerCardService.getPlayerInventory('player1');
-      expect(inventory['power_replay_001']).toBe(1);
+      // Paso 2: El combo concede una carta física; el inventario espera el QR.
+      const inventory = PowerCardService.getPlayerInventory('player1', 'session1');
+      expect(inventory['power_replay_001']).toBeUndefined();
+
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
 
       // Paso 3: Activar carta
       const activated = PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
       expect(activated.activated).toBe(true);
 
       // Paso 4: Aplicar efecto
-      const effect = PowerCardService.applyActiveCardEffect('player1', 10);
+      const effect = PowerCardService.applyActiveCardEffect('player1', 10, 'session1');
       expect(effect.finalPoints).toBe(20);
 
       // Paso 5: Verificar consumo
-      const finalInventory = PowerCardService.getPlayerInventory('player1');
+      const finalInventory = PowerCardService.getPlayerInventory('player1', 'session1');
       expect(Object.keys(finalInventory).length).toBe(0);
     });
 
-    test('múltiples combos en la misma partida', () => {
+    test('múltiples combos no agregan cartas sin validar un QR físico', () => {
       // Combo 1
-      PowerCardService.processPlayerAnswer('player1', true);
-      PowerCardService.processPlayerAnswer('player1', true);
-      const result1 = PowerCardService.processPlayerAnswer('player1', true);
+      const context = { gameSessionId: 'session1' };
+      PowerCardService.processPlayerAnswer('player1', true, context);
+      PowerCardService.processPlayerAnswer('player1', true, context);
+      const result1 = PowerCardService.processPlayerAnswer('player1', true, context);
 
       expect(result1.comboDetected).toBe(true);
 
       // Usar primera carta
       PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
-      PowerCardService.applyActiveCardEffect('player1', 10);
+      PowerCardService.applyActiveCardEffect('player1', 10, 'session1');
 
       // Combo 2
-      PowerCardService.processPlayerAnswer('player1', true);
-      PowerCardService.processPlayerAnswer('player1', true);
-      const result2 = PowerCardService.processPlayerAnswer('player1', true);
+      PowerCardService.processPlayerAnswer('player1', true, context);
+      PowerCardService.processPlayerAnswer('player1', true, context);
+      const result2 = PowerCardService.processPlayerAnswer('player1', true, context);
 
       expect(result2.comboDetected).toBe(true);
 
-      // Debe tener otra carta en inventario
-      const inventory = PowerCardService.getPlayerInventory('player1');
-      expect(inventory['power_replay_001']).toBe(1);
+      // La carta física se agrega solo al validar el QR escaneado.
+      const inventory = PowerCardService.getPlayerInventory('player1', 'session1');
+      expect(inventory['power_replay_001']).toBeUndefined();
     });
   });
 
@@ -351,28 +355,28 @@ describe('PowerCardService', () => {
   describe('Múltiples Jugadores', () => {
 
     test('inventarios deben ser independientes', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
-      PowerCardService.addCardToInventory('player2', 'power_replay_001', 2);
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
+      PowerCardService.addCardToInventory('player2', 'power_replay_001', 2, 'session1');
 
-      const inv1 = PowerCardService.getPlayerInventory('player1');
-      const inv2 = PowerCardService.getPlayerInventory('player2');
+      const inv1 = PowerCardService.getPlayerInventory('player1', 'session1');
+      const inv2 = PowerCardService.getPlayerInventory('player2', 'session1');
 
       expect(inv1['power_replay_001']).toBe(1);
       expect(inv2['power_replay_001']).toBe(2);
     });
 
     test('cartas activadas deben ser independientes', () => {
-      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1);
-      PowerCardService.addCardToInventory('player2', 'power_replay_001', 1);
+      PowerCardService.addCardToInventory('player1', 'power_replay_001', 1, 'session1');
+      PowerCardService.addCardToInventory('player2', 'power_replay_001', 1, 'session1');
 
       PowerCardService.activatePowerCard('player1', 'power_replay_001', 'session1');
 
       // Solo player1 debe tener carta activa
-      const effect1 = PowerCardService.applyActiveCardEffect('player1', 10);
+      const effect1 = PowerCardService.applyActiveCardEffect('player1', 10, 'session1');
       expect(effect1.finalPoints).toBe(20);
 
       // Player2 todavía tiene carta
-      const inv2 = PowerCardService.getPlayerInventory('player2');
+      const inv2 = PowerCardService.getPlayerInventory('player2', 'session1');
       expect(inv2['power_replay_001']).toBe(1);
     });
   });

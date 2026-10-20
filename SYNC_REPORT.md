@@ -1,5 +1,9 @@
 # 🔄 REPORTE DE SINCRONIZACIÓN FRONTEND ↔ BACKEND
 
+> Snapshot histórico del 2026-02-27; el estado “100%” no es una garantía vigente. La integración actual tiene contratos que deben verificarse con [`../documentation/HITBACK_SYSTEM_DOCS.md`](../documentation/HITBACK_SYSTEM_DOCS.md).
+
+> Revisión 2026-10-20: el test HTTP actual cubre un flujo backend determinista de create/start, scan Power Card, round, bet, activation REPLAY y reveal. No prueba Deezer/PostgreSQL, ni sincronización UI Expo, ni toda la tabla de endpoints y casos edge de este reporte. Las cifras 10/10, checks ✅ y “PRODUCCIÓN-READY” de abajo son afirmaciones históricas sin verificación vigente.
+
 **Fecha:** 2026-02-27
 **Status:** ✅ SINCRONIZADO (100%)
 **Problemas corregidos:** 5 incompatibilidades críticas
@@ -8,13 +12,13 @@
 
 ## 📊 RESUMEN EJECUTIVO
 
-| Métrica | Antes | Después |
-|---------|-------|---------|
-| **Endpoints sincronizados** | 7/10 (70%) | 10/10 (100%) |
-| **Incompatibilidades críticas** | 2 | 0 |
-| **Incompatibilidades importantes** | 2 | 0 |
-| **Inconsistencias menores** | 1 | 0 |
-| **Status general** | ⚠️ DESINCRONIZADO | ✅ SINCRONIZADO |
+| Métrica                            | Antes             | Después         |
+| ---------------------------------- | ----------------- | --------------- |
+| **Endpoints sincronizados**        | 7/10 (70%)        | 10/10 (100%)    |
+| **Incompatibilidades críticas**    | 2                 | 0               |
+| **Incompatibilidades importantes** | 2                 | 0               |
+| **Inconsistencias menores**        | 1                 | 0               |
+| **Status general**                 | ⚠️ DESINCRONIZADO | ✅ SINCRONIZADO |
 
 ---
 
@@ -23,6 +27,7 @@
 ### 1. ✅ placeBet() - Formato de respuesta incompatible
 
 **Problema:**
+
 ```javascript
 // ANTES (Backend devolvía):
 {
@@ -46,15 +51,16 @@
 ```
 
 **Solución aplicada:**
+
 ```javascript
 // GameSessionService.js línea 523-530
 return {
   success: true,
   bet: {
-    tokens: tokenValue,           // ✅ CORREGIDO
-    multiplier: tokenValue
+    tokens: tokenValue, // ✅ CORREGIDO
+    multiplier: tokenValue,
   },
-  playerTokens: player.availableTokens.length  // ✅ CORREGIDO
+  playerTokens: player.availableTokens.length, // ✅ CORREGIDO
 };
 ```
 
@@ -65,6 +71,7 @@ return {
 ### 2. ✅ revealAnswer() - Campos faltantes en Player
 
 **Problema:**
+
 ```javascript
 // ANTES (Backend devolvía):
 players: session.players.map(p => ({
@@ -94,25 +101,26 @@ players: session.players.map(p => ({
 ```
 
 **Solución aplicada:**
+
 ```javascript
 // GameSessionService.js línea 296-315
-players: session.players.map(p => ({
+players: session.players.map((p) => ({
   id: p.id,
   name: p.name,
   score: p.score,
   tokens: p.availableTokens.length,
-  powerCards: p.powerCards || [],   // ✅ AGREGADO
+  powerCards: p.powerCards || [], // ✅ AGREGADO
   stats: {
     correctAnswers: p.stats.correctAnswers || 0,
     wrongAnswers: p.stats.wrongAnswers || 0,
-    tokensWon: p.stats.tokensWon || 0,        // ✅ AGREGADO
-    tokensLost: p.stats.tokensLost || 0,      // ✅ AGREGADO
+    tokensWon: p.stats.tokensWon || 0, // ✅ AGREGADO
+    tokensLost: p.stats.tokensLost || 0, // ✅ AGREGADO
     tokensUsed: p.stats.tokensUsed || [],
     combosCompleted: p.stats.combosCompleted || 0,
     powerCardsUsed: p.stats.powerCardsUsed || 0,
-    totalComboStreak: p.stats.totalComboStreak || 0
-  }
-}))
+    totalComboStreak: p.stats.totalComboStreak || 0,
+  },
+}));
 ```
 
 **Impacto:** Frontend recibe todos los campos necesarios para renderizar correctamente el estado de los jugadores.
@@ -122,6 +130,7 @@ players: session.players.map(p => ({
 ### 3. ✅ createSession() - Stats inicializados incorrectamente
 
 **Problema:**
+
 ```javascript
 // ANTES (Backend inicializaba):
 stats: {
@@ -144,6 +153,7 @@ stats: {
 ```
 
 **Solución aplicada:**
+
 ```javascript
 // GameSessionService.js línea 50-59
 stats: {
@@ -167,6 +177,7 @@ stats: {
 **Problema:** No se incrementaba `tokensWon` cuando un jugador ganaba puntos con tokens.
 
 **Solución aplicada:**
+
 ```javascript
 // GameSessionService.js línea 147-151
 console.log(`   Token: +${tokenBonus} pts`);
@@ -188,9 +199,10 @@ if (tokenBonus > 0) {
 **Solución aplicada:**
 
 **Caso A - Cuando hay un ganador (otros jugadores pierden):**
+
 ```javascript
 // GameSessionService.js línea 237-251
-session.players.forEach(player => {
+session.players.forEach((player) => {
   if (player.id !== winnerId) {
     // ... resetear streak ...
 
@@ -204,9 +216,10 @@ session.players.forEach(player => {
 ```
 
 **Caso B - Cuando nadie acierta (todos pierden):**
+
 ```javascript
 // GameSessionService.js línea 255-268
-session.players.forEach(player => {
+session.players.forEach((player) => {
   // ... resetear streak ...
 
   // ✅ AGREGADO: Registrar tokens perdidos cuando nadie acierta
@@ -223,24 +236,25 @@ session.players.forEach(player => {
 
 ## ✅ ENDPOINTS VERIFICADOS - SINCRONIZACIÓN COMPLETA
 
-| Endpoint | Frontend | Backend | Sincronización |
-|----------|----------|---------|----------------|
-| **Create Session** | ✅ | ✅ | 🟢 100% |
-| **Start Game** | ✅ | ✅ | 🟢 100% |
-| **Next Round** | ✅ | ✅ | 🟢 100% |
-| **Place Bet** | ✅ | ✅ | 🟢 100% ← CORREGIDO |
-| **Reveal Answer** | ✅ | ✅ | 🟢 100% ← CORREGIDO |
-| **Get Status** | ✅ | ✅ | 🟢 100% |
-| **Get All Sessions** | ✅ | ✅ | 🟢 100% |
-| **Delete Session** | ✅ | ✅ | 🟢 100% |
-| **Use Power Card** | ✅ | ✅ | 🟢 100% |
-| **Health Check** | ✅ | ✅ | 🟢 100% |
+| Endpoint             | Frontend | Backend | Sincronización      |
+| -------------------- | -------- | ------- | ------------------- |
+| **Create Session**   | ✅       | ✅      | 🟢 100%             |
+| **Start Game**       | ✅       | ✅      | 🟢 100%             |
+| **Next Round**       | ✅       | ✅      | 🟢 100%             |
+| **Place Bet**        | ✅       | ✅      | 🟢 100% ← CORREGIDO |
+| **Reveal Answer**    | ✅       | ✅      | 🟢 100% ← CORREGIDO |
+| **Get Status**       | ✅       | ✅      | 🟢 100%             |
+| **Get All Sessions** | ✅       | ✅      | 🟢 100%             |
+| **Delete Session**   | ✅       | ✅      | 🟢 100%             |
+| **Use Power Card**   | ✅       | ✅      | 🟢 100%             |
+| **Health Check**     | ✅       | ✅      | 🟢 100%             |
 
 ---
 
 ## 📋 CHECKLIST DE VALIDACIÓN
 
 ### Flujo de Juego
+
 - ✅ Crear sesión con players → Backend devuelve session con stats correctos
 - ✅ Iniciar juego → Backend cambia status a 'playing'
 - ✅ Siguiente ronda → Backend devuelve track con audioUrl de Deezer/PostgreSQL
@@ -252,6 +266,7 @@ session.players.forEach(player => {
 - ✅ Finalizar juego → Backend detecta ganador cuando se alcanza targetScore
 
 ### Campos de Datos
+
 - ✅ `Player.tokens` - Número de tokens disponibles
 - ✅ `Player.powerCards` - Array de PowerCards en inventario
 - ✅ `Player.stats.tokensWon` - Total de puntos ganados con tokens
@@ -272,6 +287,7 @@ session.players.forEach(player => {
 - ✅ `PowerCardEffect.finalPointsAfterCard` - Puntos finales con carta
 
 ### Casos Edge
+
 - ✅ Nadie acierta → Todos los jugadores pierden tokens apostados
 - ✅ Ganador sin apuesta → Solo recibe puntos base
 - ✅ Ganador con apuesta → Recibe base + token bonus
@@ -288,11 +304,13 @@ session.players.forEach(player => {
 ### ✅ SINCRONIZACIÓN COMPLETA ALCANZADA
 
 **Antes de las correcciones:**
+
 - 🔴 2 endpoints con incompatibilidades críticas
 - 🟡 2 endpoints con campos faltantes
 - 🟠 1 endpoint con inconsistencias de nombres
 
 **Después de las correcciones:**
+
 - 🟢 10/10 endpoints 100% sincronizados
 - 🟢 Todos los campos coinciden entre frontend y backend
 - 🟢 Tipos de datos consistentes
@@ -350,6 +368,22 @@ session.players.forEach(player => {
 El sistema frontend-backend de HITBACK ahora está **100% sincronizado**. Todas las incompatibilidades críticas han sido corregidas y los datos fluyen correctamente entre ambos lados.
 
 El juego puede funcionar completamente con:
+
+2. **`/server/routes/tracksV2.js`**
+   - Corregir uso de `res.sendSuccess()` en lugar de `successResponse()`
+   - Corregir uso de `res.sendError()` en lugar de `errorResponse()`
+
+3. **`/server/server.js`**
+   - Agregar ruta `/api/v2/tracks` con `tracksV2Routes`
+
+---
+
+## 🏆 CONCLUSIÓN
+
+El sistema frontend-backend de HITBACK ahora está **100% sincronizado**. Todas las incompatibilidades críticas han sido corregidas y los datos fluyen correctamente entre ambos lados.
+
+El juego puede funcionar completamente con:
+
 - ✅ Sistema de apuestas con tokens
 - ✅ Sistema de combos (3 respuestas consecutivas)
 - ✅ Sistema de PowerCards con QR scanner
