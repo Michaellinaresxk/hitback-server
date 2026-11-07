@@ -5,7 +5,7 @@ function bearerToken(req) {
 }
 
 function createSessionCapabilityMiddleware(gameService, { tokenSelectSession = false } = {}) {
-  return (req, res, next) => {
+  return async (req, res, next) => {
     const token = bearerToken(req);
     if (!token) {
       return res.status(401).json({ success: false, error: 'Session capability required' });
@@ -13,13 +13,20 @@ function createSessionCapabilityMiddleware(gameService, { tokenSelectSession = f
 
     const sessionId =
       req.params.id || req.body?.sessionId || req.query.sessionId || null;
-    const session = sessionId
-      ? gameService.sessions.get(sessionId)
-      : tokenSelectSession
-        ? Array.from(gameService.sessions.values()).find(
-            (candidate) => gameService.verifyCapability(candidate.id, token),
-          )
-        : null;
+    let session;
+    try {
+      session = sessionId
+        ? await gameService.getSession(sessionId)
+        : tokenSelectSession
+          ? await gameService.findSessionByCapabilityToken(token)
+          : null;
+    } catch (error) {
+      console.error('❌ Session capability lookup failed:', error);
+      return res.status(503).json({
+        success: false,
+        error: 'El almacenamiento de sesiones no está disponible',
+      });
+    }
 
     if (!session || !gameService.verifyCapability(session.id, token)) {
       return res.status(401).json({ success: false, error: 'Invalid session capability' });

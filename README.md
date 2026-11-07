@@ -28,7 +28,9 @@ npm run dev
 | Power Cards físicas e inventario                 | `routes/powerCard.js`, `controllers/powerCardController.js`, `services/PowerCardService.js` |
 | Combos                                           | `services/ComboTracker.js`, llamado durante reveal                                          |
 
-Las rondas del juego de Expo usan `/api/v2/game/*`; `GameSessionService.nextRound()` usa `TrackService` y puede consultar Deezer, con tracks usados guardados en memoria por sessionId. `TrackServiceV2` con PostgreSQL está montado como recurso separado `/api/v2/tracks/*`; no es el servicio que crea las rondas de sesión. Si PostgreSQL no está disponible, TrackServiceV2 intenta fallback en memoria, sin persistencia. No prometas disponibilidad “ilimitada” ni recuperación durable.
+Las rondas del juego de Expo usan `/api/v2/game/*`; `GameSessionService.nextRound()` usa `TrackService` y puede consultar Deezer, con tracks usados guardados en memoria por sessionId. `TrackServiceV2` con PostgreSQL está montado como recurso separado `/api/v2/tracks/*`; no es el servicio que crea las rondas de sesión.
+
+Las sesiones de `/api/v2/game/*` se guardan como snapshots JSONB en PostgreSQL. Antes de usar esas rutas, configura la conexión `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` y aplica una vez `npm run migrate:sessions`. Las mutaciones de sesión devuelven un error si no se puede persistir el snapshot; no hay fallback exitoso en memoria. Las mutaciones se serializan dentro de un único proceso, no entre réplicas. Los inventarios y streaks de Power Cards permanecen fuera del snapshot de sesión.
 
 ## API que consume la app
 
@@ -54,8 +56,8 @@ Salvo `POST /session` y `/health`, las rutas de sesión requieren
 `Authorization: Bearer <capabilityToken>`. El token se genera aleatoriamente
 con criptografía al crear la sesión, se vincula a una única sesión y no se
 incluye en lecturas posteriores. No se usa Origin, CORS ni `x-expo-token` como
-autenticación. Las sesiones y el inventario se mantienen en memoria; reiniciar
-el backend invalida sesiones y el token que Expo mantiene sólo en memoria.
+autenticación. El inventario Power Card conserva su propia política de estado;
+los snapshots de sesión descritos arriba sí sobreviven un reinicio del backend.
 
 ### Power Cards `/api/cards`
 
@@ -77,7 +79,13 @@ La app Expo no usa `POST /api/qr/scan/:qrCode` para iniciar una canción. No doc
 
 ## Configuración
 
-`PORT` y `HOST` tienen defaults `3000` y `0.0.0.0`. `TrackServiceV2` lee `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` (`Hitback` por defecto); estas variables son para `/api/v2/tracks/*`, no para elegir rondas de sesión. La integración actual de Deezer no declara una API key.
+`PORT` y `HOST` tienen defaults `3000` y `0.0.0.0`. `GameSessionPersistence` y `TrackServiceV2` leen `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD` y `DB_NAME` (`Hitback` por defecto). La migración de snapshots requerida por las rutas de sesión se aplica con:
+
+```bash
+npm run migrate:sessions
+```
+
+La integración actual de Deezer no declara una API key.
 
 No hay `.env.example` comprometido/verificado; `server/.env` es local y está ignorado. No compartas secretos ni copies credenciales a documentación. Revisa `server/.gitIgnore` antes de crear archivos de entorno.
 
@@ -93,7 +101,7 @@ npm run validate
 
 Las pruebas Jest están bajo `__tests__/`. `npm test` ejecuta Jest serialmente; `npm run test:coverage` genera coverage sobre directorios del backend (no implica cobertura completa del comportamiento). `npm run test:integration` ejecuta los tests Jest de `__tests__/integration`; `npm run test:unit` busca una carpeta `unit`, pero las suites unitarias actuales están en `__tests__/services`, así que no usar ese script como prueba de unidad sin corregir/verificar su patrón.
 
-`__tests__/integration/expoApi.test.js` usa Supertest y sustituye TrackService/QuestionService para no depender de Deezer o PostgreSQL. Cubre creación/inicio, scan QR, ronda, apuesta, activación REPLAY, reveal/score y el endpoint Double Platinum. No cubre una sesión E2E real con proveedor de tracks, los casos de `comboStatus` dentro de reveal, la sincronización Expo UI/World Tour, el delta de Reaction Card por HTTP ni dispositivos/cámara. En la revisión del 2026-10-20, las suites focalizadas pasaron (9 tests) y la suite Jest completa pasó (5 suites, 66 tests). Estos resultados no validan Deezer, PostgreSQL, cámara ni dispositivos.
+`__tests__/integration/expoApi.test.js` usa Supertest y sustituye TrackService/QuestionService y persistencia para mantener las pruebas deterministas. Cubre creación/inicio, scan QR, ronda, apuesta, activación REPLAY, reveal/score, persistencia simulada, recuperación de snapshot y el endpoint Double Platinum. No cubre una sesión E2E con PostgreSQL real, proveedor de tracks, Deezer, cámara ni dispositivos. La implementación actual pasó 6 suites/76 tests en Jest; esos resultados no validan el servicio PostgreSQL real ni recuperación en dispositivo.
 
 Hallazgo para una futura spec/issue: `ComboTracker` declara umbrales HOT_STREAK=3, DOUBLE_HIT=5 y TRIPLE_HIT=7, pero resetea el streak al detectar el combo de 3. En la ruta normal, los umbrales de 5 y 7 parecen inalcanzables. Hoy solo debe documentarse HOT_STREAK como comportamiento esperado hasta que se resuelva y se pruebe esa regla.
 
@@ -115,6 +123,8 @@ curl http://localhost:3000/api/audio/list
 ## Documentación relacionada
 
 - Integración completa Expo/backend: [`../documentation/HITBACK_SYSTEM_DOCS.md`](../documentation/HITBACK_SYSTEM_DOCS.md).
+- World Tour y puesta en marcha de la persistencia: [`docs/WORLD_TOUR.md`](docs/WORLD_TOUR.md).
+- Spec del contrato compartido: [`docs/specs/session-boardposition/SPEC.md`](docs/specs/session-boardposition/SPEC.md).
 - [`README_DEEZER.md`](README_DEEZER.md): notas técnicas del subsistema TrackServiceV2; no representa el proveedor de rondas de sesión actual.
 - [`MIGRATION_GUIDE.md`](MIGRATION_GUIDE.md) y [`SYNC_REPORT.md`](SYNC_REPORT.md): documentos históricos, no instrucciones operativas actuales.
 - [`TRACKS.md`](TRACKS.md): comportamiento actual del catálogo y fuentes de audio.

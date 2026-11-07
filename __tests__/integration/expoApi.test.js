@@ -3,15 +3,74 @@ const app = require('../../server');
 const gameSessionRouter = require('../../routes/gameSession');
 const tracksV2Router = require('../../routes/tracksV2');
 const PowerCardService = require('../../services/PowerCardService');
+const GameSessionPersistence = require('../../services/GameSessionPersistence');
+
+const createWorldTourRoutes = (players) =>
+  Object.fromEntries(
+    players.map((_, playerIndex) => [
+      `player_${playerIndex + 1}`,
+      Array.from({ length: 22 }, (_, position) => ({
+        position,
+        cityId: `city_${playerIndex}_${position}`,
+        emoji: '🎵',
+        tileType: 'concert',
+        act:
+          position <= 5
+            ? 'act1_underground'
+            : position <= 10
+              ? 'act2_theBuzz'
+              : position <= 15
+                ? 'act3_goingGlobal'
+                : 'act4_headliner',
+        isStart: position === 0,
+        isFinish: position === 21,
+      })),
+    ]),
+  );
+
+const sessionConfig = (players, overrides = {}) => ({
+  players,
+  worldTourRoutes: createWorldTourRoutes(players),
+  ...overrides,
+});
 
 describe('Expo HTTP contract', () => {
   let originalTrackService;
   let originalGenerateQuestion;
+  let originalPersistence;
+  let originalInitialized;
+  let persistedSnapshots;
+  let testPersistence;
   let sessionId;
 
   beforeAll(() => {
     originalTrackService = gameSessionRouter.gameService.trackService;
     originalGenerateQuestion = gameSessionRouter.gameService.questionService.generateQuestion;
+    originalPersistence = gameSessionRouter.gameService.persistence;
+    originalInitialized = gameSessionRouter.gameService.initialized;
+    persistedSnapshots = new Map();
+    testPersistence = {
+      initialize: jest.fn(async () => {}),
+      get: jest.fn(async (id) => persistedSnapshots.get(id) || null),
+      findByCapabilityToken: jest.fn(async (token) => {
+        const tokenHash =
+          GameSessionPersistence.hashCapabilityToken(token);
+        return (
+          [...persistedSnapshots.values()].find(
+            (session) => session.capabilityTokenHash === tokenHash,
+          ) || null
+        );
+      }),
+      count: jest.fn(async () => persistedSnapshots.size),
+      save: jest.fn(async (session) => {
+        const snapshot = { ...session };
+        delete snapshot.capabilityToken;
+        persistedSnapshots.set(session.id, JSON.parse(JSON.stringify(snapshot)));
+      }),
+      delete: jest.fn(async (id) => persistedSnapshots.delete(id)),
+    };
+    gameSessionRouter.gameService.persistence = testPersistence;
+    gameSessionRouter.gameService.initialized = false;
     gameSessionRouter.gameService.trackService = {
       getRandomTrack: jest.fn(async ({ sessionId: currentSessionId }) => ({
         id: `${currentSessionId}-track`,
@@ -42,13 +101,15 @@ describe('Expo HTTP contract', () => {
   afterAll(() => {
     gameSessionRouter.gameService.trackService = originalTrackService;
     gameSessionRouter.gameService.questionService.generateQuestion = originalGenerateQuestion;
+    gameSessionRouter.gameService.persistence = originalPersistence;
+    gameSessionRouter.gameService.initialized = originalInitialized;
     return tracksV2Router.trackService.pool.end();
   });
 
   test('creates and starts a game, scans a card, bets, uses it, then reveals the round', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Ada', 'Lin'], targetScore: 22 });
+      .send(sessionConfig(['Ada', 'Lin'], { targetScore: 22 }));
 
     expect(created.status).toBe(201);
     expect(created.body.session.config.targetScore).toBe(22);
@@ -105,10 +166,10 @@ describe('Expo HTTP contract', () => {
   test('requires a matching session capability for game and private Power Card state', async () => {
     const first = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Ada', 'Lin'] });
+      .send(sessionConfig(['Ada', 'Lin']));
     const second = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Grace', 'Katherine'] });
+      .send(sessionConfig(['Grace', 'Katherine']));
     const firstToken = first.body.capabilityToken;
     expect(firstToken).not.toBe(second.body.capabilityToken);
     const secondId = second.body.session.id;
@@ -142,6 +203,7 @@ describe('Expo HTTP contract', () => {
         playerId: 'player_1',
         sessionId: first.body.session.id,
       });
+
     expect(anonymousScan.status).toBe(401);
 
     const crossedScan = await request(app)
@@ -196,14 +258,83 @@ describe('Expo HTTP contract', () => {
     expect(health.status).toBe(200);
   });
 
+  test('recovers the canonical route, position, score, and capability after a server restart', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin']));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    const trackCallsBefore =
+      gameSessionRouter.gameService.trackService.getRandomTrack.mock.calls.length;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const activeRound = await request(app)
+      .post(`/api/v2/game/session/${id}/round`)
+      .set(auth(token));
+    const liveSession = gameSessionRouter.gameService.sessions.get(id);
+    liveSession.players[0].boardPosition = 9;
+    liveSession.players[0].score = 14;
+    await gameSessionRouter.gameService.persistSession(id);
+
+    gameSessionRouter.gameService.sessions.clear();
+    gameSessionRouter.gameService.initialized = false;
+    const recovered = await request(app)
+      .get(`/api/v2/game/session/${id}`)
+      .set(auth(token));
+
+    expect(recovered.status).toBe(200);
+    expect(recovered.body.session.players[0]).toMatchObject({
+      boardPosition: 9,
+      score: 14,
+    });
+    expect(recovered.body.session.worldTourRoutes.player_1).toHaveLength(22);
+    expect(gameSessionRouter.gameService.verifyCapability(id, token)).toBe(true);
+
+    const resumedRound = await request(app)
+      .post(`/api/v2/game/session/${id}/round`)
+      .set(auth(token));
+    expect(resumedRound.body.round.number).toBe(activeRound.body.round.number);
+    expect(
+      gameSessionRouter.gameService.trackService.getRandomTrack,
+    ).toHaveBeenCalledTimes(trackCallsBefore + 1);
+  });
+
+  test('requires one valid World Tour route per player when creating a session', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send({ players: ['Ada', 'Lin'] });
+
+    expect(created.status).toBe(400);
+    expect(created.body.error).toBe('Rutas de World Tour inválidas');
+  });
+
+  test('does not acknowledge or keep a mutation when its durable write fails', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin']));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    testPersistence.save.mockRejectedValueOnce(new Error('database unavailable'));
+
+    const started = await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+
+    expect(started.status).toBe(503);
+    expect(started.body.success).toBe(false);
+    expect(gameSessionRouter.gameService.getStatus(id).session.status).toBe('created');
+  });
+
   test('settles modifiers atomically before deciding game over and returns canonical scores', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Ada', 'Lin'], targetScore: 2 });
+      .send(sessionConfig(['Ada', 'Lin'], { targetScore: 2 }));
     const id = created.body.session.id;
     const token = created.body.capabilityToken;
     const session = gameSessionRouter.gameService.sessions.get(id);
     session.players[0].score = 0;
+    session.players[0].boardPosition = 19;
     await request(app)
       .post(`/api/v2/game/session/${id}/start`)
       .set(auth(token));
@@ -221,6 +352,7 @@ describe('Expo HTTP contract', () => {
 
     expect(belowTarget.status).toBe(200);
     expect(belowTarget.body.players[0].score).toBe(1);
+    expect(belowTarget.body.players[0].boardPosition).toBe(20);
     expect(belowTarget.body.results.gameOver).not.toBe(true);
 
     await request(app)
@@ -259,7 +391,7 @@ describe('Expo HTTP contract', () => {
   test('rejects activation with a card type instead of cardId or without ownership', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Ada', 'Lin'] });
+      .send(sessionConfig(['Ada', 'Lin']));
     const id = created.body.session.id;
     const token = created.body.capabilityToken;
     await request(app)
@@ -278,7 +410,7 @@ describe('Expo HTTP contract', () => {
   test('exposes the World Tour Double Platinum modifier endpoint', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Ada', 'Lin'] });
+      .send(sessionConfig(['Ada', 'Lin']));
     const id = created.body.session.id;
     const token = created.body.capabilityToken;
     await request(app)

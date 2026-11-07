@@ -12,6 +12,7 @@
     "test:unit": "jest --testPathPattern=unit",
     "test:integration": "jest --testPathPattern=integration",
     "setup": "node scripts/setup.js",
+    "migrate:sessions": "node scripts/run-migration.js 002_game_session_snapshots.sql",
     "setup:audio": "node scripts/setup-audio.js",
     "health": "curl http://localhost:3000/api/health",
     "validate": "node scripts/validate-setup.js",
