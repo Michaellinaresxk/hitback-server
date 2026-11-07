@@ -15,6 +15,7 @@ const defaultTrackService = require('./TrackService');
 const QuestionService = require('./QuestionService');
 const DeezerService = require('./DeezerService');
 const PowerCardService = require('./PowerCardService');
+const crypto = require('crypto');
 
 class GameSessionService {
   constructor({ trackService = defaultTrackService, questionService } = {}) {
@@ -64,6 +65,7 @@ class GameSessionService {
 
     const session = {
       id: sessionId,
+      capabilityToken: crypto.randomBytes(32).toString('hex'),
       status: 'created',
       createdAt: new Date().toISOString(),
       config: {
@@ -95,14 +97,23 @@ class GameSessionService {
     return {
       success: true,
       session: this._sanitizeSession(session),
+      capabilityToken: session.capabilityToken,
     };
+  }
+
+  verifyCapability(sessionId, token) {
+    const session = this.sessions.get(sessionId);
+    if (!session || typeof token !== 'string') return false;
+    const expected = Buffer.from(session.capabilityToken, 'utf8');
+    const supplied = Buffer.from(token, 'utf8');
+    return expected.length === supplied.length && crypto.timingSafeEqual(expected, supplied);
   }
 
   // ═══════════════════════════════════════════════════════════════
   // ✅ REVELAR RESPUESTA CON INTEGRACIÓN DE POWER CARDS
   // ═══════════════════════════════════════════════════════════════
 
-  revealAnswer(sessionId, winnerId = null) {
+  revealAnswer(sessionId, winnerId = null, scoreModifiers = {}) {
     const session = this.sessions.get(sessionId);
 
     if (!session || !session.currentRound) {
@@ -111,6 +122,28 @@ class GameSessionService {
 
     if (winnerId && !session.players.some((player) => player.id === winnerId)) {
       return { success: false, error: 'Jugador ganador no pertenece a la sesión' };
+    }
+
+    const modifierKeys = ['alliancePartnerId', 'featuringPartnerId', 'bSidePlayerId'];
+    const invalidModifier =
+      !scoreModifiers ||
+      typeof scoreModifiers !== 'object' ||
+      Array.isArray(scoreModifiers) ||
+      Object.keys(scoreModifiers).some((key) => !modifierKeys.includes(key)) ||
+      Object.values(scoreModifiers).some(
+        (playerId) =>
+          typeof playerId !== 'string' ||
+          !session.players.some((player) => player.id === playerId),
+      ) ||
+      (scoreModifiers.alliancePartnerId &&
+        scoreModifiers.alliancePartnerId === winnerId) ||
+      (scoreModifiers.featuringPartnerId &&
+        scoreModifiers.featuringPartnerId === winnerId) ||
+      (scoreModifiers.bSidePlayerId &&
+        scoreModifiers.bSidePlayerId !== winnerId) ||
+      (!winnerId && Object.keys(scoreModifiers).length > 0);
+    if (invalidModifier) {
+      return { success: false, error: 'Ajustes de puntuación inválidos' };
     }
 
     const round = session.currentRound;
@@ -334,6 +367,47 @@ class GameSessionService {
 
     session.currentRound = null;
 
+    // Apply every round modifier after base awards and before checking the
+    // target score. Validation above ensures no partial settlement is possible.
+    const settledModifiers = [];
+    if (winnerId && scoreModifiers.alliancePartnerId) {
+      const share = Math.floor(results.pointsAwarded / 2);
+      const winner = session.players.find((player) => player.id === winnerId);
+      const partner = session.players.find(
+        (player) => player.id === scoreModifiers.alliancePartnerId,
+      );
+      winner.score = Math.max(0, winner.score - share);
+      partner.score += share;
+      settledModifiers.push({ type: 'ALLIANCE', playerId: partner.id, points: share });
+    }
+
+    if (winnerId && scoreModifiers.featuringPartnerId) {
+      const partner = session.players.find(
+        (player) => player.id === scoreModifiers.featuringPartnerId,
+      );
+      partner.score += results.pointsAwarded;
+      settledModifiers.push({
+        type: 'FEATURING',
+        playerId: partner.id,
+        points: results.pointsAwarded,
+      });
+    }
+
+    if (winnerId && scoreModifiers.bSidePlayerId) {
+      const player = session.players.find(
+        (item) => item.id === scoreModifiers.bSidePlayerId,
+      );
+      player.score += 1;
+      settledModifiers.push({ type: 'B_SIDE', playerId: player.id, points: 1 });
+    }
+
+    if (results.winner) {
+      const settledWinner = session.players.find((player) => player.id === results.winner.id);
+      results.winner.newScore = settledWinner.score;
+    }
+
+    results.scoreModifiers = settledModifiers;
+
     // Verificar ganador del juego
     const gameWinner = this._checkWinner(session);
     if (gameWinner) {
@@ -347,12 +421,14 @@ class GameSessionService {
 
     return {
       success: true,
+      session: this._sanitizeSession(session),
       results,
       players: session.players.map((p) => ({
         id: p.id,
         name: p.name,
         score: p.score,
         tokens: p.availableTokens.length,
+        availableTokens: [...p.availableTokens],
         powerCards: p.powerCards || [],
         stats: {
           correctAnswers: p.stats.correctAnswers || 0,
@@ -378,40 +454,66 @@ class GameSessionService {
    * @param {string} reason    - para logging (MANAGEMENT_FEE, BAD_REVIEW, etc.)
    */
   applyScoreDelta(sessionId, playerId, delta, reason = 'REACTION_CARD') {
+    const result = this.applyScoreAdjustments(sessionId, [
+      { playerId, delta, reason },
+    ]);
+    if (!result.success) return result;
+    return {
+      ...result,
+      player: {
+        ...result.adjustments[0],
+        id: playerId,
+      },
+    };
+  }
+
+  applyScoreAdjustments(sessionId, adjustments) {
     const session = this.sessions.get(sessionId);
+    if (!session) return { success: false, error: 'Sesión no encontrada' };
 
-    if (!session) {
-      return { success: false, error: 'Sesión no encontrada' };
+    if (
+      !Array.isArray(adjustments) ||
+      adjustments.length === 0 ||
+      adjustments.length > 16 ||
+      adjustments.some(
+        (adjustment) =>
+          !adjustment ||
+          !session.players.some((player) => player.id === adjustment.playerId) ||
+          typeof adjustment.delta !== 'number' ||
+          !Number.isFinite(adjustment.delta) ||
+          typeof adjustment.reason !== 'string' ||
+          adjustment.reason.length === 0 ||
+          adjustment.reason.length > 64,
+      )
+    ) {
+      return { success: false, error: 'Ajustes de puntuación inválidos' };
     }
 
-    const player = session.players.find((p) => p.id === playerId);
-
-    if (!player) {
-      return { success: false, error: 'Jugador no encontrado' };
-    }
-
-    const previousScore = player.score;
-    player.score = Math.max(0, player.score + delta);
-
-    console.log(
-      `🎴 ${reason}: ${player.name} ${delta > 0 ? '+' : ''}${delta} (${previousScore} → ${player.score})`
-    );
+    const settledAdjustments = adjustments.map((adjustment) => {
+      const player = session.players.find((item) => item.id === adjustment.playerId);
+      const previousScore = player.score;
+      player.score = Math.max(0, player.score + adjustment.delta);
+      console.log(
+        `🎴 ${adjustment.reason}: ${player.name} ${adjustment.delta > 0 ? '+' : ''}${adjustment.delta} (${previousScore} → ${player.score})`,
+      );
+      return {
+        playerId: player.id,
+        previousScore,
+        newScore: player.score,
+        delta: adjustment.delta,
+        reason: adjustment.reason,
+      };
+    });
 
     return {
       success: true,
-      player: {
+      adjustments: settledAdjustments,
+      players: session.players.map((player) => ({
         id: player.id,
         name: player.name,
-        previousScore,
-        newScore: player.score,
-        delta,
-        reason,
-      },
-      players: session.players.map((p) => ({
-        id: p.id,
-        name: p.name,
-        score: p.score,
-        availableTokens: p.availableTokens,
+        score: player.score,
+        availableTokens: [...player.availableTokens],
+        stats: { ...player.stats },
       })),
     };
   }
@@ -507,6 +609,15 @@ class GameSessionService {
 
     if (!session) {
       return { success: false, error: 'Sesión no encontrada' };
+    }
+
+    if (session.status === 'finished') {
+      return {
+        success: true,
+        gameOver: true,
+        winner: this._checkWinner(session),
+        session: this._sanitizeSession(session),
+      };
     }
 
     if (session.status !== 'playing') {
@@ -869,6 +980,7 @@ class GameSessionService {
 
   _sanitizeSession(session) {
     const sanitized = { ...session };
+    delete sanitized.capabilityToken;
 
     if (sanitized.currentRound) {
       sanitized.currentRound = { ...sanitized.currentRound };

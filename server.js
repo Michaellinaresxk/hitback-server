@@ -66,8 +66,8 @@ app.use(cors({
     null
   ],
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'x-expo-token']
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
 
@@ -78,9 +78,6 @@ app.use(morgan('combined', {
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
-  skip: (req) => {
-    return req.headers['x-expo-token'] || req.headers.origin?.includes('expo');
-  }
 });
 app.use(limiter);
 

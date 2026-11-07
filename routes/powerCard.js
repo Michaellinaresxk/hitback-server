@@ -12,7 +12,10 @@
 
 const express = require('express');
 const router = express.Router();
-const powerCardController = require('../controllers/PowerCardController');
+const powerCardController = require('../controllers/powerCardController');
+const { gameService } = require('./gameSession');
+const { createSessionCapabilityMiddleware } = require('../middleware/sessionCapability');
+const authenticateSession = createSessionCapabilityMiddleware(gameService);
 
 // ═══════════════════════════════════════════════════════════════
 // 📱 ESCANEO DE QR
@@ -31,7 +34,7 @@ const powerCardController = require('../controllers/PowerCardController');
  * 3. Usuario escanea carta física
  * 4. Backend valida, parsea y asigna la carta
  */
-router.post('/scan-qr', powerCardController.scanPowerCardQR);
+router.post('/scan-qr', authenticateSession, powerCardController.scanPowerCardQR);
 
 // ═══════════════════════════════════════════════════════════════
 // 🎒 INVENTARIO
@@ -46,13 +49,13 @@ router.post('/scan-qr', powerCardController.scanPowerCardQR);
  *   summary: { totalCards, uniqueCards, availableTypes }
  * }
  */
-router.get('/inventory/:playerId', powerCardController.getPlayerInventory);
+router.get('/inventory/:playerId', authenticateSession, powerCardController.getPlayerInventory);
 
 /**
  * GET /api/cards/inventories/all
  * Obtener todos los inventarios (admin/debug)
  */
-router.get('/inventories/all', powerCardController.getAllInventories);
+router.get('/inventories/all', authenticateSession, powerCardController.getAllInventories);
 
 /**
  * GET /api/cards/printable-qrs
@@ -78,7 +81,7 @@ router.get('/printable-qrs', powerCardController.getPrintableQRs);
  * 3. Backend activa la carta
  * 4. Cuando responde correctamente, se aplica el efecto
  */
-router.post('/use', powerCardController.usePowerCard);
+router.post('/use', authenticateSession, powerCardController.usePowerCard);
 
 // ═══════════════════════════════════════════════════════════════
 // 🧪 TESTING & DEBUG
@@ -90,13 +93,13 @@ router.post('/use', powerCardController.usePowerCard);
  * 
  * Body: { playerId, cardId, count }
  */
-router.post('/test-add', powerCardController.testAddCard);
+router.post('/test-add', authenticateSession, powerCardController.testAddCard);
 
 /**
  * DELETE /api/cards/player/:playerId
  * Limpiar datos de jugador
  */
-router.delete('/player/:playerId', powerCardController.clearPlayerData);
+router.delete('/player/:playerId', authenticateSession, powerCardController.clearPlayerData);
 
 // ═══════════════════════════════════════════════════════════════
 // ❌ ERROR HANDLING

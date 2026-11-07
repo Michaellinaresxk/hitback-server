@@ -11,7 +11,7 @@
  */
 
 const PowerCardService = require('../services/PowerCardService');
-const { parsePowerCardQR, generateQRsForAllCards } = require('../utils/Qrutils');
+const { parsePowerCardQR, generateQRsForAllCards } = require('../utils/qrutils');
 const { asyncHandler } = require('../utils/errors');
 const logger = require('../utils/logger');
 
@@ -197,7 +197,7 @@ class PowerCardController {
     logger.info('📦 Fetching all inventories');
 
     try {
-      const allInventories = PowerCardService.getAllInventories();
+      const allInventories = PowerCardService.getAllInventories(req.authorizedSessionId);
 
       const enrichedData = {};
       let totalPlayers = 0;

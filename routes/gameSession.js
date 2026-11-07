@@ -22,9 +22,14 @@ const router = express.Router();
 // ✅ CORREGIDO: Ruta relativa a services/
 // Si este archivo está en routes/, entonces services/ está en ../services/
 const GameSessionService = require('../services/GameSessionService');
+const { createSessionCapabilityMiddleware } = require('../middleware/sessionCapability');
 
 // Instancia del servicio
 const gameService = new GameSessionService();
+const authenticateSession = createSessionCapabilityMiddleware(gameService);
+const authenticateSessionFromToken = createSessionCapabilityMiddleware(gameService, {
+  tokenSelectSession: true,
+});
 
 // ═══════════════════════════════════════════════════════════
 // 📋 CREAR SESIÓN
@@ -65,6 +70,9 @@ router.post('/session', (req, res) => {
     });
   }
 });
+
+// Every operation below operates on one capability-owned session.
+router.use('/session/:id', authenticateSession);
 
 // ═══════════════════════════════════════════════════════════
 // ▶️ INICIAR JUEGO
@@ -180,11 +188,11 @@ router.post('/session/:id/bet', (req, res) => {
 router.post('/session/:id/reveal', (req, res) => {
   try {
     const { id } = req.params;
-    const { winnerId } = req.body;
+    const { winnerId, scoreModifiers = {} } = req.body || {};
 
     console.log(`✅ Revelando respuesta: sesión ${id}, ganador ${winnerId || 'nadie'}`);
 
-    const result = gameService.revealAnswer(id, winnerId);
+    const result = gameService.revealAnswer(id, winnerId, scoreModifiers);
 
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
@@ -232,9 +240,15 @@ router.get('/session/:id', (req, res) => {
  * GET /api/v2/game/sessions
  * Listar todas las sesiones activas
  */
-router.get('/sessions', (req, res) => {
+router.get('/sessions', authenticateSessionFromToken, (req, res) => {
   try {
-    const sessions = gameService.getAllSessions();
+    const sessions = [req.authorizedSession].map((session) => ({
+      id: session.id,
+      status: session.status,
+      players: session.players.length,
+      round: session.round,
+      createdAt: session.createdAt,
+    }));
 
     res.json({
       success: true,
@@ -329,13 +343,26 @@ router.post('/session/:id/double-platinum', (req, res) => {
   }
 });
 
+/**
+ * POST /api/v2/game/session/:id/score-settlement
+ * Atomically apply non-round score adjustments and return canonical players.
+ */
+router.post('/session/:id/score-settlement', (req, res) => {
+  const result = gameService.applyScoreAdjustments(
+    req.params.id,
+    req.body?.adjustments,
+  );
+  const status = result.success ? 200 : result.error === 'Sesión no encontrada' ? 404 : 400;
+  res.status(status).json(result);
+});
+
 // ═══════════════════════════════════════════════════════════
 // 🎴 REACTION CARD — APLICAR DELTA DE PUNTOS
 // ═══════════════════════════════════════════════════════════
 
 /**
  * PATCH /api/v2/game/session/:id/players/:playerId/score
- * Aplica un delta de puntos a un jugador (Reaction Cards frontend-only).
+ * Aplica un delta de puntos a un jugador dentro de una sesión autenticada.
  *
  * Body:
  * {
@@ -350,7 +377,7 @@ router.post('/session/:id/double-platinum', (req, res) => {
  *   players: [{ id, name, score, availableTokens }]
  * }
  */
-router.patch('/session/:id/players/:playerId/score', (req, res) => {
+router.patch('/session/:id/players/:playerId/score', authenticateSession, (req, res) => {
   try {
     const { id, playerId } = req.params;
     const { delta, reason } = req.body;

@@ -369,11 +369,11 @@ El sistema frontend-backend de HITBACK ahora está **100% sincronizado**. Todas 
 
 El juego puede funcionar completamente con:
 
-2. **`/server/routes/tracksV2.js`**
+1. **`/server/routes/tracksV2.js`**
    - Corregir uso de `res.sendSuccess()` en lugar de `successResponse()`
    - Corregir uso de `res.sendError()` en lugar de `errorResponse()`
 
-3. **`/server/server.js`**
+2. **`/server/server.js`**
    - Agregar ruta `/api/v2/tracks` con `tracksV2Routes`
 
 ---

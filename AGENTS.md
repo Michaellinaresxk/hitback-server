@@ -38,7 +38,7 @@ npm run lint
 ## Reglas de implementación
 
 - Valida input y estado de sesión en el límite HTTP; devuelve status/error consistentes con los routers vecinos. No confíes en score, ownership o session scope enviado por el cliente sin validarlo.
-- Mantén score de ronda y tokens en `GameSessionService`; los deltas de efectos locales se aplican a la sesión backend mediante `applyScoreDelta`.
+- Mantén el score canónico en `GameSessionService`. Liquida los modificadores de reveal en la misma operación; para efectos independientes usa settlement de score y sincroniza los jugadores devueltos.
 - Inventarios y streaks de Power Card/combos deben respetar `sessionId`; añade regresiones que prueben aislamiento entre sesiones al tocar ese estado.
 - No cambies reglas de juego implícitas al ampliar enums/tipos. `ComboTracker` declara thresholds 3/5/7 y resetea al alcanzar 3; los umbrales posteriores parecen inalcanzables. Resolverlo en spec y tests antes de alterar ese comportamiento.
 - No describas `/api/qr/scan/:qrCode` como flujo normal: es legacy; el juego usa `/api/v2/game/*` y los QR físicos usan `/api/cards/scan-qr`.
