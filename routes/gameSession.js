@@ -30,6 +30,66 @@ const authenticateSession = createSessionCapabilityMiddleware(gameService);
 const authenticateSessionFromToken = createSessionCapabilityMiddleware(gameService, {
   tokenSelectSession: true,
 });
+const sessionMutationQueues = new Map();
+
+const ensureSessionPersistence = async (req, res, next) => {
+  try {
+    await gameService.initialize();
+    next();
+  } catch (error) {
+    console.error('❌ Game session persistence unavailable:', error);
+    res.status(503).json({
+      success: false,
+      error: 'El almacenamiento de sesiones no está disponible',
+    });
+  }
+};
+
+router.use('/session', ensureSessionPersistence);
+router.use('/sessions', ensureSessionPersistence);
+
+async function serializeSessionMutation(sessionId, mutation) {
+  const previousQueue =
+    sessionMutationQueues.get(sessionId) || Promise.resolve();
+  const operation = previousQueue.catch(() => undefined).then(mutation);
+
+  sessionMutationQueues.set(sessionId, operation);
+  try {
+    return await operation;
+  } finally {
+    if (sessionMutationQueues.get(sessionId) === operation) {
+      sessionMutationQueues.delete(sessionId);
+    }
+  }
+}
+
+async function persistMutation(sessionId, mutation) {
+  return serializeSessionMutation(sessionId, async () => {
+    const previous = gameService.captureSession(sessionId);
+    const result = await mutation();
+    if (!result?.success) return result;
+
+    try {
+      await gameService.persistSession(sessionId);
+      return result;
+    } catch (error) {
+      gameService.restoreSession(sessionId, previous);
+      error.code = 'SESSION_PERSISTENCE_FAILED';
+      throw error;
+    }
+  });
+}
+
+function sendRouteError(res, message, error) {
+  console.error(message, error);
+  res.status(error.code === 'SESSION_PERSISTENCE_FAILED' ? 503 : 500).json({
+    success: false,
+    error:
+      error.code === 'SESSION_PERSISTENCE_FAILED'
+        ? 'No se pudo guardar el estado de la sesión'
+        : error.message,
+  });
+}
 
 // ═══════════════════════════════════════════════════════════
 // 📋 CREAR SESIÓN
@@ -49,7 +109,7 @@ const authenticateSessionFromToken = createSessionCapabilityMiddleware(gameServi
  *   timeLimit: 1200
  * }
  */
-router.post('/session', (req, res) => {
+router.post('/session', async (req, res) => {
   try {
     const config = req.body;
 
@@ -58,16 +118,19 @@ router.post('/session', (req, res) => {
     const result = gameService.createSession(config);
 
     if (result.success) {
+      try {
+        await gameService.persistSession(result.session.id);
+      } catch (error) {
+        gameService.deleteSession(result.session.id);
+        error.code = 'SESSION_PERSISTENCE_FAILED';
+        throw error;
+      }
       res.status(201).json(result);
     } else {
       res.status(400).json(result);
     }
   } catch (error) {
-    console.error('❌ Error creando sesión:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error creando sesión:', error);
   }
 });
 
@@ -82,21 +145,17 @@ router.use('/session/:id', authenticateSession);
  * POST /api/v2/game/session/:id/start
  * Iniciar la partida
  */
-router.post('/session/:id/start', (req, res) => {
+router.post('/session/:id/start', async (req, res) => {
   try {
     const { id } = req.params;
 
     console.log(`▶️ Iniciando juego: ${id}`);
 
-    const result = gameService.startGame(id);
+    const result = await persistMutation(id, () => gameService.startGame(id));
 
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
-    console.error('❌ Error iniciando juego:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error iniciando juego:', error);
   }
 });
 
@@ -120,15 +179,13 @@ router.post('/session/:id/round', async (req, res) => {
 
     console.log(`🎵 Nueva ronda para sesión: ${id}`);
 
-    const result = await gameService.nextRound(id, forceQuestionType);
+    const result = await persistMutation(id, () =>
+      gameService.nextRound(id, forceQuestionType),
+    );
 
     res.json(result);
   } catch (error) {
-    console.error('❌ Error obteniendo ronda:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error obteniendo ronda:', error);
   }
 });
 
@@ -146,7 +203,7 @@ router.post('/session/:id/round', async (req, res) => {
  *   tokens: 3
  * }
  */
-router.post('/session/:id/bet', (req, res) => {
+router.post('/session/:id/bet', async (req, res) => {
   try {
     const { id } = req.params;
     const { playerId, tokens } = req.body;
@@ -160,15 +217,13 @@ router.post('/session/:id/bet', (req, res) => {
 
     console.log(`🎰 Apuesta: sesión ${id}, jugador ${playerId}, tokens ${tokens}`);
 
-    const result = gameService.placeBet(id, playerId, tokens);
+    const result = await persistMutation(id, () =>
+      gameService.placeBet(id, playerId, tokens),
+    );
 
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
-    console.error('❌ Error registrando apuesta:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error registrando apuesta:', error);
   }
 });
 
@@ -185,22 +240,20 @@ router.post('/session/:id/bet', (req, res) => {
  *   winnerId: "player_2"  // null si nadie acertó
  * }
  */
-router.post('/session/:id/reveal', (req, res) => {
+router.post('/session/:id/reveal', async (req, res) => {
   try {
     const { id } = req.params;
     const { winnerId, scoreModifiers = {} } = req.body || {};
 
     console.log(`✅ Revelando respuesta: sesión ${id}, ganador ${winnerId || 'nadie'}`);
 
-    const result = gameService.revealAnswer(id, winnerId, scoreModifiers);
+    const result = await persistMutation(id, () =>
+      gameService.revealAnswer(id, winnerId, scoreModifiers),
+    );
 
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
-    console.error('❌ Error revelando respuesta:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error revelando respuesta:', error);
   }
 });
 
@@ -272,21 +325,25 @@ router.get('/sessions', authenticateSessionFromToken, (req, res) => {
  * DELETE /api/v2/game/session/:id
  * Eliminar una sesión
  */
-router.delete('/session/:id', (req, res) => {
+router.delete('/session/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
     console.log(`🗑️ Eliminando sesión: ${id}`);
 
-    const result = gameService.deleteSession(id);
+    const result = await serializeSessionMutation(id, async () => {
+      try {
+        await gameService.deletePersistedSession(id);
+      } catch (error) {
+        error.code = 'SESSION_PERSISTENCE_FAILED';
+        throw error;
+      }
+      return gameService.deleteSession(id);
+    });
 
     res.json(result);
   } catch (error) {
-    console.error('❌ Error eliminando sesión:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error eliminando sesión:', error);
   }
 });
 
@@ -305,7 +362,7 @@ router.delete('/session/:id', (req, res) => {
  *   targetPlayerId: "player_2"  // opcional
  * }
  */
-router.post('/session/:id/power', (req, res) => {
+router.post('/session/:id/power', async (req, res) => {
   try {
     const { id } = req.params;
     const { playerId, cardId, targetPlayerId } = req.body;
@@ -319,27 +376,27 @@ router.post('/session/:id/power', (req, res) => {
 
     console.log(`⚡ Power Card: ${cardId} por ${playerId}`);
 
-    const result = gameService.usePowerCard(id, playerId, cardId, targetPlayerId);
+    const result = await persistMutation(id, () =>
+      gameService.usePowerCard(id, playerId, cardId, targetPlayerId),
+    );
 
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
-    console.error('❌ Error usando poder:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error usando poder:', error);
   }
 });
 /**
  * POST /api/v2/game/session/:id/double-platinum
  * Activar bonus de tile
  */
-router.post('/session/:id/double-platinum', (req, res) => {
+router.post('/session/:id/double-platinum', async (req, res) => {
   try {
-    const result = gameService.activateDoublePlatinum(req.params.id);
+    const result = await persistMutation(req.params.id, () =>
+      gameService.activateDoublePlatinum(req.params.id),
+    );
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    sendRouteError(res, '❌ Error activando Double Platinum:', error);
   }
 });
 
@@ -347,13 +404,23 @@ router.post('/session/:id/double-platinum', (req, res) => {
  * POST /api/v2/game/session/:id/score-settlement
  * Atomically apply non-round score adjustments and return canonical players.
  */
-router.post('/session/:id/score-settlement', (req, res) => {
-  const result = gameService.applyScoreAdjustments(
-    req.params.id,
-    req.body?.adjustments,
-  );
-  const status = result.success ? 200 : result.error === 'Sesión no encontrada' ? 404 : 400;
-  res.status(status).json(result);
+router.post('/session/:id/score-settlement', async (req, res) => {
+  try {
+    const result = await persistMutation(req.params.id, () =>
+      gameService.applyScoreAdjustments(
+        req.params.id,
+        req.body?.adjustments,
+      ),
+    );
+    const status = result.success
+      ? 200
+      : result.error === 'Sesión no encontrada'
+        ? 404
+        : 400;
+    res.status(status).json(result);
+  } catch (error) {
+    sendRouteError(res, '❌ Error aplicando score settlement:', error);
+  }
 });
 
 // ═══════════════════════════════════════════════════════════
@@ -377,7 +444,7 @@ router.post('/session/:id/score-settlement', (req, res) => {
  *   players: [{ id, name, score, availableTokens }]
  * }
  */
-router.patch('/session/:id/players/:playerId/score', authenticateSession, (req, res) => {
+router.patch('/session/:id/players/:playerId/score', authenticateSession, async (req, res) => {
   try {
     const { id, playerId } = req.params;
     const { delta, reason } = req.body;
@@ -393,7 +460,9 @@ router.patch('/session/:id/players/:playerId/score', authenticateSession, (req, 
       `🎴 Score delta: sesión ${id}, jugador ${playerId}, delta ${delta > 0 ? '+' : ''}${delta} (${reason})`
     );
 
-    const result = gameService.applyScoreDelta(id, playerId, delta, reason);
+    const result = await persistMutation(id, () =>
+      gameService.applyScoreDelta(id, playerId, delta, reason),
+    );
 
     if (!result.success) {
       return res.status(404).json(result);
@@ -401,11 +470,7 @@ router.patch('/session/:id/players/:playerId/score', authenticateSession, (req, 
 
     res.json(result);
   } catch (error) {
-    console.error('❌ Error aplicando score delta:', error);
-    res.status(500).json({
-      success: false,
-      error: error.message,
-    });
+    sendRouteError(res, '❌ Error aplicando score delta:', error);
   }
 });
 
@@ -417,14 +482,27 @@ router.patch('/session/:id/players/:playerId/score', authenticateSession, (req, 
  * GET /api/v2/game/health
  * Health check del servicio
  */
-router.get('/health', (req, res) => {
-  res.json({
-    success: true,
-    service: 'GameSessionService',
-    status: 'healthy',
-    timestamp: new Date().toISOString(),
-    activeSessions: gameService.getAllSessions().length,
-  });
+router.get('/health', async (req, res) => {
+  try {
+    await gameService.initialize();
+    res.json({
+      success: true,
+      service: 'GameSessionService',
+      status: 'healthy',
+      persistence: 'available',
+      timestamp: new Date().toISOString(),
+      savedSessions: await gameService.getPersistedSessionCount(),
+    });
+  } catch (error) {
+    console.error('❌ Game session health check failed:', error);
+    res.status(503).json({
+      success: false,
+      service: 'GameSessionService',
+      status: 'degraded',
+      persistence: 'unavailable',
+      timestamp: new Date().toISOString(),
+    });
+  }
 });
 
 module.exports = router;

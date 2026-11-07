@@ -35,7 +35,11 @@ async function runMigration() {
     console.log(`${colors.green}✅ Conexión exitosa${colors.reset}\n`);
 
     // Leer archivo SQL
-    const sqlPath = path.join(__dirname, '../migrations/001_create_tables.sql');
+    const migrationName = process.argv[2] || '001_create_tables.sql';
+    if (!/^\d{3}_[\w-]+\.sql$/.test(migrationName)) {
+      throw new Error('Nombre de migración inválido');
+    }
+    const sqlPath = path.join(__dirname, '../migrations', migrationName);
     console.log(`${colors.yellow}📂 Leyendo: ${sqlPath}${colors.reset}`);
     const sql = fs.readFileSync(sqlPath, 'utf8');
 

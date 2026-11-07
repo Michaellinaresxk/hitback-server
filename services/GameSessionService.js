@@ -15,13 +15,74 @@ const defaultTrackService = require('./TrackService');
 const QuestionService = require('./QuestionService');
 const DeezerService = require('./DeezerService');
 const PowerCardService = require('./PowerCardService');
+const GameSessionPersistence = require('./GameSessionPersistence');
 const crypto = require('crypto');
 
 class GameSessionService {
-  constructor({ trackService = defaultTrackService, questionService } = {}) {
+  constructor({
+    trackService = defaultTrackService,
+    questionService,
+    persistence = new GameSessionPersistence(),
+  } = {}) {
     this.trackService = trackService;
     this.questionService = questionService || new QuestionService();
+    this.persistence = persistence;
     this.sessions = new Map();
+    this.initialized = false;
+  }
+
+  async initialize() {
+    if (this.initialized) return;
+
+    await this.persistence.initialize();
+    this.initialized = true;
+  }
+
+  async getSession(sessionId) {
+    const cachedSession = this.sessions.get(sessionId);
+    if (cachedSession) return cachedSession;
+
+    await this.initialize();
+    const session = await this.persistence.get(sessionId);
+    if (session) this.sessions.set(sessionId, session);
+    return session;
+  }
+
+  async findSessionByCapabilityToken(token) {
+    const cachedSession = Array.from(this.sessions.values()).find((session) =>
+      this.verifyCapability(session.id, token),
+    );
+    if (cachedSession) return cachedSession;
+
+    await this.initialize();
+    const session = await this.persistence.findByCapabilityToken(token);
+    if (session) this.sessions.set(session.id, session);
+    return session;
+  }
+
+  async persistSession(sessionId) {
+    const session = this.sessions.get(sessionId);
+    if (!session) throw new Error('No se puede persistir una sesión inexistente');
+    await this.persistence.save(session);
+  }
+
+  async deletePersistedSession(sessionId) {
+    await this.persistence.delete(sessionId);
+  }
+
+  async getPersistedSessionCount() {
+    await this.initialize();
+    return this.persistence.count();
+  }
+
+  captureSession(sessionId) {
+    const session = this.sessions.get(sessionId);
+    return session ? JSON.parse(JSON.stringify(session)) : null;
+  }
+
+  restoreSession(sessionId, snapshot) {
+    if (snapshot) this.sessions.set(sessionId, snapshot);
+    else this.sessions.delete(sessionId);
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -37,18 +98,26 @@ class GameSessionService {
       targetScore = 22,
       timeLimit = 1200,
       powerCardsPerPlayer = 3,
+      worldTourRoutes = null,
     } = config;
 
     if (!Array.isArray(players) || players.length < 2 || players.length > 8) {
       return { success: false, error: 'Se requieren entre 2 y 8 jugadores' };
     }
 
+    const playerIds = players.map((_, index) => `player_${index + 1}`);
+    if (!this._isValidWorldTourRoutes(worldTourRoutes, playerIds)) {
+      return { success: false, error: 'Rutas de World Tour inválidas' };
+    }
+
     const sessionId = this._generateSessionId();
+    const capabilityToken = crypto.randomBytes(32).toString('hex');
 
     const playerList = players.map((name, index) => ({
       id: `player_${index + 1}`,
       name: name || `Jugador ${index + 1}`,
       score: 0,
+      boardPosition: 0,
       availableTokens: [1, 2, 3],
       powerCards: [],
       stats: {
@@ -65,7 +134,8 @@ class GameSessionService {
 
     const session = {
       id: sessionId,
-      capabilityToken: crypto.randomBytes(32).toString('hex'),
+      capabilityToken,
+      capabilityTokenHash: GameSessionPersistence.hashCapabilityToken(capabilityToken),
       status: 'created',
       createdAt: new Date().toISOString(),
       config: {
@@ -77,6 +147,7 @@ class GameSessionService {
         powerCardsPerPlayer,
       },
       players: playerList,
+      worldTourRoutes,
       currentPlayerIndex: 0,
       round: 0,
       usedTrackIds: [],
@@ -97,15 +168,22 @@ class GameSessionService {
     return {
       success: true,
       session: this._sanitizeSession(session),
-      capabilityToken: session.capabilityToken,
+      capabilityToken,
     };
   }
 
   verifyCapability(sessionId, token) {
     const session = this.sessions.get(sessionId);
     if (!session || typeof token !== 'string') return false;
-    const expected = Buffer.from(session.capabilityToken, 'utf8');
-    const supplied = Buffer.from(token, 'utf8');
+    const expected = Buffer.from(
+      session.capabilityTokenHash ||
+        GameSessionPersistence.hashCapabilityToken(session.capabilityToken || ''),
+      'hex',
+    );
+    const supplied = Buffer.from(
+      GameSessionPersistence.hashCapabilityToken(token),
+      'hex',
+    );
     return expected.length === supplied.length && crypto.timingSafeEqual(expected, supplied);
   }
 
@@ -401,6 +479,11 @@ class GameSessionService {
       settledModifiers.push({ type: 'B_SIDE', playerId: player.id, points: 1 });
     }
 
+    if (winnerId && session.worldTourRoutes) {
+      const winner = session.players.find((player) => player.id === winnerId);
+      winner.boardPosition = Math.min(winner.boardPosition + 1, 21);
+    }
+
     if (results.winner) {
       const settledWinner = session.players.find((player) => player.id === results.winner.id);
       results.winner.newScore = settledWinner.score;
@@ -427,6 +510,7 @@ class GameSessionService {
         id: p.id,
         name: p.name,
         score: p.score,
+        boardPosition: p.boardPosition,
         tokens: p.availableTokens.length,
         availableTokens: [...p.availableTokens],
         powerCards: p.powerCards || [],
@@ -512,6 +596,7 @@ class GameSessionService {
         id: player.id,
         name: player.name,
         score: player.score,
+        boardPosition: player.boardPosition,
         availableTokens: [...player.availableTokens],
         stats: { ...player.stats },
       })),
@@ -622,6 +707,24 @@ class GameSessionService {
 
     if (session.status !== 'playing') {
       return { success: false, error: 'El juego no está en curso' };
+    }
+
+    if (session.currentRound) {
+      return {
+        success: true,
+        round: {
+          number: session.currentRound.roundNumber,
+          track: session.currentRound.track,
+          question: session.currentRound.question,
+          gameMasterAnswer: {
+            correct: session.currentRound._answer.correct,
+            trackTitle: session.currentRound._answer.trackTitle,
+            trackArtist: session.currentRound._answer.trackArtist,
+            acceptableAnswers:
+              session.currentRound._answer.acceptableAnswers || [],
+          },
+        },
+      };
     }
 
     const winner = this._checkWinner(session);
@@ -961,26 +1064,71 @@ class GameSessionService {
     return arr[Math.floor(Math.random() * arr.length)];
   }
 
-  _checkWinner(session) {
-    const targetScore = session.config.targetScore;
-
-    for (const player of session.players) {
-      if (player.score >= targetScore) {
-        return {
-          id: player.id,
-          name: player.name,
-          score: player.score,
-          stats: player.stats, // ✅ Incluir stats
-        };
-      }
+  _isValidWorldTourRoutes(routes, playerIds) {
+    if (
+      !routes ||
+      typeof routes !== 'object' ||
+      Array.isArray(routes) ||
+      Object.keys(routes).length !== playerIds.length
+    ) {
+      return false;
     }
 
-    return null;
+    const tileTypes = new Set([
+      'concert',
+      'festival',
+      'record_deal',
+      'rival_band',
+      'sold_out',
+    ]);
+    const acts = new Set([
+      'act1_underground',
+      'act2_theBuzz',
+      'act3_goingGlobal',
+      'act4_headliner',
+    ]);
+
+    return playerIds.every((playerId) => {
+      const route = routes[playerId];
+      return (
+        Array.isArray(route) &&
+        route.length === 22 &&
+        route.every(
+          (tile, position) =>
+            tile &&
+            tile.position === position &&
+            typeof tile.cityId === 'string' &&
+            typeof tile.emoji === 'string' &&
+            tileTypes.has(tile.tileType) &&
+            acts.has(tile.act) &&
+            tile.isStart === (position === 0) &&
+            tile.isFinish === (position === 21),
+        )
+      );
+    });
+  }
+
+  _checkWinner(session) {
+    const finisher = session.players.some((player) => player.boardPosition >= 21);
+    if (!finisher) return null;
+
+    const [winner] = [...session.players].sort(
+      (left, right) =>
+        right.score - left.score || right.boardPosition - left.boardPosition,
+    );
+    return {
+      id: winner.id,
+      name: winner.name,
+      score: winner.score,
+      boardPosition: winner.boardPosition,
+      stats: winner.stats,
+    };
   }
 
   _sanitizeSession(session) {
     const sanitized = { ...session };
     delete sanitized.capabilityToken;
+    delete sanitized.capabilityTokenHash;
 
     if (sanitized.currentRound) {
       sanitized.currentRound = { ...sanitized.currentRound };

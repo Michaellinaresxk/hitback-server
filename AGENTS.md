@@ -1,14 +1,15 @@
 # AGENTS.md — HITBACK Express Backend
 
-> Instrucciones locales para agentes que modifican `server/`. Reconciliado con rutas, servicios y suites el 2026-10-20. Para contratos compartidos, usa [`../documentation/HITBACK_SYSTEM_DOCS.md`](../documentation/HITBACK_SYSTEM_DOCS.md); para el flujo de trabajo de features, sigue [`../specs/README.md`](../specs/README.md) y [`../.github/skills/spec-driven-feature/SKILL.md`](../.github/skills/spec-driven-feature/SKILL.md).
+> Instrucciones locales para agentes que modifican `server/`. Reconciliado con el contrato persistente de sesiones World Tour el 2026-11-07. Para contratos compartidos, usa [`docs/specs/session-boardposition/SPEC.md`](docs/specs/session-boardposition/SPEC.md), [`docs/WORLD_TOUR.md`](docs/WORLD_TOUR.md) y [`../documentation/HITBACK_SYSTEM_DOCS.md`](../documentation/HITBACK_SYSTEM_DOCS.md); para el flujo de trabajo de features, sigue [`../specs/README.md`](../specs/README.md) y [`../.github/skills/spec-driven-feature/SKILL.md`](../.github/skills/spec-driven-feature/SKILL.md).
 
 ## Proyecto y ownership
 
 - Backend CommonJS con Node.js/Express; `server.js` monta las rutas de `routes/`, controladores y servicios en la raíz. No crear una estructura `src/` sin una decisión de arquitectura aprobada.
 - El backend es autoridad para sesiones, score de ronda, tokens, resolución de reveal, `comboStatus` y validación/consumo de Power Cards.
-- Expo es propietario de presentación, fases de UI y rutas/posiciones locales de World Tour. Los cambios de contrato deben coordinar ambos lados.
+- El backend es autoridad para sesiones, rutas World Tour, `boardPosition`, fans/score, resolución de reveal y fin de partida. Expo conserva una copia para presentación/hidratación.
 - Los IDs de jugador del backend (`player_1`, etc.) no son los IDs locales Expo. Mantener el mapeo cliente y validar jugador y sesión en operaciones con estado.
-- Sesiones y estado de cartas se mantienen en memoria del proceso. `TrackServiceV2`/PostgreSQL sirve `/api/v2/tracks/*`; las rondas de sesión usan `TrackService`, no `TrackServiceV2`.
+- Los snapshots de sesión se conservan en PostgreSQL; inventarios y streaks de Power Card siguen fuera de ese snapshot y pueden permanecer en memoria. `TrackServiceV2`/PostgreSQL sirve `/api/v2/tracks/*`; las rondas de sesión usan `TrackService`, no `TrackServiceV2`.
+- Ejecuta `npm run migrate:sessions` antes de usar la API de sesiones en un entorno con snapshots. El router serializa mutaciones dentro de un proceso; hasta contar con bloqueo transaccional entre réplicas, despliega una sola instancia.
 - Target de victoria actual: Expo envía `SCORE_TO_WIN = 22` como `targetScore`; backend usa 22 de default y conserva overrides explícitos.
 
 ## Antes de implementar
