@@ -25,7 +25,7 @@ npm run dev
 | Búsqueda dinámica de tracks v2                   | `routes/tracksV2.js`, `services/TrackServiceV2.js`, `services/DeezerServiceV2.js`           |
 | Audio y streaming                                | `routes/audio.js`, `services/AudioService.js`, `public/audio/tracks/`                       |
 | Health                                           | `routes/health.js` y endpoint Expo `/api/expo/health`                                       |
-| Power Cards físicas e inventario                 | `routes/powerCard.js`, `controllers/PowerCardController.js`, `services/PowerCardService.js` |
+| Power Cards físicas e inventario                 | `routes/powerCard.js`, `controllers/powerCardController.js`, `services/PowerCardService.js` |
 | Combos                                           | `services/ComboTracker.js`, llamado durante reveal                                          |
 
 Las rondas del juego de Expo usan `/api/v2/game/*`; `GameSessionService.nextRound()` usa `TrackService` y puede consultar Deezer, con tracks usados guardados en memoria por sessionId. `TrackServiceV2` con PostgreSQL está montado como recurso separado `/api/v2/tracks/*`; no es el servicio que crea las rondas de sesión. Si PostgreSQL no está disponible, TrackServiceV2 intenta fallback en memoria, sin persistencia. No prometas disponibilidad “ilimitada” ni recuperación durable.
@@ -36,30 +36,34 @@ Las rondas del juego de Expo usan `/api/v2/game/*`; `GameSessionService.nextRoun
 
 | Método   | Ruta                                   | Uso                                                                             |
 | -------- | -------------------------------------- | ------------------------------------------------------------------------------- |
-| `POST`   | `/session`                             | Crear sesión con nombres/configuración                                          |
-| `POST`   | `/session/:id/start`                   | Iniciar sesión                                                                  |
-| `POST`   | `/session/:id/round`                   | Obtener pista y pregunta                                                        |
-| `POST`   | `/session/:id/bet`                     | Registrar apuesta `{ playerId, tokens }`                                        |
-| `POST`   | `/session/:id/reveal`                  | Revelar con `{ winnerId }` o `null`                                             |
-| `GET`    | `/session/:id`                         | Consultar estado                                                                |
-| `GET`    | `/sessions`                            | Listar sesiones del proceso                                                     |
-| `DELETE` | `/session/:id`                         | Eliminar sesión                                                                 |
-| `POST`   | `/session/:id/power`                   | Activar carta por `playerId` + `cardId`; valida inventario asociado a la sesión |
-| `POST`   | `/session/:id/double-platinum`         | Activar el modificador de tile hasta el siguiente reveal                        |
-| `PATCH`  | `/session/:id/players/:playerId/score` | Aplicar delta de score                                                          |
-| `GET`    | `/health`                              | Health de sesiones                                                              |
+| `POST`   | `/session`                             | Crear sesión; devuelve `{ success, session, capabilityToken }` una sola vez     |
+| `POST`   | `/session/:id/start`                   | Iniciar sesión (Bearer de esa sesión)                                            |
+| `POST`   | `/session/:id/round`                   | Obtener pista/pregunta; también devuelve gameOver sin round al terminar          |
+| `POST`   | `/session/:id/bet`                     | Registrar apuesta `{ playerId, tokens }` (Bearer)                                |
+| `POST`   | `/session/:id/reveal`                  | `{ winnerId, scoreModifiers? }`; settle en backend y devuelve jugadores canónicos |
+| `GET`    | `/session/:id`                         | Consultar estado (Bearer)                                                       |
+| `GET`    | `/sessions`                            | Resumen únicamente de la sesión del Bearer                                      |
+| `DELETE` | `/session/:id`                         | Eliminar sesión (Bearer)                                                        |
+| `POST`   | `/session/:id/power`                   | Activar carta owned por el jugador y sesión (Bearer)                            |
+| `POST`   | `/session/:id/double-platinum`         | Activar modificador hasta el siguiente reveal (Bearer)                           |
+| `POST`   | `/session/:id/score-settlement`        | Aplicar varios deltas validados atómicamente (Bearer)                            |
+| `PATCH`  | `/session/:id/players/:playerId/score` | Aplicar delta individual (Bearer)                                               |
+| `GET`    | `/health`                              | Health público                                                                   |
 
-Las sesiones y el inventario del servicio se mantienen en memoria del proceso; reiniciar el backend no es un mecanismo de recuperación.
+Salvo `POST /session` y `/health`, las rutas de sesión requieren
+`Authorization: Bearer <capabilityToken>`. El token se genera aleatoriamente
+con criptografía al crear la sesión, se vincula a una única sesión y no se
+incluye en lecturas posteriores. No se usa Origin, CORS ni `x-expo-token` como
+autenticación. Las sesiones y el inventario se mantienen en memoria; reiniciar
+el backend invalida sesiones y el token que Expo mantiene sólo en memoria.
 
 ### Power Cards `/api/cards`
 
-- `POST /scan-qr`: escanea QR `HITBACK_PC_{cardId}` (también admite sufijo timestamp); body `{ qrCode, playerId, sessionId? }`. El controlador agrega al inventario backend salvo cartas con `effectOnDraw`.
-- `GET /inventory/:playerId`: inventario; pasar `?sessionId=...` para recuperar inventario de una sesión. Sin el parámetro consulta el scope global legacy.
-- `GET /inventories/all`: diagnóstico de todos los inventarios.
-- `GET /printable-qrs`: QRs imprimibles.
-- `POST /use`: endpoint PowerCard independiente; el cliente Expo del flujo de partida activa cartas mediante `POST /api/v2/game/session/:id/power`.
-- `POST /test-add`: ruta de diagnóstico; no usar como flujo de juego.
-- `DELETE /player/:playerId`: limpiar datos de jugador.
+- `POST /scan-qr`: QR `HITBACK_PC_{cardId}`; requiere `sessionId` en body y Bearer de esa sesión.
+- `GET /inventory/:playerId?sessionId=...`: inventario privado; requiere Bearer coincidente.
+- `GET /inventories/all?sessionId=...`: diagnóstico limitado a esa sesión; requiere Bearer.
+- `GET /printable-qrs`: definición pública de QRs imprimibles; no lee estado privado.
+- `POST /use`, `/test-add` y `DELETE /player/:playerId?sessionId=...`: mutaciones privadas; requieren Bearer coincidente.
 
 La app Expo no usa `POST /api/qr/scan/:qrCode` para iniciar una canción. No documentes ese endpoint heredado como paso de juego.
 

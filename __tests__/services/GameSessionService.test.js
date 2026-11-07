@@ -66,9 +66,44 @@ describe('GameSessionService contracts used by Expo', () => {
     expect(reveal.success).toBe(true);
     expect(reveal.results.pointsAwarded).toBe(4);
     expect(reveal.players[0].score).toBe(4);
+    expect(reveal.players[0].stats.correctAnswers).toBe(1);
     expect(service.applyScoreDelta(session.id, 'player_1', 1, 'TEST')).toMatchObject({
       success: true,
       player: { newScore: 5 },
+    });
+  });
+
+  test('keeps exact cumulative score and correct-answer count across rounds', async () => {
+    const { session } = service.createSession({ players: ['Ada', 'Lin'] });
+    service.startGame(session.id);
+
+    await service.nextRound(session.id);
+    service.placeBet(session.id, 'player_1', 2);
+    const firstReveal = service.revealAnswer(session.id, 'player_1');
+
+    expect(firstReveal.players[0]).toMatchObject({
+      score: 4,
+      stats: { correctAnswers: 1 },
+    });
+
+    await service.nextRound(session.id);
+    const secondReveal = service.revealAnswer(session.id, 'player_1');
+
+    expect(secondReveal.players[0]).toMatchObject({
+      score: 6,
+      stats: { correctAnswers: 2 },
+    });
+    expect(secondReveal.players[1]).toMatchObject({
+      score: 0,
+      stats: { correctAnswers: 0 },
+    });
+
+    await service.nextRound(session.id);
+    const noWinnerReveal = service.revealAnswer(session.id);
+
+    expect(noWinnerReveal.players[0]).toMatchObject({
+      score: 6,
+      stats: { correctAnswers: 2 },
     });
   });
 

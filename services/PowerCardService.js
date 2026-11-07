@@ -251,11 +251,18 @@ class PowerCardService {
    * 
    * @returns {object} { playerId: { cardId: count } }
    */
-  getAllInventories() {
+  getAllInventories(sessionId = null) {
     const allInventories = {};
 
     this.playerInventory.forEach((inventory, playerId) => {
-      allInventories[playerId] = inventory;
+      if (sessionId) {
+        const prefix = `${sessionId}::`;
+        if (playerId.startsWith(prefix)) {
+          allInventories[playerId.slice(prefix.length)] = inventory;
+        }
+      } else {
+        allInventories[playerId] = inventory;
+      }
     });
 
     return allInventories;
