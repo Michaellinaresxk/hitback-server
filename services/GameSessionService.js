@@ -1116,12 +1116,20 @@ class GameSessionService {
       (left, right) =>
         right.score - left.score || right.boardPosition - left.boardPosition,
     );
+
+    // Determinar estado de fin de juego
+    const scoreToWin = session.config?.targetScore ?? 22;
+    const isExactWinner = winner.score >= scoreToWin;
+    const isCandidate = winner.score === scoreToWin - 1; // 21 de 22 = candidato
+
     return {
       id: winner.id,
       name: winner.name,
       score: winner.score,
       boardPosition: winner.boardPosition,
       stats: winner.stats,
+      gameOver: isExactWinner,
+      isCandidate, // verdadero cuando score = targetScore - 1 (21/22)
     };
   }
 
