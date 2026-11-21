@@ -38,13 +38,72 @@ class GameSessionService {
     this.initialized = true;
   }
 
+  _normalizeSession(session) {
+    if (!session) return session;
+    session.alliances = Array.isArray(session.alliances) ? session.alliances : [];
+    session.activeEffects = Array.isArray(session.activeEffects) ? session.activeEffects : [];
+    session.processedIdempotencyKeys = session.processedIdempotencyKeys && typeof session.processedIdempotencyKeys === 'object'
+      ? session.processedIdempotencyKeys
+      : {};
+    session.doublePlatinumActive = Boolean(session.doublePlatinumActive);
+    session.timer = session.timer && typeof session.timer === 'object'
+      ? {
+          durationMs: Number(session.timer.durationMs) || (Number(session.config?.timeLimit) || 1200) * 1000,
+          remainingMs: Math.max(0, Number(session.timer.remainingMs) || 0),
+          startedAt: session.timer.startedAt || session.startedAt || null,
+          pausedAt: session.timer.pausedAt || null,
+          isPaused: Boolean(session.timer.isPaused),
+        }
+      : {
+          durationMs: (Number(session.config?.timeLimit) || 1200) * 1000,
+          remainingMs: (Number(session.timeRemaining) || Number(session.config?.timeLimit) || 1200) * 1000,
+          startedAt: session.startedAt || null,
+          pausedAt: null,
+          isPaused: false,
+        };
+
+    session.players = (session.players || []).map((player) => ({
+      ...player,
+      boardPosition: Number.isFinite(player.boardPosition) ? player.boardPosition : 0,
+      availableTokens: Array.isArray(player.availableTokens) ? player.availableTokens : [1, 2, 3],
+      powerCards: Array.isArray(player.powerCards) ? player.powerCards : [],
+      stats: {
+        correctAnswers: 0,
+        wrongAnswers: 0,
+        tokensWon: 0,
+        tokensLost: 0,
+        tokensUsed: [],
+        combosCompleted: 0,
+        powerCardsUsed: 0,
+        totalComboStreak: 0,
+        ...(player.stats || {}),
+      },
+      effects: {
+        isFrozen: Boolean(player.effects?.isFrozen),
+        frozenRoundsLeft: Math.max(0, Number(player.effects?.frozenRoundsLeft) || 0),
+        frozenForRound: Number.isFinite(player.effects?.frozenForRound) ? player.effects.frozenForRound : null,
+        lossStreak: Math.max(0, Number(player.effects?.lossStreak) || 0),
+        bSideActive: Boolean(player.effects?.bSideActive),
+        stopBlastActive: Boolean(player.effects?.stopBlastActive),
+        duelActive: Boolean(player.effects?.duelActive),
+        duelOpponentId: player.effects?.duelOpponentId || null,
+        featuringPartnerId: player.effects?.featuringPartnerId || null,
+      },
+    }));
+    return session;
+  }
+
   async getSession(sessionId) {
     const cachedSession = this.sessions.get(sessionId);
-    if (cachedSession) return cachedSession;
+    if (cachedSession) return this._normalizeSession(cachedSession);
 
     await this.initialize();
     const session = await this.persistence.get(sessionId);
-    if (session) this.sessions.set(sessionId, session);
+    if (session) {
+      this._normalizeSession(session);
+      this.sessions.set(sessionId, session);
+      if (session.powerCardState) PowerCardService.importSessionState(sessionId, session.powerCardState);
+    }
     return session;
   }
 
@@ -52,17 +111,22 @@ class GameSessionService {
     const cachedSession = Array.from(this.sessions.values()).find((session) =>
       this.verifyCapability(session.id, token),
     );
-    if (cachedSession) return cachedSession;
+    if (cachedSession) return this._normalizeSession(cachedSession);
 
     await this.initialize();
     const session = await this.persistence.findByCapabilityToken(token);
-    if (session) this.sessions.set(session.id, session);
+    if (session) {
+      this._normalizeSession(session);
+      this.sessions.set(session.id, session);
+      if (session.powerCardState) PowerCardService.importSessionState(session.id, session.powerCardState);
+    }
     return session;
   }
 
   async persistSession(sessionId) {
     const session = this.sessions.get(sessionId);
     if (!session) throw new Error('No se puede persistir una sesión inexistente');
+    session.powerCardState = PowerCardService.exportSessionState(sessionId);
     await this.persistence.save(session);
   }
 
@@ -81,8 +145,156 @@ class GameSessionService {
   }
 
   restoreSession(sessionId, snapshot) {
-    if (snapshot) this.sessions.set(sessionId, snapshot);
-    else this.sessions.delete(sessionId);
+    if (snapshot) {
+      this.sessions.set(sessionId, snapshot);
+      if (snapshot.powerCardState) PowerCardService.importSessionState(sessionId, snapshot.powerCardState);
+    } else {
+      this.sessions.delete(sessionId);
+      PowerCardService.clearSessionData(sessionId);
+    }
+  }
+
+  _getIdempotencyRecord(session, scope, key) {
+    if (!key) return null;
+    return session.processedIdempotencyKeys?.[`${scope}:${key}`] || null;
+  }
+
+  _commitIdempotency(session, scope, key, payload, result) {
+    if (!key) return;
+    session.processedIdempotencyKeys = session.processedIdempotencyKeys || {};
+    session.processedIdempotencyKeys[`${scope}:${key}`] = {
+      payload: JSON.stringify(payload ?? null),
+      result,
+      committedAt: new Date().toISOString(),
+    };
+    const entries = Object.entries(session.processedIdempotencyKeys);
+    if (entries.length > 200) {
+      entries
+        .sort((a, b) => String(a[1].committedAt).localeCompare(String(b[1].committedAt)))
+        .slice(0, entries.length - 200)
+        .forEach(([k]) => delete session.processedIdempotencyKeys[k]);
+    }
+  }
+
+  _idempotencyGuard(session, scope, key, payload) {
+    if (!key) return { hit: false };
+    const record = this._getIdempotencyRecord(session, scope, key);
+    if (!record) return { hit: false };
+    const samePayload = record.payload === JSON.stringify(payload ?? null);
+    if (samePayload) return { hit: true, result: record.result };
+    return { hit: true, conflict: true };
+  }
+
+  _getPlayer(session, playerId) {
+    return session.players.find((p) => p.id === playerId) || null;
+  }
+
+  _activeAlliances(session) {
+    return (session.alliances || []).filter((a) => a.status === 'active' && a.roundsLeft > 0);
+  }
+
+  _getPlayerAlliance(session, playerId) {
+    return this._activeAlliances(session).find(
+      (a) => a.player1Id === playerId || a.player2Id === playerId,
+    ) || null;
+  }
+
+  _syncDerivedPlayerEffects(session) {
+    const activeAlliances = this._activeAlliances(session);
+    const activeEffects = (session.activeEffects || []).filter((e) => e.status === 'active');
+    session.players.forEach((player) => {
+      player.effects = player.effects || {};
+      const freeze = activeEffects.find(
+        (e) => e.type === 'FREEZE' && (e.targetPlayerIds || []).includes(player.id),
+      );
+      player.effects.isFrozen = Boolean(freeze);
+      player.effects.frozenRoundsLeft = freeze ? Math.max(0, Number(freeze.roundsLeft) || 0) : 0;
+      player.effects.frozenForRound = freeze ? freeze.createdAtRound ?? null : null;
+
+      const stopBlast = activeEffects.find((e) => e.type === 'STOP_BLAST' && e.status === 'active');
+      player.effects.stopBlastActive = Boolean(stopBlast && stopBlast.sourcePlayerId === player.id);
+
+      const duel = activeEffects.find((e) => e.type === 'DUEL' && e.status === 'active');
+      const inDuel = Boolean(duel && (duel.targetPlayerIds || []).includes(player.id));
+      player.effects.duelActive = inDuel;
+      player.effects.duelOpponentId = inDuel
+        ? (duel.targetPlayerIds || []).find((id) => id !== player.id) || null
+        : null;
+
+      const featuring = activeEffects.find(
+        (e) => e.type === 'FEATURING' && e.status === 'active' && e.sourcePlayerId === player.id,
+      );
+      player.effects.featuringPartnerId = featuring ? featuring.targetPlayerIds?.[0] || null : null;
+
+      player.effects.lossStreak = Math.max(0, Number(player.effects.lossStreak) || 0);
+      player.effects.bSideActive = Boolean(player.effects.bSideActive);
+      // alliance membership is derived from session.alliances, not stored on player
+      player._hasAlliance = activeAlliances.some(
+        (a) => a.player1Id === player.id || a.player2Id === player.id,
+      );
+    });
+    session.players.forEach((p) => { delete p._hasAlliance; });
+  }
+
+  _getRevealEligibility(session, playerId) {
+    this._syncDerivedPlayerEffects(session);
+    const player = this._getPlayer(session, playerId);
+    if (!player) return { eligible: false, reason: 'PLAYER_NOT_FOUND' };
+    if (player.effects.isFrozen) return { eligible: false, reason: 'PLAYER_FROZEN' };
+
+    const stopBlast = (session.activeEffects || []).find((e) => e.type === 'STOP_BLAST' && e.status === 'active');
+    if (stopBlast && stopBlast.sourcePlayerId !== playerId) {
+      return { eligible: false, reason: 'STOP_BLAST_ACTIVE' };
+    }
+
+    const duel = (session.activeEffects || []).find((e) => e.type === 'DUEL' && e.status === 'active');
+    if (duel && !(duel.targetPlayerIds || []).includes(playerId)) {
+      return { eligible: false, reason: 'DUEL_ACTIVE' };
+    }
+
+    return { eligible: true };
+  }
+
+  _updateBSideStreaks(session, winnerId) {
+    const newlyActivated = [];
+    session.players.forEach((player) => {
+      player.effects = player.effects || { lossStreak: 0, bSideActive: false };
+      if (winnerId && player.id === winnerId) {
+        player.effects.lossStreak = 0;
+        return;
+      }
+      const prev = Math.max(0, Number(player.effects.lossStreak) || 0);
+      const next = prev + 1;
+      player.effects.lossStreak = next;
+      if (next >= 3 && !player.effects.bSideActive) {
+        player.effects.bSideActive = true;
+        newlyActivated.push(player.id);
+      }
+    });
+    return newlyActivated;
+  }
+
+  _advanceRoundState(session) {
+    // Called when moving to next round. Decrement freeze/round-based effects, expire alliances, clear round-scoped effects.
+    (session.activeEffects || []).forEach((effect) => {
+      if (effect.status !== 'active') return;
+      if (effect.type === 'FREEZE') {
+        effect.roundsLeft = Math.max(0, (Number(effect.roundsLeft) || 0) - 1);
+        if (effect.roundsLeft <= 0) effect.status = 'expired';
+      }
+      if (effect.type === 'STOP_BLAST' || effect.type === 'DUEL') {
+        effect.status = 'expired';
+      }
+      // FEATURING persists until consumed in reveal or explicitly expired; keep active.
+    });
+
+    (session.alliances || []).forEach((alliance) => {
+      if (alliance.status !== 'active') return;
+      alliance.roundsLeft = Math.max(0, (Number(alliance.roundsLeft) || 0) - 1);
+      if (alliance.roundsLeft <= 0) alliance.status = 'expired';
+    });
+
+    this._syncDerivedPlayerEffects(session);
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -130,6 +342,17 @@ class GameSessionService {
         powerCardsUsed: 0,
         totalComboStreak: 0,
       },
+      effects: {
+        isFrozen: false,
+        frozenRoundsLeft: 0,
+        frozenForRound: null,
+        lossStreak: 0,
+        bSideActive: false,
+        stopBlastActive: false,
+        duelActive: false,
+        duelOpponentId: null,
+        featuringPartnerId: null,
+      },
     }));
 
     const session = {
@@ -155,6 +378,17 @@ class GameSessionService {
       timeRemaining: timeLimit,
       startedAt: null,
       history: [],
+      alliances: [],
+      activeEffects: [],
+      doublePlatinumActive: false,
+      processedIdempotencyKeys: {},
+      timer: {
+        durationMs: Number(timeLimit) * 1000,
+        remainingMs: Number(timeLimit) * 1000,
+        startedAt: null,
+        pausedAt: null,
+        isPaused: false,
+      },
     };
 
     this.sessions.set(sessionId, session);
@@ -191,15 +425,34 @@ class GameSessionService {
   // ✅ REVELAR RESPUESTA CON INTEGRACIÓN DE POWER CARDS
   // ═══════════════════════════════════════════════════════════════
 
-  revealAnswer(sessionId, winnerId = null, scoreModifiers = {}) {
+  revealAnswer(sessionId, winnerId = null, scoreModifiers = {}, options = {}) {
     const session = this.sessions.get(sessionId);
 
     if (!session || !session.currentRound) {
       return { success: false, error: 'No hay ronda activa' };
     }
 
+    const idempotencyKey = options.idempotencyKey || null;
+    const idem = this._idempotencyGuard(session, 'reveal', idempotencyKey, { winnerId, scoreModifiers });
+    if (idem.hit) {
+      if (idem.conflict) return { success: false, error: 'Conflicto de idempotencia en reveal', statusCode: 409 };
+      return idem.result;
+    }
+
     if (winnerId && !session.players.some((player) => player.id === winnerId)) {
       return { success: false, error: 'Jugador ganador no pertenece a la sesión' };
+    }
+
+    if (winnerId) {
+      const eligibility = this._getRevealEligibility(session, winnerId);
+      if (!eligibility.eligible) {
+        return {
+          success: false,
+          error: 'El jugador no es elegible para ganar esta ronda',
+          reason: eligibility.reason,
+          statusCode: 400,
+        };
+      }
     }
 
     const modifierKeys = ['alliancePartnerId', 'featuringPartnerId', 'bSidePlayerId'];
@@ -223,6 +476,39 @@ class GameSessionService {
     if (invalidModifier) {
       return { success: false, error: 'Ajustes de puntuación inválidos' };
     }
+
+    // Canonicalize modifiers from server state; reject mismatches when client sends them.
+    const canonicalModifiers = {};
+    if (winnerId) {
+      const alliance = this._getPlayerAlliance(session, winnerId);
+      if (alliance) {
+        canonicalModifiers.alliancePartnerId =
+          alliance.player1Id === winnerId ? alliance.player2Id : alliance.player1Id;
+      }
+      const featuring = (session.activeEffects || []).find(
+        (e) => e.type === 'FEATURING' && e.status === 'active' &&
+          (e.sourcePlayerId === winnerId || (e.targetPlayerIds || []).includes(winnerId)),
+      );
+      if (featuring) {
+        canonicalModifiers.featuringPartnerId =
+          featuring.sourcePlayerId === winnerId ? featuring.targetPlayerIds[0] : featuring.sourcePlayerId;
+      }
+      const winner = this._getPlayer(session, winnerId);
+      if (winner?.effects?.bSideActive) {
+        canonicalModifiers.bSidePlayerId = winnerId;
+      }
+    }
+
+    const legacyModifiers = {};
+    for (const key of modifierKeys) {
+      if (scoreModifiers[key] && canonicalModifiers[key] && scoreModifiers[key] !== canonicalModifiers[key]) {
+        return { success: false, error: `Modificador ${key} no coincide con el estado canónico`, statusCode: 400 };
+      }
+      if (scoreModifiers[key] && !canonicalModifiers[key]) {
+        legacyModifiers[key] = scoreModifiers[key]; // backward compat
+      }
+    }
+    scoreModifiers = { ...canonicalModifiers, ...legacyModifiers };
 
     const round = session.currentRound;
     const answer = round._answer;
@@ -479,6 +765,27 @@ class GameSessionService {
       settledModifiers.push({ type: 'B_SIDE', playerId: player.id, points: 1 });
     }
 
+    // Consume featuring effect if used
+    if (winnerId && canonicalModifiers.featuringPartnerId) {
+      const featuring = (session.activeEffects || []).find(
+        (e) => e.type === 'FEATURING' && e.status === 'active' &&
+          (e.sourcePlayerId === winnerId || (e.targetPlayerIds || []).includes(winnerId)),
+      );
+      if (featuring) featuring.status = 'consumed';
+    }
+
+    // Clear B-SIDE activation on successful comeback (bonus already applied above)
+    if (winnerId && canonicalModifiers.bSidePlayerId) {
+      const winnerPlayer = this._getPlayer(session, winnerId);
+      if (winnerPlayer?.effects) {
+        winnerPlayer.effects.bSideActive = false;
+        winnerPlayer.effects.lossStreak = 0;
+      }
+    }
+
+    // Update B-SIDE streaks for all players based on round outcome
+    const newlyActivatedBSide = this._updateBSideStreaks(session, winnerId);
+
     if (winnerId && session.worldTourRoutes) {
       const winner = session.players.find((player) => player.id === winnerId);
       winner.boardPosition = Math.min(winner.boardPosition + 1, 21);
@@ -490,6 +797,8 @@ class GameSessionService {
     }
 
     results.scoreModifiers = settledModifiers;
+    results.bSideActivatedPlayerIds = newlyActivatedBSide;
+    this._syncDerivedPlayerEffects(session);
 
     // Verificar ganador del juego
     const gameWinner = this._checkWinner(session);
@@ -502,7 +811,7 @@ class GameSessionService {
 
     console.log(`═══════════════════════\n`);
 
-    return {
+    const response = {
       success: true,
       session: this._sanitizeSession(session),
       results,
@@ -524,8 +833,11 @@ class GameSessionService {
           powerCardsUsed: p.stats.powerCardsUsed || 0,
           totalComboStreak: p.stats.totalComboStreak || 0,
         },
+        effects: p.effects || {},
       })),
     };
+    this._commitIdempotency(session, 'reveal', idempotencyKey, { winnerId, scoreModifiers: canonicalModifiers }, response);
+    return response;
   }
 
   /**
@@ -600,6 +912,216 @@ class GameSessionService {
         availableTokens: [...player.availableTokens],
         stats: { ...player.stats },
       })),
+    };
+  }
+
+  _stablePick(ids, seedStr) {
+    if (!ids || ids.length === 0) return null;
+    let hash = 0;
+    for (let i = 0; i < seedStr.length; i++) hash = ((hash << 5) - hash) + seedStr.charCodeAt(i) | 0;
+    const idx = Math.abs(hash) % ids.length;
+    return ids[idx];
+  }
+
+  _pushEvent(session, event) {
+    session.history = session.history || [];
+    session.history.push({ ...event, timestamp: new Date().toISOString() });
+  }
+
+  applyReactionCard(sessionId, command = {}, options = {}) {
+    const session = this.sessions.get(sessionId);
+    if (!session) return { success: false, error: 'Sesión no encontrada', statusCode: 404 };
+    if (session.status !== 'playing') return { success: false, error: 'La sesión no está en juego', statusCode: 400 };
+
+    const { sourcePlayerId, cardType, targetPlayerId = null, payload = {} } = command || {};
+    const idempotencyKey = options.idempotencyKey || command.idempotencyKey || null;
+    const idemPayload = { sourcePlayerId, cardType, targetPlayerId, payload };
+    const idem = this._idempotencyGuard(session, 'reaction', idempotencyKey, idemPayload);
+    if (idem.hit) {
+      if (idem.conflict) return { success: false, error: 'Conflicto de idempotencia en reaction card', statusCode: 409 };
+      return idem.result;
+    }
+
+    const source = this._getPlayer(session, sourcePlayerId);
+    if (!source) return { success: false, error: 'Jugador origen no encontrado', statusCode: 400 };
+    if (targetPlayerId && !this._getPlayer(session, targetPlayerId)) {
+      return { success: false, error: 'Jugador objetivo no encontrado', statusCode: 400 };
+    }
+
+    const round = session.round || 0;
+    const effectId = `eff_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    let event = { type: 'REACTION_CARD', cardType, sourcePlayerId, targetPlayerId, round };
+    let resultData = {};
+
+    const ensureNoDuplicateActive = (type, predicate) => {
+      return (session.activeEffects || []).some((e) => e.status === 'active' && e.type === type && (!predicate || predicate(e)));
+    };
+
+    switch (cardType) {
+      case 'MUTE': {
+        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        const existing = (session.activeEffects || []).find((e) => e.status === 'active' && e.type === 'FREEZE' && e.sourceCard === 'MUTE' && (e.targetPlayerIds || []).includes(targetPlayerId));
+        if (existing) {
+          existing.status = 'expired';
+          resultData = { action: 'unfrozen', targetPlayerId };
+        } else {
+          session.activeEffects.push({
+            id: effectId, type: 'FREEZE', sourceCard: 'MUTE', sourcePlayerId,
+            targetPlayerIds: [targetPlayerId], roundsLeft: 1, createdAtRound: round, status: 'active',
+          });
+          resultData = { action: 'frozen', targetPlayerId, roundsLeft: 1 };
+        }
+        break;
+      }
+      case 'ARTIST_HOLD': {
+        const maxScore = Math.max(...session.players.map((p) => p.score));
+        const leaders = session.players.filter((p) => p.score === maxScore).map((p) => p.id);
+        if (leaders.length === 0) return { success: false, error: 'No hay líderes para congelar', statusCode: 400 };
+        session.activeEffects.push({
+          id: effectId, type: 'FREEZE', sourceCard: 'ARTIST_HOLD', sourcePlayerId,
+          targetPlayerIds: leaders, roundsLeft: 2, createdAtRound: round, status: 'active',
+        });
+        resultData = { targetPlayerIds: leaders, roundsLeft: 2 };
+        break;
+      }
+      case 'STOP_BLAST': {
+        if (ensureNoDuplicateActive('STOP_BLAST')) return { success: false, error: 'STOP_BLAST ya está activo', statusCode: 400 };
+        session.activeEffects.push({
+          id: effectId, type: 'STOP_BLAST', sourceCard: 'STOP_BLAST', sourcePlayerId,
+          targetPlayerIds: [sourcePlayerId], roundsLeft: 1, createdAtRound: round, status: 'active',
+        });
+        resultData = { holderId: sourcePlayerId };
+        break;
+      }
+      case 'DUEL': {
+        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        if (targetPlayerId === sourcePlayerId) return { success: false, error: 'No puedes retarte a ti mismo', statusCode: 400 };
+        if (ensureNoDuplicateActive('DUEL')) return { success: false, error: 'DUEL ya está activo', statusCode: 400 };
+        session.activeEffects.push({
+          id: effectId, type: 'DUEL', sourceCard: 'DUEL', sourcePlayerId,
+          targetPlayerIds: [sourcePlayerId, targetPlayerId], roundsLeft: 1, createdAtRound: round, status: 'active',
+        });
+        resultData = { challengerId: sourcePlayerId, opponentId: targetPlayerId };
+        break;
+      }
+      case 'FEATURING': {
+        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        if (targetPlayerId === sourcePlayerId) return { success: false, error: 'No puedes hacer featuring contigo mismo', statusCode: 400 };
+        const existing = (session.activeEffects || []).find((e) => e.status === 'active' && e.type === 'FEATURING' && e.sourcePlayerId === sourcePlayerId);
+        if (existing) return { success: false, error: 'Ya tienes un FEATURING activo', statusCode: 400 };
+        session.activeEffects.push({
+          id: effectId, type: 'FEATURING', sourceCard: 'FEATURING', sourcePlayerId,
+          targetPlayerIds: [targetPlayerId], roundsLeft: 99, createdAtRound: round, status: 'active',
+        });
+        resultData = { featuringPlayerId: sourcePlayerId, partnerId: targetPlayerId };
+        break;
+      }
+      case 'ALLIANCE': {
+        const p2 = targetPlayerId;
+        if (!p2) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        if (p2 === sourcePlayerId) return { success: false, error: 'No puedes aliarte contigo mismo', statusCode: 400 };
+        const p1Has = this._getPlayerAlliance(session, sourcePlayerId);
+        const p2Has = this._getPlayerAlliance(session, p2);
+        if (p1Has || p2Has) return { success: false, error: 'Uno de los jugadores ya tiene alianza activa', statusCode: 400 };
+        session.alliances.push({
+          id: `all_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+          player1Id: sourcePlayerId, player2Id: p2, roundsLeft: 3, createdAtRound: round, status: 'active',
+        });
+        resultData = { player1Id: sourcePlayerId, player2Id: p2, roundsLeft: 3 };
+        break;
+      }
+      case 'ROYALTIES': {
+        const maxScore = Math.max(...session.players.map((p) => p.score));
+        const leaders = session.players.filter((p) => p.score === maxScore && p.id !== sourcePlayerId).map((p) => p.id);
+        if (leaders.length === 0) return { success: false, error: 'No hay líder válido para ROYALTIES', statusCode: 400 };
+        const leaderId = this._stablePick(leaders, `${session.id}:${round}:ROYALTIES:${sourcePlayerId}`);
+        const leader = this._getPlayer(session, leaderId);
+        leader.score = Math.max(0, leader.score - 1);
+        source.score += 1;
+        resultData = { leaderId, holderId: sourcePlayerId, amount: 1, tiedLeaderIds: leaders };
+        break;
+      }
+      case 'COPYRIGHTS': {
+        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        const points = Math.max(0, Number(payload.lastAwardedPoints) || 0);
+        const deduction = Math.floor(points / 2);
+        if (deduction <= 0) return { success: false, error: 'No hay puntos para deducir', statusCode: 400 };
+        const target = this._getPlayer(session, targetPlayerId);
+        target.score = Math.max(0, target.score - deduction);
+        resultData = { targetPlayerId, deduction, sourcePoints: points };
+        break;
+      }
+      case 'SOLD_OUT': {
+        source.score += 1;
+        resultData = { holderId: sourcePlayerId, delta: 1 };
+        break;
+      }
+      case 'BAD_REVIEW': {
+        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        const target = this._getPlayer(session, targetPlayerId);
+        target.score = Math.max(0, target.score - 1);
+        resultData = { targetPlayerId, delta: -1 };
+        break;
+      }
+      case 'MANAGEMENT_FEE': {
+        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
+        const target = this._getPlayer(session, targetPlayerId);
+        target.score = Math.max(0, target.score - 1);
+        resultData = { targetPlayerId, delta: -1 };
+        break;
+      }
+      case 'CHARITY_SHOW': {
+        const maxScore = Math.max(...session.players.map((p) => p.score));
+        const leaderIds = session.players.filter((p) => p.score === maxScore).map((p) => p.id);
+        const leaderId = this._stablePick(leaderIds, `${session.id}:${round}:CHARITY_LEADER:${sourcePlayerId}`);
+        const leader = this._getPlayer(session, leaderId);
+        if (!leader || leader.score <= 0) return { success: false, error: 'No hay líder con puntos para donar', statusCode: 400 };
+        const minScore = Math.min(...session.players.map((p) => p.score));
+        const recipients = session.players.filter((p) => p.score === minScore && p.id !== leaderId).map((p) => p.id);
+        if (recipients.length === 0) return { success: false, error: 'No hay destinatario válido', statusCode: 400 };
+        const recipientId = this._stablePick(recipients, `${session.id}:${round}:CHARITY_RECIPIENT:${sourcePlayerId}`);
+        const recipient = this._getPlayer(session, recipientId);
+        leader.score = Math.max(0, leader.score - 1);
+        recipient.score += 1;
+        resultData = { leaderId, leaderName: leader.name, recipientId, recipientName: recipient.name, tiedLeaders: leaderIds.length, tiedRecipients: recipients.length };
+        break;
+      }
+      default:
+        return { success: false, error: `Reaction Card no soportada: ${cardType}`, statusCode: 400 };
+    }
+
+    this._syncDerivedPlayerEffects(session);
+    event = { ...event, ...resultData, effectId };
+    this._pushEvent(session, event);
+
+    const response = {
+      success: true,
+      event,
+      session: this._sanitizeSession(session),
+      players: session.players.map((p) => ({
+        id: p.id, name: p.name, score: p.score, boardPosition: p.boardPosition,
+        availableTokens: [...p.availableTokens], stats: { ...p.stats }, effects: { ...p.effects },
+      })),
+      activeEffects: session.activeEffects,
+      alliances: session.alliances,
+    };
+    this._commitIdempotency(session, 'reaction', idempotencyKey, idemPayload, response);
+    return response;
+  }
+
+  dissolveAlliance(sessionId, allianceId) {
+    const session = this.sessions.get(sessionId);
+    if (!session) return { success: false, error: 'Sesión no encontrada', statusCode: 404 };
+    const alliance = (session.alliances || []).find((a) => a.id === allianceId);
+    if (!alliance) return { success: false, error: 'Alianza no encontrada', statusCode: 404 };
+    alliance.status = 'expired';
+    alliance.roundsLeft = 0;
+    this._syncDerivedPlayerEffects(session);
+    return {
+      success: true,
+      session: this._sanitizeSession(session),
+      alliances: session.alliances,
+      players: session.players.map((p) => ({ id: p.id, name: p.name, score: p.score, boardPosition: p.boardPosition, availableTokens: [...p.availableTokens], stats: { ...p.stats }, effects: { ...p.effects } })),
     };
   }
 
@@ -738,6 +1260,9 @@ class GameSessionService {
       };
     }
 
+    if (session.round > 0) {
+      this._advanceRoundState(session);
+    }
     session.round++;
 
     const filters = {
@@ -1134,12 +1659,12 @@ class GameSessionService {
   }
 
   _sanitizeSession(session) {
-    const sanitized = { ...session };
+    const sanitized = JSON.parse(JSON.stringify(session));
     delete sanitized.capabilityToken;
     delete sanitized.capabilityTokenHash;
+    delete sanitized.processedIdempotencyKeys;
 
     if (sanitized.currentRound) {
-      sanitized.currentRound = { ...sanitized.currentRound };
       delete sanitized.currentRound._answer;
     }
 

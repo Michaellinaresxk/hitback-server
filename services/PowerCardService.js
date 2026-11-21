@@ -472,6 +472,37 @@ class PowerCardService {
     ComboTracker.clearSessionData(sessionId);
   }
 
+  exportSessionState(sessionId) {
+    const prefix = `${sessionId}::`;
+    const exportMap = (store) => {
+      const out = {};
+      for (const [key, value] of store.entries()) {
+        if (key.startsWith(prefix)) out[key.slice(prefix.length)] = value;
+      }
+      return out;
+    };
+    return {
+      playerInventory: exportMap(this.playerInventory),
+      usageHistory: exportMap(this.usageHistory),
+      activePowerCards: exportMap(this.activePowerCards),
+      comboTracker: ComboTracker.exportSessionState(sessionId),
+    };
+  }
+
+  importSessionState(sessionId, state = {}) {
+    this.clearSessionData(sessionId);
+    const prefix = `${sessionId}::`;
+    const importMap = (store, data = {}) => {
+      Object.entries(data).forEach(([playerId, value]) => {
+        store.set(`${prefix}${playerId}`, value);
+      });
+    };
+    importMap(this.playerInventory, state.playerInventory || {});
+    importMap(this.usageHistory, state.usageHistory || {});
+    importMap(this.activePowerCards, state.activePowerCards || {});
+    if (state.comboTracker) ComboTracker.importSessionState(sessionId, state.comboTracker);
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // 🔧 MÉTODOS PRIVADOS
   // ═══════════════════════════════════════════════════════════════

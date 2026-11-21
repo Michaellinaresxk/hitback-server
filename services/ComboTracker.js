@@ -203,6 +203,24 @@ class ComboTracker {
     }
   }
 
+  exportSessionState(sessionId) {
+    const prefix = `${sessionId}::`;
+    const playerStreaks = {};
+    for (const [playerId, data] of this.playerStreaks.entries()) {
+      if (playerId.startsWith(prefix)) playerStreaks[playerId.slice(prefix.length)] = data;
+    }
+    return { playerStreaks };
+  }
+
+  importSessionState(sessionId, state = {}) {
+    this.clearSessionData(sessionId);
+    const prefix = `${sessionId}::`;
+    const streaks = state.playerStreaks || {};
+    Object.entries(streaks).forEach(([playerId, data]) => {
+      this.playerStreaks.set(`${prefix}${playerId}`, data);
+    });
+  }
+
   // ═══════════════════════════════════════════════════════════════
   // MÉTODOS PRIVADOS
   // ═══════════════════════════════════════════════════════════════

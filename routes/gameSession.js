@@ -243,15 +243,16 @@ router.post('/session/:id/bet', async (req, res) => {
 router.post('/session/:id/reveal', async (req, res) => {
   try {
     const { id } = req.params;
-    const { winnerId, scoreModifiers = {} } = req.body || {};
+    const { winnerId, scoreModifiers = {}, idempotencyKey } = req.body || {};
 
     console.log(`✅ Revelando respuesta: sesión ${id}, ganador ${winnerId || 'nadie'}`);
 
     const result = await persistMutation(id, () =>
-      gameService.revealAnswer(id, winnerId, scoreModifiers),
+      gameService.revealAnswer(id, winnerId, scoreModifiers, { idempotencyKey }),
     );
 
-    res.status(result.success ? 200 : 400).json(result);
+    const status = result.success ? 200 : (result.statusCode || 400);
+    res.status(status).json(result);
   } catch (error) {
     sendRouteError(res, '❌ Error revelando respuesta:', error);
   }
@@ -397,6 +398,37 @@ router.post('/session/:id/double-platinum', async (req, res) => {
     res.status(result.success ? 200 : 400).json(result);
   } catch (error) {
     sendRouteError(res, '❌ Error activando Double Platinum:', error);
+  }
+});
+
+/**
+ * POST /api/v2/game/session/:id/reaction-cards/apply
+ * Apply a Reaction Card canonically on the server.
+ */
+router.post('/session/:id/reaction-cards/apply', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const command = req.body || {};
+    const result = await persistMutation(id, () =>
+      gameService.applyReactionCard(id, command, { idempotencyKey: command.idempotencyKey }),
+    );
+    const status = result.success ? 200 : (result.statusCode || 400);
+    res.status(status).json(result);
+  } catch (error) {
+    sendRouteError(res, '❌ Error aplicando reaction card:', error);
+  }
+});
+
+router.post('/session/:id/alliances/:allianceId/dissolve', async (req, res) => {
+  try {
+    const { id, allianceId } = req.params;
+    const result = await persistMutation(id, () =>
+      gameService.dissolveAlliance(id, allianceId),
+    );
+    const status = result.success ? 200 : (result.statusCode || 400);
+    res.status(status).json(result);
+  } catch (error) {
+    sendRouteError(res, '❌ Error disolviendo alianza:', error);
   }
 });
 

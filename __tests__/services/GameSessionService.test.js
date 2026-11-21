@@ -182,10 +182,11 @@ describe('GameSessionService contracts used by Expo', () => {
 
   test('advances one tile per winner and ranks by fans then progress at the finish', async () => {
     const { session } = createSession(service, { players: ['Ada', 'Lin'] });
+    const live = service.sessions.get(session.id);
     service.startGame(session.id);
-    session.players[0].boardPosition = 20;
-    session.players[0].score = 8;
-    session.players[1].score = 20;
+    live.players[0].boardPosition = 20;
+    live.players[0].score = 8;
+    live.players[1].score = 20;
     await service.nextRound(session.id);
 
     const reveal = service.revealAnswer(session.id, 'player_1');
@@ -198,10 +199,10 @@ describe('GameSessionService contracts used by Expo', () => {
       boardPosition: 0,
     });
 
-    session.players[0].score = 20;
-    session.players[1].score = 20;
-    session.players[1].boardPosition = 20;
-    expect(service._checkWinner(session).id).toBe('player_1');
+    live.players[0].score = 20;
+    live.players[1].score = 20;
+    live.players[1].boardPosition = 20;
+    expect(service._checkWinner(live).id).toBe('player_1');
   });
 
   test('rejects malformed or incomplete World Tour routes', () => {
@@ -219,8 +220,9 @@ describe('GameSessionService contracts used by Expo', () => {
     const { session, capabilityToken } = createSession(service, {
       players: ['Ada', 'Lin'],
     });
-    session.players[0].boardPosition = 7;
-    session.players[0].score = 12;
+    const live = service.sessions.get(session.id);
+    live.players[0].boardPosition = 7;
+    live.players[0].score = 12;
 
     let savedSnapshot;
     const persistence = {
