@@ -801,12 +801,22 @@ class GameSessionService {
     this._syncDerivedPlayerEffects(session);
 
     // Verificar ganador del juego
+    const scoreToWin = session.config?.targetScore ?? 22;
     const gameWinner = this._checkWinner(session);
-    if (gameWinner) {
+    if (gameWinner && gameWinner.gameOver) {
       session.status = 'finished';
       results.gameOver = true;
       results.gameWinner = gameWinner;
+      results.isCandidate = false;
       console.log(`🏆 GAME OVER - ${gameWinner.name}`);
+    } else {
+      // Near-win warning (1 point away from target)
+      const candidate = session.players.find((p) => p.score === scoreToWin - 1);
+      if (candidate) {
+        results.isCandidate = true;
+        results.candidatePlayerId = candidate.id;
+        results.candidatePlayerName = candidate.name;
+      }
     }
 
     console.log(`═══════════════════════\n`);
@@ -1634,18 +1644,19 @@ class GameSessionService {
   }
 
   _checkWinner(session) {
+    const scoreToWin = session.config?.targetScore ?? 22;
     const finisher = session.players.some((player) => player.boardPosition >= 21);
-    if (!finisher) return null;
+    const scoreWinner = session.players.some((player) => player.score >= scoreToWin);
+    if (!finisher && !scoreWinner) return null;
 
     const [winner] = [...session.players].sort(
       (left, right) =>
         right.score - left.score || right.boardPosition - left.boardPosition,
     );
 
-    // Determinar estado de fin de juego
-    const scoreToWin = session.config?.targetScore ?? 22;
-    const isExactWinner = winner.score >= scoreToWin;
-    const isCandidate = winner.score === scoreToWin - 1; // 21 de 22 = candidato
+    const reachedScoreTarget = winner.score >= scoreToWin;
+    const gameOver = reachedScoreTarget || finisher;
+    const isCandidate = !reachedScoreTarget && winner.score === scoreToWin - 1;
 
     return {
       id: winner.id,
@@ -1653,8 +1664,8 @@ class GameSessionService {
       score: winner.score,
       boardPosition: winner.boardPosition,
       stats: winner.stats,
-      gameOver: isExactWinner,
-      isCandidate, // verdadero cuando score = targetScore - 1 (21/22)
+      gameOver,
+      isCandidate,
     };
   }
 
