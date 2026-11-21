@@ -294,7 +294,7 @@ app.post('/api/test/deezer-fallback', async (req, res) => {
 // ========================================
 // MANEJO DE ERRORES
 // ========================================
-app.use('*', (req, res) => {
+app.use((req, res) => {
   console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.sendNotFound('Endpoint', req.originalUrl);
 });
