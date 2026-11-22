@@ -16,17 +16,27 @@ const QuestionService = require('./QuestionService');
 const DeezerService = require('./DeezerService');
 const PowerCardService = require('./PowerCardService');
 const GameSessionPersistence = require('./GameSessionPersistence');
+const {
+  createDeck,
+  drawCard,
+  isBackstagePosition,
+} = require('./BackstageDeck');
+const { BACKSTAGE_INTERVAL } = require('../constants/backstage');
 const crypto = require('crypto');
+
+const PLAY_MODES = new Set(['physical', 'digital']);
 
 class GameSessionService {
   constructor({
     trackService = defaultTrackService,
     questionService,
     persistence = new GameSessionPersistence(),
+    backstageRng = Math.random,
   } = {}) {
     this.trackService = trackService;
     this.questionService = questionService || new QuestionService();
     this.persistence = persistence;
+    this.backstageRng = backstageRng;
     this.sessions = new Map();
     this.initialized = false;
   }
@@ -46,6 +56,25 @@ class GameSessionService {
       ? session.processedIdempotencyKeys
       : {};
     session.doublePlatinumActive = Boolean(session.doublePlatinumActive);
+    session.config = session.config && typeof session.config === 'object' ? session.config : {};
+    session.config.playMode = PLAY_MODES.has(session.config.playMode)
+      ? session.config.playMode
+      : 'physical';
+    if (session.config.playMode === 'digital') {
+      session.config.backstageInterval =
+        Number.isInteger(session.config.backstageInterval) &&
+        session.config.backstageInterval > 0
+          ? session.config.backstageInterval
+          : BACKSTAGE_INTERVAL;
+      session.backstageDeck = Array.isArray(session.backstageDeck)
+        ? session.backstageDeck
+        : [];
+      session.lastBackstageCard = session.lastBackstageCard || null;
+    }
+    session.backstageCard =
+      session.backstageCard && typeof session.backstageCard === 'object'
+        ? session.backstageCard
+        : null;
     session.timer = session.timer && typeof session.timer === 'object'
       ? {
           durationMs: Number(session.timer.durationMs) || (Number(session.config?.timeLimit) || 1200) * 1000,
@@ -146,6 +175,7 @@ class GameSessionService {
 
   restoreSession(sessionId, snapshot) {
     if (snapshot) {
+      this._normalizeSession(snapshot);
       this.sessions.set(sessionId, snapshot);
       if (snapshot.powerCardState) PowerCardService.importSessionState(sessionId, snapshot.powerCardState);
     } else {
@@ -311,10 +341,16 @@ class GameSessionService {
       timeLimit = 1200,
       powerCardsPerPlayer = 3,
       worldTourRoutes = null,
+      playMode,
+      backstageInterval = BACKSTAGE_INTERVAL,
     } = config;
 
     if (!Array.isArray(players) || players.length < 2 || players.length > 8) {
       return { success: false, error: 'Se requieren entre 2 y 8 jugadores' };
+    }
+
+    if (!PLAY_MODES.has(playMode)) {
+      return { success: false, error: 'playMode inválido' };
     }
 
     const playerIds = players.map((_, index) => `player_${index + 1}`);
@@ -368,6 +404,15 @@ class GameSessionService {
         targetScore,
         timeLimit,
         powerCardsPerPlayer,
+        playMode,
+        ...(playMode === 'digital'
+          ? {
+              backstageInterval:
+                Number.isInteger(backstageInterval) && backstageInterval > 0
+                  ? backstageInterval
+                  : BACKSTAGE_INTERVAL,
+            }
+          : {}),
       },
       players: playerList,
       worldTourRoutes,
@@ -382,6 +427,13 @@ class GameSessionService {
       activeEffects: [],
       doublePlatinumActive: false,
       processedIdempotencyKeys: {},
+      ...(playMode === 'digital'
+        ? {
+            backstageDeck: createDeck(this.backstageRng),
+            lastBackstageCard: null,
+            backstageCard: null,
+          }
+        : {}),
       timer: {
         durationMs: Number(timeLimit) * 1000,
         remainingMs: Number(timeLimit) * 1000,
@@ -525,6 +577,7 @@ class GameSessionService {
       tokenBonus: 0,
       powerCardEffect: null, // ✅ NUEVA PROP
       comboStatus: null, // ✅ NUEVA PROP
+      backstage: null,
     };
 
     console.log(`\n═══ REVEAL ANSWER ═══`);
@@ -819,6 +872,36 @@ class GameSessionService {
       }
     }
 
+    // Streaming: landing on a backstage tile draws the session card. The draw
+    // belongs to this persisted mutation, so a failed snapshot rolls it back.
+    if (winnerId && session.config?.playMode === 'digital' && !results.gameOver) {
+      const winner = this._getPlayer(session, winnerId);
+      const interval = session.config.backstageInterval || BACKSTAGE_INTERVAL;
+      if (winner && isBackstagePosition(winner.boardPosition, interval)) {
+        const { card, deck } = drawCard(
+          session.backstageDeck,
+          session.lastBackstageCard,
+          this.backstageRng,
+        );
+        session.backstageDeck = deck;
+        session.lastBackstageCard = card;
+        const route = session.worldTourRoutes?.[winnerId];
+        const cityId = Array.isArray(route)
+          ? route[winner.boardPosition]?.cityId || null
+          : null;
+        session.backstageCard = {
+          playerId: winnerId,
+          cardType: card,
+          position: winner.boardPosition,
+          cityId,
+        };
+        results.backstage = session.backstageCard;
+        console.log(
+          `🎟️ BACKSTAGE ${winner.name} @ ${winner.boardPosition}: ${card}`,
+        );
+      }
+    }
+
     console.log(`═══════════════════════\n`);
 
     const response = {
@@ -956,6 +1039,22 @@ class GameSessionService {
     if (!source) return { success: false, error: 'Jugador origen no encontrado', statusCode: 400 };
     if (targetPlayerId && !this._getPlayer(session, targetPlayerId)) {
       return { success: false, error: 'Jugador objetivo no encontrado', statusCode: 400 };
+    }
+
+    const isDigital = session.config?.playMode === 'digital';
+    if (isDigital) {
+      const pending = session.backstageCard;
+      if (
+        !pending ||
+        pending.playerId !== sourcePlayerId ||
+        pending.cardType !== cardType
+      ) {
+        return {
+          success: false,
+          error: 'No hay carta de backstage para ese jugador',
+          statusCode: 400,
+        };
+      }
     }
 
     const round = session.round || 0;
@@ -1101,6 +1200,7 @@ class GameSessionService {
     }
 
     this._syncDerivedPlayerEffects(session);
+    if (isDigital) session.backstageCard = null;
     event = { ...event, ...resultData, effectId };
     this._pushEvent(session, event);
 
@@ -1117,6 +1217,34 @@ class GameSessionService {
     };
     this._commitIdempotency(session, 'reaction', idempotencyKey, idemPayload, response);
     return response;
+  }
+
+  discardBackstageCard(sessionId, playerId = null) {
+    const session = this.sessions.get(sessionId);
+    if (!session) {
+      return { success: false, error: 'Sesión no encontrada', statusCode: 404 };
+    }
+    const pending = session.backstageCard;
+    if (!pending) {
+      return {
+        success: true,
+        discarded: false,
+        session: this._sanitizeSession(session),
+      };
+    }
+    if (playerId && pending.playerId !== playerId) {
+      return {
+        success: false,
+        error: 'No hay carta de backstage para ese jugador',
+        statusCode: 400,
+      };
+    }
+    session.backstageCard = null;
+    return {
+      success: true,
+      discarded: true,
+      session: this._sanitizeSession(session),
+    };
   }
 
   dissolveAlliance(sessionId, allianceId) {
@@ -1257,6 +1385,10 @@ class GameSessionService {
           },
         },
       };
+    }
+
+    if (session.config?.playMode === 'digital') {
+      session.backstageCard = null;
     }
 
     const winner = this._checkWinner(session);
@@ -1674,6 +1806,8 @@ class GameSessionService {
     delete sanitized.capabilityToken;
     delete sanitized.capabilityTokenHash;
     delete sanitized.processedIdempotencyKeys;
+    delete sanitized.backstageDeck;
+    delete sanitized.lastBackstageCard;
 
     if (sanitized.currentRound) {
       delete sanitized.currentRound._answer;

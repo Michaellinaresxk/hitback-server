@@ -30,6 +30,7 @@ const createWorldTourRoutes = (players) =>
 
 const sessionConfig = (players, overrides = {}) => ({
   players,
+  playMode: 'physical',
   worldTourRoutes: createWorldTourRoutes(players),
   ...overrides,
 });
@@ -160,6 +161,8 @@ describe('Expo HTTP contract', () => {
       .send({ winnerId: 'player_1' });
     expect(reveal.status).toBe(200);
     expect(reveal.body.results.pointsAwarded).toBe(6);
+    expect(reveal.body.results.backstage).toBeNull();
+    expect(reveal.body.session.backstageDeck).toBeUndefined();
     expect(reveal.body.players[0].score).toBe(6);
   });
 
@@ -303,7 +306,7 @@ describe('Expo HTTP contract', () => {
   test('requires one valid World Tour route per player when creating a session', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
-      .send({ players: ['Ada', 'Lin'] });
+      .send({ players: ['Ada', 'Lin'], playMode: 'physical' });
 
     expect(created.status).toBe(400);
     expect(created.body.error).toBe('Rutas de World Tour inválidas');
@@ -422,5 +425,119 @@ describe('Expo HTTP contract', () => {
     ).set(auth(token));
     expect(result.status).toBe(200);
     expect(result.body.active).toBe(true);
+  });
+
+  test('requires a valid playMode when creating a session', async () => {
+    const missing = await request(app)
+      .post('/api/v2/game/session')
+      .send({
+        players: ['Ada', 'Lin'],
+        worldTourRoutes: createWorldTourRoutes(['Ada', 'Lin']),
+      });
+    expect(missing.status).toBe(400);
+    expect(missing.body.error).toBe('playMode inválido');
+
+    const invalid = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { playMode: 'cassette' }));
+    expect(invalid.status).toBe(400);
+    expect(invalid.body.error).toBe('playMode inválido');
+  });
+
+  test('reveals, applies and discards a Streaming backstage card over HTTP', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { playMode: 'digital' }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    expect(created.body.session.config).toMatchObject({
+      playMode: 'digital',
+      backstageInterval: 3,
+    });
+    expect(created.body.session.backstageDeck).toBeUndefined();
+
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const live = gameSessionRouter.gameService.sessions.get(id);
+    live.players[0].boardPosition = 2;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/round`)
+      .set(auth(token));
+
+    const reveal = await request(app)
+      .post(`/api/v2/game/session/${id}/reveal`)
+      .set(auth(token))
+      .send({ winnerId: 'player_1' });
+    expect(reveal.status).toBe(200);
+    expect(reveal.body.results.backstage).toMatchObject({
+      playerId: 'player_1',
+      position: 3,
+      cityId: 'city_0_3',
+    });
+    expect(reveal.body.session.backstageCard).toEqual(
+      reveal.body.results.backstage,
+    );
+    expect(reveal.body.session.backstageDeck).toBeUndefined();
+    expect(reveal.body.session.lastBackstageCard).toBeUndefined();
+
+    live.backstageCard = {
+      playerId: 'player_1',
+      cardType: 'SOLD_OUT',
+      position: 3,
+      cityId: 'city_0_3',
+    };
+    const wrongSource = await request(app)
+      .post(`/api/v2/game/session/${id}/reaction-cards/apply`)
+      .set(auth(token))
+      .send({ sourcePlayerId: 'player_2', cardType: 'SOLD_OUT' });
+    expect(wrongSource.status).toBe(400);
+    expect(live.backstageCard).not.toBeNull();
+
+    const applied = await request(app)
+      .post(`/api/v2/game/session/${id}/reaction-cards/apply`)
+      .set(auth(token))
+      .send({ sourcePlayerId: 'player_1', cardType: 'SOLD_OUT' });
+    expect(applied.status).toBe(200);
+    expect(live.backstageCard).toBeNull();
+
+    live.backstageCard = {
+      playerId: 'player_1',
+      cardType: 'SOLD_OUT',
+      position: 3,
+      cityId: 'city_0_3',
+    };
+    const discarded = await request(app)
+      .post(`/api/v2/game/session/${id}/backstage/discard`)
+      .set(auth(token))
+      .send({ playerId: 'player_1' });
+    expect(discarded.status).toBe(200);
+    expect(discarded.body.discarded).toBe(true);
+    expect(live.backstageCard).toBeNull();
+  });
+
+  test('clears an unused Streaming card when the next round starts', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { playMode: 'digital' }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const live = gameSessionRouter.gameService.sessions.get(id);
+    live.backstageCard = {
+      playerId: 'player_1',
+      cardType: 'SOLD_OUT',
+      position: 3,
+      cityId: 'city_0_3',
+    };
+
+    const round = await request(app)
+      .post(`/api/v2/game/session/${id}/round`)
+      .set(auth(token));
+
+    expect(round.status).toBe(200);
+    expect(live.backstageCard).toBeNull();
   });
 });

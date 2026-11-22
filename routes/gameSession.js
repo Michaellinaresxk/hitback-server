@@ -419,6 +419,24 @@ router.post('/session/:id/reaction-cards/apply', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/v2/game/session/:id/backstage/discard
+ * Discard the pending Streaming backstage card without applying it.
+ */
+router.post('/session/:id/backstage/discard', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { playerId = null } = req.body || {};
+    const result = await persistMutation(id, () =>
+      gameService.discardBackstageCard(id, playerId),
+    );
+    const status = result.success ? 200 : (result.statusCode || 400);
+    res.status(status).json(result);
+  } catch (error) {
+    sendRouteError(res, '❌ Error descartando carta de backstage:', error);
+  }
+});
+
 router.post('/session/:id/alliances/:allianceId/dissolve', async (req, res) => {
   try {
     const { id, allianceId } = req.params;

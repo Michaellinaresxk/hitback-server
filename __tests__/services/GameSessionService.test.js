@@ -26,6 +26,7 @@ const createTestRoutes = (playerCount) =>
 
 const createSession = (service, config) =>
   service.createSession({
+    playMode: 'physical',
     ...config,
     worldTourRoutes: createTestRoutes(config.players.length),
   });
@@ -208,6 +209,7 @@ describe('GameSessionService contracts used by Expo', () => {
   test('rejects malformed or incomplete World Tour routes', () => {
     const result = service.createSession({
       players: ['Ada', 'Lin'],
+      playMode: 'physical',
       worldTourRoutes: { player_1: [] },
     });
     expect(result).toMatchObject({
@@ -254,5 +256,165 @@ describe('GameSessionService contracts used by Expo', () => {
     expect(restored.worldTourRoutes).toEqual(session.worldTourRoutes);
     expect(restartedService.verifyCapability(session.id, capabilityToken)).toBe(true);
     expect(savedSnapshot.capabilityToken).toBeUndefined();
+  });
+
+  describe('Vinilo / Streaming backstage', () => {
+    const createDigitalSession = (players = ['Ada', 'Lin']) =>
+      createSession(service, { players, playMode: 'digital' });
+
+    const startAtPosition = async (sessionId, position) => {
+      service.startGame(sessionId);
+      const live = service.sessions.get(sessionId);
+      live.players[0].boardPosition = position;
+      await service.nextRound(sessionId);
+      return live;
+    };
+
+    test('requires a valid playMode when creating a session', () => {
+      const routes = createTestRoutes(2);
+
+      expect(
+        service.createSession({ players: ['Ada', 'Lin'], worldTourRoutes: routes }),
+      ).toMatchObject({ success: false, error: 'playMode inválido' });
+      expect(
+        service.createSession({
+          players: ['Ada', 'Lin'],
+          playMode: 'cassette',
+          worldTourRoutes: routes,
+        }),
+      ).toMatchObject({ success: false, error: 'playMode inválido' });
+    });
+
+    test('creates a secret deck and interval only for Streaming', () => {
+      const physical = createSession(service, { players: ['Ada', 'Lin'] });
+      const digital = createDigitalSession();
+
+      expect(physical.session.config.playMode).toBe('physical');
+      expect(physical.session.config.backstageInterval).toBeUndefined();
+      expect(physical.session.backstageDeck).toBeUndefined();
+
+      expect(digital.session.config).toMatchObject({
+        playMode: 'digital',
+        backstageInterval: 3,
+      });
+      expect(digital.session.backstageDeck).toBeUndefined();
+      expect(service.sessions.get(digital.session.id).backstageDeck).toHaveLength(12);
+    });
+
+    test('never draws a backstage card in Vinilo', async () => {
+      const { session } = createSession(service, { players: ['Ada', 'Lin'] });
+      const live = await startAtPosition(session.id, 2);
+
+      const reveal = service.revealAnswer(session.id, 'player_1');
+
+      expect(reveal.results.backstage).toBeNull();
+      expect(live.backstageCard).toBeUndefined();
+      expect(live.backstageDeck).toBeUndefined();
+    });
+
+    test('draws and stores the card when a Streaming reveal lands on backstage', async () => {
+      const { session } = createDigitalSession();
+      const live = await startAtPosition(session.id, 2);
+
+      const reveal = service.revealAnswer(session.id, 'player_1');
+
+      expect(reveal.results.backstage).toMatchObject({
+        playerId: 'player_1',
+        position: 3,
+        cityId: 'city_0_3',
+        cardType: expect.any(String),
+      });
+      expect(reveal.session.backstageCard).toEqual(reveal.results.backstage);
+      expect(reveal.session.backstageDeck).toBeUndefined();
+      expect(reveal.session.lastBackstageCard).toBeUndefined();
+      expect(live.backstageDeck).toHaveLength(11);
+      expect(live.lastBackstageCard).toBe(reveal.results.backstage.cardType);
+    });
+
+    test('returns null when Streaming does not land on backstage or nobody wins', async () => {
+      const { session } = createDigitalSession();
+      await startAtPosition(session.id, 0);
+
+      expect(service.revealAnswer(session.id, 'player_1').results.backstage).toBeNull();
+
+      const live = service.sessions.get(session.id);
+      live.players[0].boardPosition = 2;
+      await service.nextRound(session.id);
+      expect(service.revealAnswer(session.id).results.backstage).toBeNull();
+      expect(live.backstageCard).toBeNull();
+    });
+
+    test('rejects a mismatched Streaming card and clears it only after a valid apply', async () => {
+      const { session } = createDigitalSession();
+      const live = await startAtPosition(session.id, 2);
+      service.revealAnswer(session.id, 'player_1');
+      live.backstageCard = {
+        playerId: 'player_1',
+        cardType: 'SOLD_OUT',
+        position: 3,
+        cityId: 'city_0_3',
+      };
+
+      expect(
+        service.applyReactionCard(session.id, {
+          sourcePlayerId: 'player_2',
+          cardType: 'SOLD_OUT',
+        }),
+      ).toMatchObject({ success: false, statusCode: 400 });
+      expect(
+        service.applyReactionCard(session.id, {
+          sourcePlayerId: 'player_1',
+          cardType: 'DUEL',
+        }),
+      ).toMatchObject({ success: false, statusCode: 400 });
+      expect(live.backstageCard.cardType).toBe('SOLD_OUT');
+      expect(live.activeEffects).toHaveLength(0);
+
+      const scoreBefore = live.players[0].score;
+      expect(
+        service.applyReactionCard(session.id, {
+          sourcePlayerId: 'player_1',
+          cardType: 'SOLD_OUT',
+        }),
+      ).toMatchObject({ success: true });
+      expect(live.backstageCard).toBeNull();
+      expect(live.players[0].score).toBe(scoreBefore + 1);
+    });
+
+    test('discards or rolls over an unused Streaming card', async () => {
+      const { session } = createDigitalSession();
+      const live = await startAtPosition(session.id, 2);
+      service.revealAnswer(session.id, 'player_1');
+
+      expect(service.discardBackstageCard(session.id, 'player_2')).toMatchObject({
+        success: false,
+        statusCode: 400,
+      });
+      expect(live.backstageCard).not.toBeNull();
+      expect(service.discardBackstageCard(session.id, 'player_1')).toMatchObject({
+        success: true,
+        discarded: true,
+      });
+      expect(live.backstageCard).toBeNull();
+
+      live.backstageCard = {
+        playerId: 'player_1',
+        cardType: 'SOLD_OUT',
+        position: 3,
+        cityId: 'city_0_3',
+      };
+      await service.nextRound(session.id);
+      expect(live.backstageCard).toBeNull();
+    });
+
+    test('recovers sessions saved before the feature as Vinilo', () => {
+      const { session } = createSession(service, { players: ['Ada', 'Lin'] });
+      const live = service.sessions.get(session.id);
+      delete live.config.playMode;
+
+      service._normalizeSession(live);
+
+      expect(live.config.playMode).toBe('physical');
+    });
   });
 });
