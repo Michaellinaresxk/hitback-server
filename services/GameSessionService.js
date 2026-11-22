@@ -232,23 +232,32 @@ class GameSessionService {
   _syncDerivedPlayerEffects(session) {
     const activeAlliances = this._activeAlliances(session);
     const activeEffects = (session.activeEffects || []).filter((e) => e.status === 'active');
+    const activeDuel = activeEffects.find((e) => e.type === 'DUEL' && e.status === 'active');
     session.players.forEach((player) => {
       player.effects = player.effects || {};
       const freeze = activeEffects.find(
         (e) => e.type === 'FREEZE' && (e.targetPlayerIds || []).includes(player.id),
       );
-      player.effects.isFrozen = Boolean(freeze);
-      player.effects.frozenRoundsLeft = freeze ? Math.max(0, Number(freeze.roundsLeft) || 0) : 0;
-      player.effects.frozenForRound = freeze ? freeze.createdAtRound ?? null : null;
+      const inDuel = Boolean(activeDuel && (activeDuel.targetPlayerIds || []).includes(player.id));
+      const frozenByDuel = Boolean(activeDuel && !inDuel);
+      player.effects.isFrozen = Boolean(freeze) || frozenByDuel;
+      player.effects.frozenRoundsLeft = freeze
+        ? Math.max(0, Number(freeze.roundsLeft) || 0)
+        : frozenByDuel
+          ? Math.max(0, Number(activeDuel.roundsLeft) || 1)
+          : 0;
+      player.effects.frozenForRound = freeze
+        ? freeze.createdAtRound ?? null
+        : frozenByDuel
+          ? activeDuel.createdAtRound ?? null
+          : null;
 
       const stopBlast = activeEffects.find((e) => e.type === 'STOP_BLAST' && e.status === 'active');
       player.effects.stopBlastActive = Boolean(stopBlast && stopBlast.sourcePlayerId === player.id);
 
-      const duel = activeEffects.find((e) => e.type === 'DUEL' && e.status === 'active');
-      const inDuel = Boolean(duel && (duel.targetPlayerIds || []).includes(player.id));
       player.effects.duelActive = inDuel;
       player.effects.duelOpponentId = inDuel
-        ? (duel.targetPlayerIds || []).find((id) => id !== player.id) || null
+        ? (activeDuel.targetPlayerIds || []).find((id) => id !== player.id) || null
         : null;
 
       const featuring = activeEffects.find(
