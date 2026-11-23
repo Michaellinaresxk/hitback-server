@@ -1054,6 +1054,18 @@ class GameSessionService {
       return { success: false, error: 'Jugador objetivo no encontrado', statusCode: 400 };
     }
 
+    // Algunas cartas necesitan otro jugador además del portador. Con menos de
+    // 3 jugadores no hay compañero válido: rechazar antes de mutar el estado.
+    const PARTNER_REQUIRED_CARDS = ['FEATURING', 'DUEL', 'ALLIANCE'];
+    if (PARTNER_REQUIRED_CARDS.includes(cardType) && session.players.length < 3) {
+      return {
+        success: false,
+        error: 'Esta carta requiere al menos 3 jugadores',
+        statusCode: 400,
+        code: 'INSUFFICIENT_PLAYERS',
+      };
+    }
+
     const isDigital = session.config?.playMode === 'digital';
     if (isDigital) {
       const pending = session.backstageCard;
