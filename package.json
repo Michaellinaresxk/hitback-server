@@ -19,11 +19,12 @@
     "logs": "tail -f logs/hitback.log",
     "clean": "rm -rf logs/* backups/* && echo 'Cleaned logs and backups'",
     "backup": "node scripts/backup-data.js",
-    "lint": "eslint server.js routes controllers middleware services utils --ext .js",
-    "lint:fix": "eslint server.js routes controllers middleware services utils --ext .js --fix",
+    "lint": "eslint server.js routes controllers middleware services utils",
+    "lint:fix": "eslint server.js routes controllers middleware services utils --fix",
     "format": "prettier --write 'server.js' '{routes,controllers,middleware,services,utils}/**/*.js'",
     "docs": "node scripts/generate-docs.js",
-    "migrate": "node scripts/migrate-tracks.js"
+    "migrate": "node scripts/migrate-tracks.js",
+    "build": "npm run lint && npm test"
   },
   "keywords": [
     "music",
@@ -55,9 +56,11 @@
   },
   "devDependencies": {
     "@babel/preset-env": "^8.0.7",
+    "@eslint/js": "^9.39.5",
     "@types/jest": "^30.0.0",
     "babel-jest": "^30.5.2",
     "eslint": "^10.15.0",
+    "globals": "^17.14.0",
     "jest": "^30.5.2",
     "nodemon": "^3.1.14",
     "prettier": "^3.10.1",
@@ -88,26 +91,6 @@
       "lcov",
       "html"
     ]
-  },
-  "eslintConfig": {
-    "env": {
-      "node": true,
-      "es2021": true,
-      "jest": true
-    },
-    "extends": [
-      "eslint:recommended"
-    ],
-    "parserOptions": {
-      "ecmaVersion": 12,
-      "sourceType": "module"
-    },
-    "rules": {
-      "no-unused-vars": "warn",
-      "no-console": "off",
-      "prefer-const": "error",
-      "no-var": "error"
-    }
   },
   "prettier": {
     "semi": true,

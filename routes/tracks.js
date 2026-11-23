@@ -238,7 +238,7 @@ router.post('/:id/validate', trackValidation, asyncHandler(async (req, res) => {
     const validation = trackService.validateTrackData(track);
 
     // Validación adicional de audio
-    let audioValidation = {
+    const audioValidation = {
       hasAudioFile: !!track.audioFile,
       audioFileExists: false,
       audioFileValid: false,
