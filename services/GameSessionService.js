@@ -308,9 +308,13 @@ class GameSessionService {
       player.effects.lossStreak = next;
       // Con HOT_STREAK en la ronda se pospone la activación: el contador sigue
       // subiendo y B-SIDE se activa en el siguiente turno si sigue sin acertar.
-      if (next >= BSIDE_LOSS_THRESHOLD && !player.effects.bSideActive && !suppressActivation) {
-        player.effects.bSideActive = true;
+      if (next >= BSIDE_LOSS_THRESHOLD && !suppressActivation) {
+        // Premio de consolación: +1 fan/punto al activarse, no al hacer comeback.
+        // Se reinicia la racha para permitir un nuevo B-SIDE tras otras 4 derrotas.
+        player.score += 1;
         newlyActivated.push(player.id);
+        player.effects.bSideActive = false;
+        player.effects.lossStreak = 0;
       }
     });
     return newlyActivated;
@@ -830,13 +834,8 @@ class GameSessionService {
       });
     }
 
-    if (winnerId && scoreModifiers.bSidePlayerId) {
-      const player = session.players.find(
-        (item) => item.id === scoreModifiers.bSidePlayerId,
-      );
-      player.score += 1;
-      settledModifiers.push({ type: 'B_SIDE', playerId: player.id, points: 1 });
-    }
+    // B-SIDE ya no otorga puntos en el comeback: el +1 se da al activarse en
+    // _updateBSideStreaks. Se ignora bSidePlayerId aunque el cliente lo envíe.
 
     // Consume featuring effect if used
     if (winnerId && canonicalModifiers.featuringPartnerId) {
@@ -845,15 +844,6 @@ class GameSessionService {
           (e.sourcePlayerId === winnerId || (e.targetPlayerIds || []).includes(winnerId)),
       );
       if (featuring) featuring.status = 'consumed';
-    }
-
-    // Clear B-SIDE activation on successful comeback (bonus already applied above)
-    if (winnerId && canonicalModifiers.bSidePlayerId) {
-      const winnerPlayer = this._getPlayer(session, winnerId);
-      if (winnerPlayer?.effects) {
-        winnerPlayer.effects.bSideActive = false;
-        winnerPlayer.effects.lossStreak = 0;
-      }
     }
 
     // Update B-SIDE streaks for all players based on round outcome

@@ -375,12 +375,9 @@ describe('Expo HTTP contract', () => {
     const finalSettlement = await request(app)
       .post(`/api/v2/game/session/${id}/reveal`)
       .set(auth(token))
-      .send({
-        winnerId: 'player_1',
-        scoreModifiers: { bSidePlayerId: 'player_1' },
-      });
+      .send({ winnerId: 'player_1' });
     expect(finalSettlement.status).toBe(200);
-    expect(finalSettlement.body.players[0].score).toBe(4);
+    expect(finalSettlement.body.players[0].score).toBe(3);
     expect(finalSettlement.body.results.gameOver).toBe(true);
 
     const finishedRound = await request(app)
@@ -568,12 +565,13 @@ describe('Expo HTTP contract', () => {
     expect(third.body.results.comboStatus.type).toBe('HOT_STREAK');
     expect(third.body.results.bSideActivatedPlayerIds).toEqual([]);
     expect(live.players[1].effects.lossStreak).toBe(3);
-    expect(live.players[1].effects.bSideActive).toBe(false);
+    expect(live.players[1].score).toBe(0);
 
     // 4th round: player_2 reaches 4 consecutive losses (no new HOT_STREAK).
     const fourth = await playRound('player_1');
     expect(fourth.body.results.bSideActivatedPlayerIds).toEqual(['player_2']);
-    expect(live.players[1].effects.bSideActive).toBe(true);
+    expect(live.players[1].score).toBe(1);
+    expect(live.players[1].effects.lossStreak).toBe(0);
   });
 
   test('postpones B-SIDE when HOT_STREAK fires in the same round', async () => {
@@ -612,6 +610,39 @@ describe('Expo HTTP contract', () => {
     // Next round without combo: B-SIDE activates (streak 5 >= 4).
     const next = await playRound('player_1');
     expect(next.body.results.bSideActivatedPlayerIds).toContain('player_2');
+    expect(live.players[1].score).toBe(1);
+  });
+
+  test('B-SIDE bonus is granted once on activation, not on comeback', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { targetScore: 99 }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const live = gameSessionRouter.gameService.sessions.get(id);
+
+    const playRound = async (winnerId) => {
+      await request(app)
+        .post(`/api/v2/game/session/${id}/round`)
+        .set(auth(token));
+      return request(app)
+        .post(`/api/v2/game/session/${id}/reveal`)
+        .set(auth(token))
+        .send({ winnerId });
+    };
+
+    for (let i = 0; i < 4; i++) await playRound('player_1');
+    expect(live.players[1].score).toBe(1); // +1 al activarse
+
+    // Cuando el jugador con B-SIDE gana, no recibe otro punto extra.
+    const scoreBefore = live.players[1].score;
+    const comeback = await playRound('player_2');
+    expect(live.players[1].score).toBe(scoreBefore + comeback.body.results.pointsAwarded);
+    expect(comeback.body.results.scoreModifiers.some((m) => m.type === 'B_SIDE')).toBe(false);
+    expect(live.players[1].effects.bSideActive).toBe(false);
   });
 
   test('rejects partner-required reaction cards with fewer than 3 players', async () => {
