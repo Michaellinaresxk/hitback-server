@@ -22,6 +22,7 @@ const {
   isBackstagePosition,
 } = require('./BackstageDeck');
 const { BACKSTAGE_INTERVAL } = require('../constants/backstage');
+const { BSIDE_LOSS_THRESHOLD } = require('../constants/lossStreak');
 const crypto = require('crypto');
 
 const PLAY_MODES = new Set(['physical', 'digital']);
@@ -294,7 +295,7 @@ class GameSessionService {
     return { eligible: true };
   }
 
-  _updateBSideStreaks(session, winnerId) {
+  _updateBSideStreaks(session, winnerId, suppressActivation = false) {
     const newlyActivated = [];
     session.players.forEach((player) => {
       player.effects = player.effects || { lossStreak: 0, bSideActive: false };
@@ -305,7 +306,9 @@ class GameSessionService {
       const prev = Math.max(0, Number(player.effects.lossStreak) || 0);
       const next = prev + 1;
       player.effects.lossStreak = next;
-      if (next >= 3 && !player.effects.bSideActive) {
+      // Con HOT_STREAK en la ronda se pospone la activación: el contador sigue
+      // subiendo y B-SIDE se activa en el siguiente turno si sigue sin acertar.
+      if (next >= BSIDE_LOSS_THRESHOLD && !player.effects.bSideActive && !suppressActivation) {
         player.effects.bSideActive = true;
         newlyActivated.push(player.id);
       }
@@ -488,6 +491,9 @@ class GameSessionService {
 
   revealAnswer(sessionId, winnerId = null, scoreModifiers = {}, options = {}) {
     const session = this.sessions.get(sessionId);
+    // HOT_STREAK tiene prioridad: si se detecta en esta ronda, B-SIDE no se
+    // activa aquí (se pospone al siguiente turno si el jugador sigue perdiendo).
+    let comboDetectedThisRound = false;
 
     if (!session || !session.currentRound) {
       return { success: false, error: 'No hay ronda activa' };
@@ -697,6 +703,7 @@ class GameSessionService {
 
         // Actualizar stats de combo
         if (comboResult.comboDetected) {
+          comboDetectedThisRound = true;
           winner.stats.combosCompleted++;
 
           results.comboStatus = {
@@ -850,7 +857,11 @@ class GameSessionService {
     }
 
     // Update B-SIDE streaks for all players based on round outcome
-    const newlyActivatedBSide = this._updateBSideStreaks(session, winnerId);
+    const newlyActivatedBSide = this._updateBSideStreaks(
+      session,
+      winnerId,
+      comboDetectedThisRound,
+    );
 
     if (winnerId && session.worldTourRoutes) {
       const winner = session.players.find((player) => player.id === winnerId);

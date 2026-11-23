@@ -541,6 +541,79 @@ describe('Expo HTTP contract', () => {
     expect(live.backstageCard).toBeNull();
   });
 
+  test('activates B-SIDE after 4 losses, not 3 (aligned with Expo threshold)', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { targetScore: 99 }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const live = gameSessionRouter.gameService.sessions.get(id);
+
+    const playRound = async (winnerId) => {
+      await request(app)
+        .post(`/api/v2/game/session/${id}/round`)
+        .set(auth(token));
+      return request(app)
+        .post(`/api/v2/game/session/${id}/reveal`)
+        .set(auth(token))
+        .send({ winnerId });
+    };
+
+    await playRound('player_1');
+    await playRound('player_1');
+    const third = await playRound('player_1');
+    expect(third.body.results.comboStatus.type).toBe('HOT_STREAK');
+    expect(third.body.results.bSideActivatedPlayerIds).toEqual([]);
+    expect(live.players[1].effects.lossStreak).toBe(3);
+    expect(live.players[1].effects.bSideActive).toBe(false);
+
+    // 4th round: player_2 reaches 4 consecutive losses (no new HOT_STREAK).
+    const fourth = await playRound('player_1');
+    expect(fourth.body.results.bSideActivatedPlayerIds).toEqual(['player_2']);
+    expect(live.players[1].effects.bSideActive).toBe(true);
+  });
+
+  test('postpones B-SIDE when HOT_STREAK fires in the same round', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin', 'Bob'], { targetScore: 99 }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const live = gameSessionRouter.gameService.sessions.get(id);
+
+    const playRound = async (winnerId) => {
+      await request(app)
+        .post(`/api/v2/game/session/${id}/round`)
+        .set(auth(token));
+      return request(app)
+        .post(`/api/v2/game/session/${id}/reveal`)
+        .set(auth(token))
+        .send({ winnerId });
+    };
+
+    // player_2 acumula derrotas: 1, 2, 3... mientras player_1 gana las suyas.
+    await playRound('player_3');
+    await playRound('player_1');
+    await playRound('player_1');
+    // Ronda del HOT_STREAK: player_1 va por su 3ª victoria consecutiva y
+    // player_2 llega a 4 derrotas en la MISMA ronda. B-SIDE debe posponerse.
+    const comboRound = await playRound('player_1');
+    expect(comboRound.body.results.comboStatus.type).toBe('HOT_STREAK');
+    expect(comboRound.body.results.bSideActivatedPlayerIds).toEqual([]);
+    expect(live.players[1].effects.lossStreak).toBe(4);
+    expect(live.players[1].effects.bSideActive).toBe(false);
+
+    // Next round without combo: B-SIDE activates (streak 5 >= 4).
+    const next = await playRound('player_1');
+    expect(next.body.results.bSideActivatedPlayerIds).toContain('player_2');
+  });
+
   test('rejects partner-required reaction cards with fewer than 3 players', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
