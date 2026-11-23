@@ -569,6 +569,35 @@ describe('Expo HTTP contract', () => {
     expect(live.activeEffects.some((e) => e.type === 'FEATURING')).toBe(false);
   });
 
+  test('rejects DUEL and ALLIANCE with fewer than 3 players', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { playMode: 'digital' }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+    const live = gameSessionRouter.gameService.sessions.get(id);
+
+    for (const cardType of ['DUEL', 'ALLIANCE']) {
+      live.backstageCard = {
+        playerId: 'player_1',
+        cardType,
+        position: 3,
+        cityId: 'city_0_3',
+      };
+      const denied = await request(app)
+        .post(`/api/v2/game/session/${id}/reaction-cards/apply`)
+        .set(auth(token))
+        .send({ sourcePlayerId: 'player_1', cardType, targetPlayerId: 'player_2' });
+
+      expect(denied.status).toBe(400);
+      expect(denied.body.code).toBe('INSUFFICIENT_PLAYERS');
+    }
+    expect(live.activeEffects.some((e) => ['DUEL', 'ALLIANCE'].includes(e.type))).toBe(false);
+  });
+
   test('awards a random Power Card on a digital combo without QR scanning', async () => {
     const created = await request(app)
       .post('/api/v2/game/session')
