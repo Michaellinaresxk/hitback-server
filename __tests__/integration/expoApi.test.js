@@ -540,4 +540,38 @@ describe('Expo HTTP contract', () => {
     expect(round.status).toBe(200);
     expect(live.backstageCard).toBeNull();
   });
+
+  test('awards a random Power Card on a digital combo without QR scanning', async () => {
+    const created = await request(app)
+      .post('/api/v2/game/session')
+      .send(sessionConfig(['Ada', 'Lin'], { playMode: 'digital', targetScore: 99 }));
+    const id = created.body.session.id;
+    const token = created.body.capabilityToken;
+    await request(app)
+      .post(`/api/v2/game/session/${id}/start`)
+      .set(auth(token));
+
+    let reveal;
+    for (let i = 0; i < 3; i++) {
+      await request(app)
+        .post(`/api/v2/game/session/${id}/round`)
+        .set(auth(token));
+      reveal = await request(app)
+        .post(`/api/v2/game/session/${id}/reveal`)
+        .set(auth(token))
+        .send({ winnerId: 'player_1' });
+      expect(reveal.status).toBe(200);
+    }
+
+    expect(reveal.body.results.comboStatus).toMatchObject({ type: 'HOT_STREAK' });
+    expect(reveal.body.results.comboStatus.cardAwarded).toMatchObject({
+      id: expect.any(String),
+      type: expect.stringMatching(/^(replay|festival|double_platinum|label_fee)$/),
+      name: expect.any(String),
+      description: expect.any(String),
+      emoji: expect.any(String),
+      usageLimit: expect.any(Number),
+    });
+    expect(reveal.body.results.comboStatus.cardAwarded.qrCode).toMatch(/^HITBACK_PC_/);
+  });
 });

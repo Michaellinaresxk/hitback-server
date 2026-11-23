@@ -683,7 +683,11 @@ class GameSessionService {
         const comboResult = PowerCardService.processPlayerAnswer(
           winnerId,
           true, // Es correcta
-          { gameSessionId: sessionId, roundNumber: round.roundNumber }
+          {
+            gameSessionId: sessionId,
+            roundNumber: round.roundNumber,
+            playMode: session.config?.playMode || 'physical',
+          }
         );
 
         console.log(`🔍 DEBUG COMBO - Resultado:`);

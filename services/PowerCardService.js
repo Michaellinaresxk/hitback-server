@@ -28,6 +28,10 @@ class PowerCardService {
 
     // Cartas activas/pendientes de usar: { playerId: { cardId, status: 'pending'|'active' } }
     this.activePowerCards = new Map();
+
+    // Otorgamientos de combo ya resueltos (idempotencia digital):
+    // { "${sessionId}:${roundNumber}:${playerId}:${comboType}": cardAwarded }
+    this.awardedCombos = new Map();
   }
 
   // ═══════════════════════════════════════════════════════════════
@@ -99,7 +103,7 @@ class PowerCardService {
    * 
    * @param {string} playerId - ID del jugador
    * @param {boolean} isCorrect - ¿Acertó?
-   * @param {object} context - Contexto adicional { gameSessionId, roundNumber }
+   * @param {object} context - Contexto adicional { gameSessionId, roundNumber, playMode }
    * @returns {object} { comboDetected, cardAwarded, playerData }
    */
   processPlayerAnswer(playerId, isCorrect, context = {}) {
@@ -112,8 +116,28 @@ class PowerCardService {
     let cardAwarded = null;
 
     if (comboResult.comboDetected) {
-      cardAwarded = this._awardCardForCombo(playerId, comboResult.comboType, sessionId);
-      console.log(`⚡ Carta otorgada a ${playerId}: ${cardAwarded.name} (${cardAwarded.id})`);
+      const awardKey = `${sessionId}:${context.roundNumber}:${playerId}:${comboResult.comboType}`;
+
+      // Idempotencia: un mismo evento de combo nunca otorga dos cartas.
+      if (this.awardedCombos.has(awardKey)) {
+        cardAwarded = this.awardedCombos.get(awardKey);
+        console.log(`♻️ Combo ${awardKey} ya otorgado: ${cardAwarded.name}`);
+      } else {
+        // Digital: sorteo aleatorio del mazo existente. Vinilo: carta fija por combo.
+        cardAwarded = context.playMode === 'digital'
+          ? this.getRandomPowerCard()
+          : this._awardCardForCombo(playerId, comboResult.comboType, sessionId);
+
+        // En digital el backend es autoridad del inventario: la carta se registra
+        // aquí (sin QR). Las cartas con effectOnDraw se aplican al recibir y no
+        // entran al inventario, igual que en el flujo de escáner físico.
+        if (context.playMode === 'digital' && !cardAwarded.effectOnDraw) {
+          this.addCardToInventory(playerId, cardAwarded.id, 1, sessionId);
+        }
+
+        this.awardedCombos.set(awardKey, cardAwarded);
+        console.log(`⚡ Carta otorgada a ${playerId}: ${cardAwarded.name} (${cardAwarded.id}) [${context.playMode || 'physical'}]`);
+      }
     }
 
     return {
@@ -122,17 +146,24 @@ class PowerCardService {
       comboType: comboResult.comboType,
       comboMessage: comboResult.comboMessage,
       currentStreak: comboResult.currentStreak,
-      cardAwarded: cardAwarded ? {
-        id: cardAwarded.id,
-        type: cardAwarded.type,
-        name: cardAwarded.name,
-        description: cardAwarded.description,
-        emoji: cardAwarded.emoji,
-        qrCode: this._generateQRForCard(cardAwarded.id, playerId)
-      } : null,
+      cardAwarded: cardAwarded ? this._serializeAwardedCard(cardAwarded, playerId) : null,
       playerInventory: this.getPlayerInventory(playerId, sessionId),
       progressToNextCombo: comboResult.progressToNextCombo,
       context
+    };
+  }
+
+  /** Serializar la carta otorgada con todos los campos que consume Expo. */
+  _serializeAwardedCard(card, playerId) {
+    return {
+      id: card.id,
+      type: card.type,
+      name: card.name,
+      description: card.description,
+      emoji: card.emoji,
+      usageLimit: card.usageLimit,
+      effectOnDraw: card.effectOnDraw || null,
+      qrCode: this._generateQRForCard(card.id, playerId)
     };
   }
 
@@ -445,6 +476,9 @@ class PowerCardService {
     this.playerInventory.delete(scopedPlayerId);
     this.usageHistory.delete(scopedPlayerId);
     this.activePowerCards.delete(scopedPlayerId);
+    for (const key of this.awardedCombos.keys()) {
+      if (key.includes(`:${playerId}:`)) this.awardedCombos.delete(key);
+    }
     ComboTracker.clearPlayerData(this._getScopedPlayerId(playerId, sessionId));
 
     console.log(`🧹 ${playerId}: Datos limpiados`);
@@ -457,6 +491,7 @@ class PowerCardService {
     this.playerInventory.clear();
     this.usageHistory.clear();
     this.activePowerCards.clear();
+    this.awardedCombos.clear();
     ComboTracker.clearAll();
 
     console.log(`🧹 Sistema de Power Cards completamente reseteado`);
@@ -468,6 +503,9 @@ class PowerCardService {
       for (const playerId of store.keys()) {
         if (playerId.startsWith(prefix)) store.delete(playerId);
       }
+    }
+    for (const key of this.awardedCombos.keys()) {
+      if (key.startsWith(`${sessionId}:`)) this.awardedCombos.delete(key);
     }
     ComboTracker.clearSessionData(sessionId);
   }
@@ -485,6 +523,11 @@ class PowerCardService {
       playerInventory: exportMap(this.playerInventory),
       usageHistory: exportMap(this.usageHistory),
       activePowerCards: exportMap(this.activePowerCards),
+      awardedCombos: Object.fromEntries(
+        [...this.awardedCombos.entries()]
+          .filter(([key]) => key.startsWith(`${sessionId}:`))
+          .map(([key, value]) => [key.slice(sessionId.length + 1), value]),
+      ),
       comboTracker: ComboTracker.exportSessionState(sessionId),
     };
   }
@@ -500,6 +543,9 @@ class PowerCardService {
     importMap(this.playerInventory, state.playerInventory || {});
     importMap(this.usageHistory, state.usageHistory || {});
     importMap(this.activePowerCards, state.activePowerCards || {});
+    Object.entries(state.awardedCombos || {}).forEach(([key, value]) => {
+      this.awardedCombos.set(`${sessionId}:${key}`, value);
+    });
     if (state.comboTracker) ComboTracker.importSessionState(sessionId, state.comboTracker);
   }
 

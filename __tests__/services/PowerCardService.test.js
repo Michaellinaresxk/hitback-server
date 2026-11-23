@@ -169,6 +169,86 @@ describe('PowerCardService', () => {
   });
 
   // ═══════════════════════════════════════════════════════════════
+  // TEST SUITE: Recompensa de combo en modo digital (sin QR)
+  // ═══════════════════════════════════════════════════════════════
+
+  describe('Combo digital - carta aleatoria sin escaneo', () => {
+    const digitalContext = { gameSessionId: 'session-digital', roundNumber: 3, playMode: 'digital' };
+
+    const reachCombo = (playerId = 'digitalPlayer') => {
+      PowerCardService.processPlayerAnswer(playerId, true, digitalContext);
+      PowerCardService.processPlayerAnswer(playerId, true, digitalContext);
+      return PowerCardService.processPlayerAnswer(playerId, true, digitalContext);
+    };
+
+    test('otorga una carta aleatoria del mazo existente con datos completos', () => {
+      const expected = PowerCardService.getPowerCardByType('festival');
+      jest.spyOn(PowerCardService, 'getRandomPowerCard').mockReturnValue(expected);
+
+      const result = reachCombo();
+
+      expect(result.comboDetected).toBe(true);
+      expect(result.cardAwarded).toMatchObject({
+        id: expected.id,
+        type: 'festival',
+        name: expected.name,
+        emoji: expected.emoji,
+        usageLimit: expected.usageLimit,
+      });
+      expect(result.cardAwarded).toHaveProperty('description');
+      expect(result.cardAwarded.qrCode).toMatch(/^HITBACK_PC_/);
+      PowerCardService.getRandomPowerCard.mockRestore();
+    });
+
+    test('registra la carta en el inventario del backend (sin QR)', () => {
+      const expected = PowerCardService.getPowerCardByType('festival');
+      jest.spyOn(PowerCardService, 'getRandomPowerCard').mockReturnValue(expected);
+
+      reachCombo();
+
+      const inventory = PowerCardService.getPlayerInventory('digitalPlayer', 'session-digital');
+      expect(inventory[expected.id]).toBe(1);
+      PowerCardService.getRandomPowerCard.mockRestore();
+    });
+
+    test('label_fee aplica efecto inmediato y no entra al inventario', () => {
+      const expected = PowerCardService.getPowerCardByType('label_fee');
+      jest.spyOn(PowerCardService, 'getRandomPowerCard').mockReturnValue(expected);
+
+      const result = reachCombo();
+
+      expect(result.cardAwarded.effectOnDraw).toEqual(expected.effectOnDraw);
+      const inventory = PowerCardService.getPlayerInventory('digitalPlayer', 'session-digital');
+      expect(inventory[expected.id]).toBeUndefined();
+      PowerCardService.getRandomPowerCard.mockRestore();
+    });
+
+    test('el mismo evento de combo no otorga dos cartas', () => {
+      const expected = PowerCardService.getPowerCardByType('replay');
+      jest.spyOn(PowerCardService, 'getRandomPowerCard').mockReturnValue(expected);
+
+      const first = reachCombo();
+      const second = reachCombo();
+
+      expect(second.cardAwarded.id).toBe(first.cardAwarded.id);
+      const inventory = PowerCardService.getPlayerInventory('digitalPlayer', 'session-digital');
+      expect(inventory[expected.id]).toBe(1);
+      PowerCardService.getRandomPowerCard.mockRestore();
+    });
+
+    test('el inventario digital está aislado por sesión', () => {
+      const expected = PowerCardService.getPowerCardByType('replay');
+      jest.spyOn(PowerCardService, 'getRandomPowerCard').mockReturnValue(expected);
+
+      reachCombo();
+      const other = PowerCardService.getPlayerInventory('digitalPlayer', 'otra-sesion');
+
+      expect(Object.keys(other).length).toBe(0);
+      PowerCardService.getRandomPowerCard.mockRestore();
+    });
+  });
+
+  // ═══════════════════════════════════════════════════════════════
   // TEST SUITE 4: Gestión de Inventario
   // ═══════════════════════════════════════════════════════════════
 
