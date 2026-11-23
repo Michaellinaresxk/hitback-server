@@ -44,7 +44,7 @@ function crossedBackstages(from, to, interval = BACKSTAGE_INTERVAL) {
  * repeating the last drawn card when the fresh deck allows it.
  */
 function drawCard(deck, lastCard = null, rng = Math.random) {
-  let remaining = Array.isArray(deck) && deck.length > 0 ? [...deck] : createDeck(rng);
+  const remaining = Array.isArray(deck) && deck.length > 0 ? [...deck] : createDeck(rng);
   let card = remaining.shift();
 
   if (card === lastCard) {

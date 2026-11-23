@@ -21,9 +21,10 @@ class GameController {
 
     logger.info(`QR scan initiated: ${qrCode}`);
 
+    let qrData;
     try {
       // 1. Parsear y validar QR
-      const qrData = this.qrService.parseQRCode(qrCode);
+      qrData = this.qrService.parseQRCode(qrCode);
 
       // 2. Obtener datos del track
       const track = this.trackService.getTrackById(qrData.trackId);

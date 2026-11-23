@@ -120,7 +120,7 @@ class DeezerServiceV2 {
       }
 
       // Construir URL
-      let url = `${this.baseURL}/search/track`;
+      const url = `${this.baseURL}/search/track`;
       const params = {
         q: query,
         limit: limit * 2, // Pedimos más para filtrar después
@@ -297,7 +297,7 @@ class DeezerServiceV2 {
     }
 
     // Determinar género
-    let genre = genreOverride || 'POP'; // Default POP si no se especifica
+    const genre = genreOverride || 'POP'; // Default POP si no se especifica
 
     // Intentar mapear género desde Deezer (limitado)
     if (deezerTrack.artist && deezerTrack.artist.type === 'artist') {
