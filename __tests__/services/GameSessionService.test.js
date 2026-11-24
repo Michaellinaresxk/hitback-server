@@ -417,4 +417,113 @@ describe('GameSessionService contracts used by Expo', () => {
       expect(live.config.playMode).toBe('physical');
     });
   });
+
+  describe('STOP-BLAST y BAD REVIEW', () => {
+    const createPhysicalSession = (players = ['Ada', 'Lin', 'Nia']) =>
+      createSession(service, { players });
+
+    test('STOP-BLAST congela a los demás jugadores y solo el portador puede ganar', async () => {
+      const { session } = createPhysicalSession();
+      service.startGame(session.id);
+      await service.nextRound(session.id);
+      const live = service.sessions.get(session.id);
+
+      const applied = service.applyReactionCard(session.id, {
+        sourcePlayerId: 'player_1',
+        cardType: 'STOP_BLAST',
+      });
+      expect(applied.success).toBe(true);
+      expect(applied.players[0].effects).toMatchObject({
+        stopBlastActive: true,
+        isFrozen: false,
+      });
+      expect(applied.players[1].effects).toMatchObject({
+        stopBlastActive: false,
+        isFrozen: true,
+        frozenRoundsLeft: 1,
+      });
+      expect(live.activeEffects[0]).toMatchObject({
+        type: 'STOP_BLAST',
+        activeFromRound: 1,
+      });
+
+      expect(service.revealAnswer(session.id, 'player_2')).toMatchObject({
+        success: false,
+        reason: 'STOP_BLAST_ACTIVE',
+        statusCode: 400,
+      });
+      expect(service.revealAnswer(session.id, 'player_1').success).toBe(true);
+
+      await service.nextRound(session.id);
+      expect(live.activeEffects[0].status).toBe('expired');
+      expect(service.revealAnswer(session.id, 'player_2').success).toBe(true);
+    });
+
+    test('un STOP-BLAST de Streaming se mantiene activo durante la ronda siguiente', async () => {
+      const { session } = createSession(service, {
+        players: ['Ada', 'Lin', 'Nia'],
+        playMode: 'digital',
+      });
+      service.startGame(session.id);
+      const live = service.sessions.get(session.id);
+      await service.nextRound(session.id);
+      service.revealAnswer(session.id, 'player_1');
+      live.backstageCard = {
+        playerId: 'player_1',
+        cardType: 'STOP_BLAST',
+        position: 3,
+        cityId: 'city_0_3',
+      };
+
+      expect(
+        service.applyReactionCard(session.id, {
+          sourcePlayerId: 'player_1',
+          cardType: 'STOP_BLAST',
+        }).success,
+      ).toBe(true);
+      expect(live.activeEffects[0].activeFromRound).toBe(2);
+
+      // nextRound expira efectos de la ronda que termina, no los que empiezan.
+      await service.nextRound(session.id);
+      expect(live.activeEffects[0].status).toBe('active');
+      expect(live.players[1].effects.isFrozen).toBe(true);
+      expect(service.revealAnswer(session.id, 'player_2')).toMatchObject({
+        success: false,
+        reason: 'STOP_BLAST_ACTIVE',
+      });
+      expect(service.revealAnswer(session.id, 'player_1').success).toBe(true);
+
+      await service.nextRound(session.id);
+      expect(live.activeEffects[0].status).toBe('expired');
+      expect(service.revealAnswer(session.id, 'player_2').success).toBe(true);
+    });
+
+    test('BAD REVIEW resta 1 fan a quien obtiene la carta, con o sin objetivo', async () => {
+      const { session } = createPhysicalSession();
+      service.startGame(session.id);
+      await service.nextRound(session.id);
+      const live = service.sessions.get(session.id);
+      live.players[0].score = 5;
+      live.players[1].score = 7;
+
+      expect(
+        service.applyReactionCard(session.id, {
+          sourcePlayerId: 'player_1',
+          cardType: 'BAD_REVIEW',
+          targetPlayerId: 'player_2',
+        }),
+      ).toMatchObject({ success: true, event: { holderId: 'player_1', delta: -1 } });
+      expect(live.players[0].score).toBe(4);
+      expect(live.players[1].score).toBe(7);
+
+      expect(
+        service.applyReactionCard(session.id, {
+          sourcePlayerId: 'player_1',
+          cardType: 'BAD_REVIEW',
+        }).success,
+      ).toBe(true);
+      expect(live.players[0].score).toBe(3);
+      expect(live.players[1].score).toBe(7);
+    });
+  });
 });

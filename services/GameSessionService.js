@@ -234,6 +234,7 @@ class GameSessionService {
     const activeAlliances = this._activeAlliances(session);
     const activeEffects = (session.activeEffects || []).filter((e) => e.status === 'active');
     const activeDuel = activeEffects.find((e) => e.type === 'DUEL' && e.status === 'active');
+    const stopBlast = activeEffects.find((e) => e.type === 'STOP_BLAST' && e.status === 'active');
     session.players.forEach((player) => {
       player.effects = player.effects || {};
       const freeze = activeEffects.find(
@@ -241,20 +242,22 @@ class GameSessionService {
       );
       const inDuel = Boolean(activeDuel && (activeDuel.targetPlayerIds || []).includes(player.id));
       const frozenByDuel = Boolean(activeDuel && !inDuel);
-      player.effects.isFrozen = Boolean(freeze) || frozenByDuel;
+      const inStopBlast = Boolean(stopBlast && stopBlast.sourcePlayerId === player.id);
+      const frozenByStopBlast = Boolean(stopBlast && !inStopBlast);
+      const roundBlocker = frozenByStopBlast ? stopBlast : frozenByDuel ? activeDuel : null;
+      player.effects.isFrozen = Boolean(freeze) || frozenByDuel || frozenByStopBlast;
       player.effects.frozenRoundsLeft = freeze
         ? Math.max(0, Number(freeze.roundsLeft) || 0)
-        : frozenByDuel
-          ? Math.max(0, Number(activeDuel.roundsLeft) || 1)
+        : roundBlocker
+          ? Math.max(0, Number(roundBlocker.roundsLeft) || 1)
           : 0;
       player.effects.frozenForRound = freeze
         ? freeze.createdAtRound ?? null
-        : frozenByDuel
-          ? activeDuel.createdAtRound ?? null
+        : roundBlocker
+          ? roundBlocker.createdAtRound ?? null
           : null;
 
-      const stopBlast = activeEffects.find((e) => e.type === 'STOP_BLAST' && e.status === 'active');
-      player.effects.stopBlastActive = Boolean(stopBlast && stopBlast.sourcePlayerId === player.id);
+      player.effects.stopBlastActive = inStopBlast;
 
       player.effects.duelActive = inDuel;
       player.effects.duelOpponentId = inDuel
@@ -280,8 +283,8 @@ class GameSessionService {
     this._syncDerivedPlayerEffects(session);
     const player = this._getPlayer(session, playerId);
     if (!player) return { eligible: false, reason: 'PLAYER_NOT_FOUND' };
-    if (player.effects.isFrozen) return { eligible: false, reason: 'PLAYER_FROZEN' };
-
+    // Razones específicas primero: STOP_BLAST/DUEL también marcan isFrozen en
+    // el estado derivado, pero el cliente necesita saber qué carta bloquea.
     const stopBlast = (session.activeEffects || []).find((e) => e.type === 'STOP_BLAST' && e.status === 'active');
     if (stopBlast && stopBlast.sourcePlayerId !== playerId) {
       return { eligible: false, reason: 'STOP_BLAST_ACTIVE' };
@@ -291,6 +294,8 @@ class GameSessionService {
     if (duel && !(duel.targetPlayerIds || []).includes(playerId)) {
       return { eligible: false, reason: 'DUEL_ACTIVE' };
     }
+
+    if (player.effects.isFrozen) return { eligible: false, reason: 'PLAYER_FROZEN' };
 
     return { eligible: true };
   }
@@ -320,14 +325,19 @@ class GameSessionService {
     // Called when moving to next round. Decrement freeze/round-based effects, expire alliances, clear round-scoped effects.
     (session.activeEffects || []).forEach((effect) => {
       if (effect.status !== 'active') return;
+      // FEATURING persiste hasta consumirse en el reveal; no se toca aquí.
+      if (!['FREEZE', 'STOP_BLAST', 'DUEL'].includes(effect.type)) return;
+      // Una carta entregada entre rondas (backstage de Streaming) empieza a
+      // regir en la ronda siguiente; no se consume en este avance. Así sus
+      // efectos están activos cuando se revela esa ronda.
+      const startsAt = Number(effect.activeFromRound ?? effect.createdAtRound ?? 0);
+      if (startsAt > session.round) return;
       if (effect.type === 'FREEZE') {
         effect.roundsLeft = Math.max(0, (Number(effect.roundsLeft) || 0) - 1);
         if (effect.roundsLeft <= 0) effect.status = 'expired';
-      }
-      if (effect.type === 'STOP_BLAST' || effect.type === 'DUEL') {
+      } else {
         effect.status = 'expired';
       }
-      // FEATURING persists until consumed in reveal or explicitly expired; keep active.
     });
 
     (session.alliances || []).forEach((alliance) => {
@@ -1094,6 +1104,9 @@ class GameSessionService {
     }
 
     const round = session.round || 0;
+    // Activa en la ronda en curso; si la carta llega entre rondas (backstage
+    // de Streaming, después del reveal), rige en la ronda que viene.
+    const activeFromRound = session.currentRound ? round : round + 1;
     const effectId = `eff_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     let event = { type: 'REACTION_CARD', cardType, sourcePlayerId, targetPlayerId, round };
     let resultData = {};
@@ -1112,7 +1125,8 @@ class GameSessionService {
         } else {
           session.activeEffects.push({
             id: effectId, type: 'FREEZE', sourceCard: 'MUTE', sourcePlayerId,
-            targetPlayerIds: [targetPlayerId], roundsLeft: 1, createdAtRound: round, status: 'active',
+            targetPlayerIds: [targetPlayerId], roundsLeft: 1, createdAtRound: round,
+            activeFromRound, status: 'active',
           });
           resultData = { action: 'frozen', targetPlayerId, roundsLeft: 1 };
         }
@@ -1124,7 +1138,8 @@ class GameSessionService {
         if (leaders.length === 0) return { success: false, error: 'No hay líderes para congelar', statusCode: 400 };
         session.activeEffects.push({
           id: effectId, type: 'FREEZE', sourceCard: 'ARTIST_HOLD', sourcePlayerId,
-          targetPlayerIds: leaders, roundsLeft: 2, createdAtRound: round, status: 'active',
+          targetPlayerIds: leaders, roundsLeft: 2, createdAtRound: round,
+          activeFromRound, status: 'active',
         });
         resultData = { targetPlayerIds: leaders, roundsLeft: 2 };
         break;
@@ -1133,7 +1148,8 @@ class GameSessionService {
         if (ensureNoDuplicateActive('STOP_BLAST')) return { success: false, error: 'STOP_BLAST ya está activo', statusCode: 400 };
         session.activeEffects.push({
           id: effectId, type: 'STOP_BLAST', sourceCard: 'STOP_BLAST', sourcePlayerId,
-          targetPlayerIds: [sourcePlayerId], roundsLeft: 1, createdAtRound: round, status: 'active',
+          targetPlayerIds: [sourcePlayerId], roundsLeft: 1, createdAtRound: round,
+          activeFromRound, status: 'active',
         });
         resultData = { holderId: sourcePlayerId };
         break;
@@ -1144,7 +1160,8 @@ class GameSessionService {
         if (ensureNoDuplicateActive('DUEL')) return { success: false, error: 'DUEL ya está activo', statusCode: 400 };
         session.activeEffects.push({
           id: effectId, type: 'DUEL', sourceCard: 'DUEL', sourcePlayerId,
-          targetPlayerIds: [sourcePlayerId, targetPlayerId], roundsLeft: 1, createdAtRound: round, status: 'active',
+          targetPlayerIds: [sourcePlayerId, targetPlayerId], roundsLeft: 1,
+          createdAtRound: round, activeFromRound, status: 'active',
         });
         resultData = { challengerId: sourcePlayerId, opponentId: targetPlayerId };
         break;
@@ -1202,10 +1219,10 @@ class GameSessionService {
         break;
       }
       case 'BAD_REVIEW': {
-        if (!targetPlayerId) return { success: false, error: 'targetPlayerId requerido', statusCode: 400 };
-        const target = this._getPlayer(session, targetPlayerId);
-        target.score = Math.max(0, target.score - 1);
-        resultData = { targetPlayerId, delta: -1 };
+        // El crítico va contra quien obtiene la carta: no se elige objetivo.
+        // Se ignora un targetPlayerId heredado de clientes anteriores.
+        source.score = Math.max(0, source.score - 1);
+        resultData = { holderId: sourcePlayerId, delta: -1 };
         break;
       }
       case 'MANAGEMENT_FEE': {
@@ -1558,6 +1575,14 @@ class GameSessionService {
           acceptableAnswers: session.currentRound._answer?.acceptableAnswers || [],
         },
       },
+      // Efectos canónicos para que Expo vuelva a hidratar STOP-BLAST/DUEL/freeze
+      // después de cada cambio de ronda (si no, la UI conserva estados obsoletos).
+      session: this._sanitizeSession(session),
+      activeEffects: session.activeEffects,
+      players: session.players.map((p) => ({
+        id: p.id, name: p.name, score: p.score, boardPosition: p.boardPosition,
+        availableTokens: [...p.availableTokens], stats: { ...p.stats }, effects: { ...p.effects },
+      })),
     };
   }
 
